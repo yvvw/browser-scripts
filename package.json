@@ -1,0 +1,23 @@
+{
+  "name": "tampermonkey-scripts",
+  "version": "1.0.0",
+  "description": "some tampermonkey scripts.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yvvw/tampermonkey-scripts.git"
+  },
+  "author": {
+    "name": "yvvw",
+    "email": "15168529+yvvw@users.noreply.github.com"
+  },
+  "scripts": {
+    "build:jd_assistant": "node build.mjs src/jd_assistant.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.3",
+    "@types/tampermonkey": "^4.0.10",
+    "esbuild": "^0.17.12",
+    "prettier": "^2.8.5"
+  }
+}
