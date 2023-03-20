@@ -2,16 +2,18 @@
 // @name         JD助理
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
 // @version      0.7
-// @author       yvvw
 // @description  一键保价、复制购物车链接
+// @author       yvvw
 // @icon         https://www.jd.com/favicon.ico
 // @license      MIT
+// @updateURL    https://ghproxy.com/https://raw.githubusercontent.com/yvvw/tampermonkey-scripts/main/dist/jd_assistant.user.js
 // @downloadURL  https://ghproxy.com/https://raw.githubusercontent.com/yvvw/tampermonkey-scripts/main/dist/jd_assistant.user.js
 // @match        https://pcsitepp-fm.jd.com/
 // @match        https://cart.jd.com/*
+// @grant        none
 // ==/UserScript==
 
-main()
+window.onload = main
 
 function main() {
   const button = document.createElement('button')
@@ -24,9 +26,7 @@ function main() {
         // 排除超过价保周期及正在进行价保
         const buttons = Array.from(
           document.querySelectorAll<HTMLButtonElement>('[id^=applyBT]'),
-        ).filter(
-          (btn) => btn.innerText === '申请价保' && !btn.hasAttribute('style'),
-        )
+        ).filter((btn) => btn.innerText === '申请价保' && !btn.hasAttribute('style'))
         if (buttons.length === 0) {
           break
         }
@@ -44,14 +44,10 @@ function main() {
     button.innerText = '复制链接'
     button.onclick = async () => {
       let linkText = ''
-      for (const el of Array.from(
-        document.getElementsByClassName('item-selected'),
-      )) {
+      for (const el of Array.from(document.getElementsByClassName('item-selected'))) {
         linkText += `https://item.jd.com/${el.getAttribute('skuid')}.html\n\n`
       }
-      for (const el of Array.from(
-        document.getElementsByClassName('item-seleted'),
-      )) {
+      for (const el of Array.from(document.getElementsByClassName('item-seleted'))) {
         if (el instanceof HTMLElement) {
           linkText += `https://item.jd.com/${el.dataset.sku}.html\n\n`
         }

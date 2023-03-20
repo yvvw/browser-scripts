@@ -11,7 +11,9 @@ async function main() {
       js: await parseBanner(entry.path),
     },
     outfile: `dist/${entry.object.name}.user.js`,
+    bundle: true,
     minify: true,
+    target: ["chrome58"],
     legalComments: "none",
   })
 }

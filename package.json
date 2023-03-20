@@ -12,7 +12,8 @@
     "email": "15168529+yvvw@users.noreply.github.com"
   },
   "scripts": {
-    "build:jd_assistant": "node build.mjs src/jd_assistant.ts"
+    "build:jd_assistant": "node build.mjs src/jd_assistant.ts",
+    "build:bilibili_better": "node build.mjs src/bilibili_better.ts"
   },
   "devDependencies": {
     "@types/node": "^18.15.3",
