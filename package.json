@@ -1,0 +1,25 @@
+{
+  "name": "browser-scripts",
+  "version": "1.0.0",
+  "description": "some browser's scripts.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node scripts/watch.mjs",
+    "build": "node scripts/build.mjs",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "anime4k-webgpu": "^1.0.0",
+    "debounce": "^2.2.0"
+  },
+  "devDependencies": {
+    "@prettier/plugin-oxc": "^0.0.4",
+    "@types/node": "^20.17.52",
+    "@violentmonkey/types": "^0.1.9",
+    "chokidar": "^3.6.0",
+    "esbuild": "^0.23.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.3"
+  },
+  "packageManager": "pnpm@8.10.4+sha1.ad75b0e775742692244c8e5e17c358390abf2025"
+}
