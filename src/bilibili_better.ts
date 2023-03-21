@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.1
+// @version      0.0.2
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -118,6 +118,7 @@ class VideoPlayer implements IPlayer {
   static CONFIG = {
     video: {
       waitSelector: '.bpx-player-ctrl-web',
+      bigVipQualityClassName: 'bpx-player-ctrl-quality-badge-bigvip',
       qualitySelector: 'ul.bpx-player-ctrl-quality-menu',
       activeQualityClassName: 'bpx-state-active',
       webFullscreenSelector: '.bpx-player-ctrl-web',
