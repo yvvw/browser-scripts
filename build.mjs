@@ -13,7 +13,7 @@ async function main() {
     outfile: `dist/${entry.object.name}.user.js`,
     bundle: true,
     minify: true,
-    target: ["chrome58"],
+    target: ["es2015"],
     legalComments: "none",
   })
 }

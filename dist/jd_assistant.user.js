@@ -13,11 +13,11 @@
 // @grant        none
 // ==/UserScript==
 
-(()=>{window.onload=l;function l(){let n=document.createElement("button"),i=location.host.split(".")[0];if(i==="pcsitepp-fm")n.innerText="\u4E00\u952E\u4EF7\u4FDD",n.onclick=async()=>{for(;;){let e=Array.from(document.querySelectorAll("[id^=applyBT]")).filter(t=>t.innerText==="\u7533\u8BF7\u4EF7\u4FDD"&&!t.hasAttribute("style"));if(e.length===0)break;for(;;){let t=e.splice(0,5);if(t.length===0)break;t.forEach(o=>o.click()),await new Promise(o=>setTimeout(o,1e3))}}};else if(i==="cart")n.innerText="\u590D\u5236\u94FE\u63A5",n.onclick=async()=>{let e="";for(let t of Array.from(document.getElementsByClassName("item-selected")))e+=`https://item.jd.com/${t.getAttribute("skuid")}.html
+(()=>{var a=(n,l,t)=>new Promise((e,i)=>{var c=o=>{try{r(t.next(o))}catch(s){i(s)}},m=o=>{try{r(t.throw(o))}catch(s){i(s)}},r=o=>o.done?e(o.value):Promise.resolve(o.value).then(c,m);r((t=t.apply(n,l)).next())});window.onload=f;function f(){let n=document.createElement("button"),l=location.host.split(".")[0];if(l==="pcsitepp-fm")n.innerText="\u4E00\u952E\u4EF7\u4FDD",n.onclick=()=>a(this,null,function*(){for(;;){let t=Array.from(document.querySelectorAll("[id^=applyBT]")).filter(e=>e.innerText==="\u7533\u8BF7\u4EF7\u4FDD"&&!e.hasAttribute("style"));if(t.length===0)break;for(;;){let e=t.splice(0,5);if(e.length===0)break;e.forEach(i=>i.click()),yield new Promise(i=>setTimeout(i,1e3))}}});else if(l==="cart")n.innerText="\u590D\u5236\u94FE\u63A5",n.onclick=()=>a(this,null,function*(){let t="";for(let e of Array.from(document.getElementsByClassName("item-selected")))t+=`https://item.jd.com/${e.getAttribute("skuid")}.html
 
-`;for(let t of Array.from(document.getElementsByClassName("item-seleted")))t instanceof HTMLElement&&(e+=`https://item.jd.com/${t.dataset.sku}.html
+`;for(let e of Array.from(document.getElementsByClassName("item-seleted")))e instanceof HTMLElement&&(t+=`https://item.jd.com/${e.dataset.sku}.html
 
-`);e+="\u590D\u5236",await navigator.clipboard.writeText(e),alert("\u590D\u5236\u6210\u529F")};else return;n.setAttribute("style",`
+`);t+="\u590D\u5236",yield navigator.clipboard.writeText(t),alert("\u590D\u5236\u6210\u529F")});else return;n.setAttribute("style",`
 -webkit-appearance: none;
 position: fixed;
 top: 350px;
