@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.2
+// @version      0.0.1
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
 // @license      MIT
-// @updateURL    https://ghproxy.com/https://raw.githubusercontent.com/yvvw/tampermonkey-scripts/main/dist/bilibili_better.user.js
-// @downloadURL  https://ghproxy.com/https://raw.githubusercontent.com/yvvw/tampermonkey-scripts/main/dist/bilibili_better.user.js
+// @updateURL    https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/raw/main/dist/bilibili_better.user.js
+// @downloadURL  https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/raw/main/dist/bilibili_better.user.js
 // @match        https://www.bilibili.com/video/*
 // @match        https://www.bilibili.com/bangumi/play/*
 // @match        https://live.bilibili.com/*

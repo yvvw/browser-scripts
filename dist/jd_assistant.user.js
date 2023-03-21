@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         JD助理
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.7
+// @version      0.0.1
 // @description  一键保价、复制购物车链接
 // @author       yvvw
 // @icon         https://www.jd.com/favicon.ico
 // @license      MIT
-// @updateURL    https://ghproxy.com/https://raw.githubusercontent.com/yvvw/tampermonkey-scripts/main/dist/jd_assistant.user.js
-// @downloadURL  https://ghproxy.com/https://raw.githubusercontent.com/yvvw/tampermonkey-scripts/main/dist/jd_assistant.user.js
+// @updateURL    https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/raw/main/dist/jd_assistant.user.js
+// @downloadURL  https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/raw/main/dist/jd_assistant.user.js
 // @match        https://pcsitepp-fm.jd.com/
 // @match        https://cart.jd.com/*
 // @grant        none
