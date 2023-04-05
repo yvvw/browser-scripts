@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.2
+// @version      0.0.3
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -65,7 +65,6 @@ class LivePlayer implements IPlayer {
     if (head === null) return
     let css = '#my-dear-haruna-vm{display:none !important}'
     const style = document.createElement('style')
-    style.type = 'text/css'
     style.appendChild(document.createTextNode(css))
     head.appendChild(style)
   }
@@ -83,14 +82,15 @@ class LivePlayer implements IPlayer {
       view: window,
     })
     playerEl.dispatchEvent(event)
-
+    const id = setTimeout(() => playerEl.dispatchEvent(event), 1000)
     const areaEl = document.querySelector('.right-area')
-    if (areaEl === null) return
+    if (areaEl === null) return clearTimeout(id)
     const childEl = areaEl.children.item(1)
-    if (childEl === null) return
+    if (childEl === null) return clearTimeout(id)
     const spanEl = childEl.querySelector('span') as HTMLElement | null
-    if (spanEl === null) return
+    if (spanEl === null) return clearTimeout(id)
     spanEl.click()
+    clearTimeout(id)
   }
 
   switchBestQuality() {
