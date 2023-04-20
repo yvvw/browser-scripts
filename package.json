@@ -12,6 +12,7 @@
     "email": "15168529+yvvw@users.noreply.github.com"
   },
   "scripts": {
+    "build": "run-p build:*",
     "build:jd_assistant": "node build.mjs src/jd_assistant.ts",
     "build:bilibili_better": "node build.mjs src/bilibili_better.ts"
   },
@@ -19,6 +20,7 @@
     "@types/node": "^18.15.3",
     "@types/tampermonkey": "^4.0.10",
     "esbuild": "^0.17.12",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.8.5"
   }
 }
