@@ -6,8 +6,8 @@
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
 // @license      MIT
-// @updateURL    https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/raw/main/dist/bilibili_better.user.js
-// @downloadURL  https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/raw/main/dist/bilibili_better.user.js
+// @updateURL    https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/bilibili_better.user.js
+// @downloadURL  https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/bilibili_better.user.js
 // @match        https://www.bilibili.com/video/*
 // @match        https://www.bilibili.com/bangumi/play/*
 // @match        https://live.bilibili.com/*

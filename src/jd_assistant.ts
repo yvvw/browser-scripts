@@ -6,8 +6,8 @@
 // @author       yvvw
 // @icon         https://www.jd.com/favicon.ico
 // @license      MIT
-// @updateURL    https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/raw/main/dist/jd_assistant.user.js
-// @downloadURL  https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/raw/main/dist/jd_assistant.user.js
+// @updateURL    https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/jd_assistant.user.js
+// @downloadURL  https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/jd_assistant.user.js
 // @match        https://pcsitepp-fm.jd.com/
 // @match        https://cart.jd.com/*
 // @grant        none
