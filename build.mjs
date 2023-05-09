@@ -13,8 +13,8 @@ async function main() {
     outfile: `dist/${entry.object.name}.user.js`,
     bundle: true,
     minify: true,
-    target: ["es2015"],
-    legalComments: "none",
+    target: ['es2015'],
+    legalComments: 'none',
   })
 }
 
@@ -25,7 +25,7 @@ main().catch((err) => {
 
 function parseEntry() {
   const index = process.argv.findIndex((it) => it.endsWith('build.mjs')) + 1
-  if (process.argv.length === index) throw new Error(`no entry.`)
+  if (process.argv.length === index) throw new Error('no entry.')
   const entry = path.parse(process.argv[index])
   return {
     object: entry,

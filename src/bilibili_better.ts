@@ -25,7 +25,7 @@ async function main() {
 }
 
 interface IPlayer {
-  wait(): Promise<any>
+  wait(): Promise<void>
 
   optimistic()
 }
@@ -63,7 +63,7 @@ class LivePlayer implements IPlayer {
   hideElement() {
     const head = document.querySelector('head')
     if (head === null) return
-    let css = '#my-dear-haruna-vm{display:none !important}'
+    const css = '#my-dear-haruna-vm{display:none !important}'
     const style = document.createElement('style')
     style.appendChild(document.createTextNode(css))
     head.appendChild(style)
