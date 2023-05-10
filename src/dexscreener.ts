@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dexscreener
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.1
+// @version      0.0.2
 // @description
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -24,6 +24,11 @@ async function hideAd() {
     if (times > 10) break
     times++
     await new Promise((resolve) => setTimeout(resolve, 500))
+    const el = document.querySelector<HTMLButtonElement>('button[aria-label="Hide"]')
+    if (el !== null) el.click()
+  }
+  while (true) {
+    await new Promise((resolve) => setTimeout(resolve, 5000))
     const el = document.querySelector<HTMLButtonElement>('button[aria-label="Hide"]')
     if (el !== null) el.click()
   }
