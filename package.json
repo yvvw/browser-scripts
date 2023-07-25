@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "some tampermonkey scripts.",
   "license": "MIT",
+  "engines" : {
+    "node" : ">=18.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/yvvw/tampermonkey-scripts.git"
@@ -17,6 +20,7 @@
     "build": "run-p build:*",
     "build:jd_assistant": "node build.mjs src/jd_assistant.ts",
     "build:bilibili_better": "node build.mjs src/bilibili_better.ts",
+    "build:douyu_better": "node build.mjs src/douyu_better.ts",
     "build:dexscreener": "node build.mjs src/dexscreener.ts"
   },
   "devDependencies": {

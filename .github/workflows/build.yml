@@ -18,9 +18,9 @@ jobs:
         with:
           node-version: 18
 
-      - run: yarn install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
 
-      - run: yarn build
+      - run: pnpm build
 
       - uses: softprops/action-gh-release@v1
         with:
