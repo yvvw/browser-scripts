@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.5
+// @version      0.0.9
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -9,6 +9,7 @@
 // @updateURL    https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/bilibili_better.user.js
 // @downloadURL  https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/bilibili_better.user.js
 // @match        https://www.bilibili.com/video/*
+// @match        https://www.bilibili.com/list/*
 // @match        https://www.bilibili.com/bangumi/play/*
 // @match        https://live.bilibili.com/*
 // @grant        none
@@ -37,9 +38,9 @@ function getPlayer(): IPlayer | undefined {
   if (href.match('live')) {
     player = new LivePlayer()
   } else {
-    const match = href.match(/video|bangumi/)
+    const match = href.match(/video|list|bangumi/)
     if (match) {
-      player = new VideoPlayer(match[0] as 'video' | 'bangumi')
+      player = new VideoPlayer(match[0] as 'video' | 'list' | 'bangumi')
     }
   }
   return player
@@ -127,7 +128,7 @@ interface IVideoConfig {
 
 class VideoPlayer implements IPlayer {
   static CONFIG = {
-    video: {
+    'video|list': {
       waitSelector: '.bpx-player-ctrl-web',
       bigVipQualityClassName: 'bpx-player-ctrl-quality-badge-bigvip',
       qualitySelector: 'ul.bpx-player-ctrl-quality-menu',
@@ -147,8 +148,12 @@ class VideoPlayer implements IPlayer {
 
   config: IVideoConfig
 
-  constructor(type: 'video' | 'bangumi') {
-    this.config = VideoPlayer.CONFIG[type]
+  constructor(type: 'video' | 'list' | 'bangumi') {
+    for (const key of Object.keys(VideoPlayer.CONFIG)) {
+      if (key.includes(type)) {
+        this.config = VideoPlayer.CONFIG[key]
+      }
+    }
   }
 
   async optimistic() {
