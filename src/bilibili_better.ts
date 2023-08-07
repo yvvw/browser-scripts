@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.4
+// @version      0.0.5
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -20,14 +20,15 @@ async function main() {
   const player = getPlayer()
   if (!player) return
 
-  await player.wait()
+  await player.prepare()
   player.optimistic()
+  player.daemon()
 }
 
 interface IPlayer {
-  wait(): Promise<void>
-
-  optimistic()
+  prepare(): Promise<void>
+  optimistic(): void
+  daemon(): void
 }
 
 function getPlayer(): IPlayer | undefined {
@@ -52,7 +53,14 @@ class LivePlayer implements IPlayer {
     this.hideChatPanel()
   }
 
-  async wait(maxTimes = 100) {
+  daemon() {
+    setTimeout(() => {
+      this.switchBestQuality()
+      this.daemon()
+    }, 60000)
+  }
+
+  async prepare(maxTimes = 100) {
     let times = 0
     while (true) {
       times++
@@ -148,7 +156,14 @@ class VideoPlayer implements IPlayer {
     this.switchBestQuality()
   }
 
-  async wait(maxTimes = 100) {
+  daemon() {
+    setTimeout(() => {
+      this.switchBestQuality()
+      this.daemon()
+    }, 60000)
+  }
+
+  async prepare(maxTimes = 100) {
     if (!this.config.waitSelector) return
     let times = 0
     while (true) {
