@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Douyu
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.2
+// @version      0.0.3
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.douyu.com/favicon.ico
@@ -27,11 +27,6 @@ window.onload = main
 async function main() {
   hideElement()
   await Promise.all([switchBestQuality(), switchWebFullscreen(), hideDanmuPanel()])
-  const loop = () => {
-    switchBestQuality()
-    loop()
-  }
-  setTimeout(loop, 60000)
 }
 
 async function switchWebFullscreen() {
