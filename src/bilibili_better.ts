@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.9
+// @version      0.0.10
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -61,11 +61,11 @@ class LivePlayer implements IPlayer {
     }, 60000)
   }
 
-  async prepare(maxTimes = 100) {
+  async prepare(maxTimes = 30) {
     let times = 0
     while (true) {
       times++
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 500))
       const el = document.querySelector('video')
       if (el !== null) break
       if (times >= maxTimes) throw new Error("Can't find `video`")
@@ -168,12 +168,12 @@ class VideoPlayer implements IPlayer {
     }, 60000)
   }
 
-  async prepare(maxTimes = 100) {
+  async prepare(maxTimes = 30) {
     if (!this.config.waitSelector) return
     let times = 0
     while (true) {
       times++
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 500))
       const el = document.querySelector(this.config.waitSelector)
       if (el !== null) break
       if (times >= maxTimes) throw new Error(`Can't find \`${this.config.waitSelector}\``)
