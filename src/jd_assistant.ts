@@ -13,9 +13,7 @@
 // @grant        none
 // ==/UserScript==
 
-window.onload = main
-
-function main() {
+window.onload = function main() {
   const button = document.createElement('button')
 
   const site = location.host.split('.')[0]

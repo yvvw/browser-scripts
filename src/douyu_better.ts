@@ -22,9 +22,7 @@
 // @grant        none
 // ==/UserScript==
 
-window.onload = main
-
-async function main() {
+window.onload = async function main() {
   hideElement()
   await Promise.all([switchBestQuality(), switchWebFullscreen(), hideDanmuPanel()])
 }

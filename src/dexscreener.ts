@@ -12,9 +12,7 @@
 // @grant        none
 // ==/UserScript==
 
-window.onload = main
-
-async function main() {
+window.onload = async function main() {
   await Promise.all([hideAd(), expandWatchList()])
 }
 

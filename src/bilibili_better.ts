@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.10
+// @version      0.0.11
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -15,13 +15,17 @@
 // @grant        none
 // ==/UserScript==
 
-window.onload = main
+let IS_VIP = false
 
-async function main() {
+window.onload = async function main() {
   const player = getPlayer()
   if (!player) return
 
-  await player.prepare()
+  const api = new BiApi('https://api.bilibili.com')
+
+  const [isVip] = await Promise.all([api.isVip(), player.prepare()])
+  IS_VIP = isVip
+
   player.optimistic()
   player.daemon()
 }
@@ -144,16 +148,21 @@ class VideoPlayer implements IPlayer {
       webFullscreenSelector: '.squirtle-video-pagefullscreen',
       activeWebFullscreenClassName: 'active',
     },
-  }
+  } as const
 
   config: IVideoConfig
 
   constructor(type: 'video' | 'list' | 'bangumi') {
+    let config: IVideoConfig | undefined
     for (const key of Object.keys(VideoPlayer.CONFIG)) {
       if (key.includes(type)) {
-        this.config = VideoPlayer.CONFIG[key]
+        // @ts-ignore
+        config = VideoPlayer.CONFIG[key]
       }
     }
+    if (!config) throw new Error(`Can't find config for ${type}`)
+
+    this.config = config
   }
 
   async optimistic() {
@@ -198,7 +207,7 @@ class VideoPlayer implements IPlayer {
       const childEl = el.children.item(i) as HTMLElement | null
       if (childEl === null) break
       if (childEl.classList.contains(this.config.activeQualityClassName)) break
-      if (this.isBigVipQuality(childEl)) continue
+      if (!IS_VIP && this.isBigVipQuality(childEl)) continue
       childEl.click()
     }
   }
@@ -216,3 +225,32 @@ class VideoPlayer implements IPlayer {
     return false
   }
 }
+
+class BiApi {
+  constructor(private url: string) {}
+
+  async getNavInfo() {
+    const res = await fetch(`${this.url}/x/web-interface/nav`, {
+      credentials: 'include',
+    })
+    const data = (await res.json()) as IBiNavInfo
+    if (data.code !== 0) throw new Error(`NavInfo ${data.message}`)
+    return data.data
+  }
+
+  async isVip() {
+    const navInfo = await this.getNavInfo()
+    return navInfo.isLogin && navInfo.vipStatus === 1
+  }
+}
+
+interface IBiResponse<D> {
+  code: number
+  data: D
+  message: string
+}
+
+type IBiNavInfo = IBiResponse<{
+  isLogin: boolean
+  vipStatus: number
+}>
