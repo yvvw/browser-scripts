@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.11
+// @version      0.0.12
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -11,6 +11,7 @@
 // @match        https://www.bilibili.com/video/*
 // @match        https://www.bilibili.com/list/*
 // @match        https://www.bilibili.com/bangumi/play/*
+// @match        https://www.bilibili.com/blackboard/*
 // @match        https://live.bilibili.com/*
 // @grant        none
 // ==/UserScript==
@@ -42,9 +43,9 @@ function getPlayer(): IPlayer | undefined {
   if (href.match('live')) {
     player = new LivePlayer()
   } else {
-    const match = href.match(/video|list|bangumi/)
+    const match = href.match(/video|list|bangumi|blackboard/)
     if (match) {
-      player = new VideoPlayer(match[0] as 'video' | 'list' | 'bangumi')
+      player = new VideoPlayer(match[0] as IVideoType)
     }
   }
   return player
@@ -130,10 +131,12 @@ interface IVideoConfig {
   activeWebFullscreenClassName?: string
 }
 
+type IVideoType = 'video' | 'list' | 'bangumi' | 'blackboard'
+
 class VideoPlayer implements IPlayer {
   static CONFIG = {
-    'video|list': {
-      waitSelector: '.bpx-player-ctrl-web',
+    'video|list|blackboard': {
+      waitSelector: 'ul.bpx-player-ctrl-quality-menu',
       bigVipQualityClassName: 'bpx-player-ctrl-quality-badge-bigvip',
       qualitySelector: 'ul.bpx-player-ctrl-quality-menu',
       activeQualityClassName: 'bpx-state-active',
@@ -152,7 +155,7 @@ class VideoPlayer implements IPlayer {
 
   config: IVideoConfig
 
-  constructor(type: 'video' | 'list' | 'bangumi') {
+  constructor(type: IVideoType) {
     let config: IVideoConfig | undefined
     for (const key of Object.keys(VideoPlayer.CONFIG)) {
       if (key.includes(type)) {
@@ -192,7 +195,6 @@ class VideoPlayer implements IPlayer {
   switchWebFullscreen() {
     if (!this.config.webFullscreenSelector || !this.config.activeWebFullscreenClassName) return
     const el = document.querySelector(this.config.webFullscreenSelector) as HTMLElement | null
-    console.log(el)
     if (el === null) return
     if (el.classList.contains(this.config.activeWebFullscreenClassName)) return
     el.click()
