@@ -21,11 +21,12 @@
     "build:jd_assistant": "node build.mjs src/jd_assistant.ts",
     "build:bilibili_better": "node build.mjs src/bilibili_better.ts",
     "build:douyu_better": "node build.mjs src/douyu_better.ts",
+    "build:x_better": "node build.mjs src/x_better.ts",
     "build:dexscreener": "node build.mjs src/dexscreener.ts"
   },
   "devDependencies": {
-    "@types/node": "^18.18.4",
-    "@types/tampermonkey": "^4.20.3",
+    "@types/node": "^18.18.7",
+    "@types/tampermonkey": "^4.20.4",
     "esbuild": "^0.17.19",
     "npm-run-all": "^4.1.5",
     "rome": "^12.1.3",
