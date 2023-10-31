@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Better X(Twitter)
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.2
-// @description
+// @version      0.0.3
+// @description  自动屏蔽AD，快捷屏蔽
 // @author       yvvw
 // @icon         https://abs.twimg.com/responsive-web/client-web/icon-default-maskable.bacea37a.png
 // @license      MIT
@@ -19,7 +19,7 @@ window.onload = function main() {
       .map((it) => Array.from(it.addedNodes) as HTMLDivElement[])
       .flat()
       .filter(
-        (it) => it.dataset['testid'] === 'cellInnerDiv' && it.querySelector('article[data-testid="tweet"]') !== null,
+        (it) => it.dataset?.testid === 'cellInnerDiv' && it.querySelector('article[data-testid="tweet"]') !== null,
       )
     if (twitterEls.length === 0) return
 
