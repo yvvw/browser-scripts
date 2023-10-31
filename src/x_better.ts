@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         x(twitter)
+// @name         Better X(Twitter)
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
 // @version      0.0.2
 // @description
