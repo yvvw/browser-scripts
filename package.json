@@ -18,7 +18,7 @@
     "rome:check": "rome check --verbose --apply-unsafe .",
     "rome:format": "rome format --write .",
     "build": "run-p build:*",
-    "build:jd_assistant": "node build.mjs src/jd_assistant.ts",
+    "build:jd_better": "node build.mjs src/jd_better.ts",
     "build:bilibili_better": "node build.mjs src/bilibili_better.ts",
     "build:douyu_better": "node build.mjs src/douyu_better.ts",
     "build:x_better": "node build.mjs src/x_better.ts",
