@@ -18,10 +18,10 @@
     "rome:check": "rome check --verbose --apply-unsafe .",
     "rome:format": "rome format --write .",
     "build": "run-p build:*",
-    "build:jd_better": "node build.mjs src/jd_better.ts",
-    "build:bilibili_better": "node build.mjs src/bilibili_better.ts",
-    "build:douyu_better": "node build.mjs src/douyu_better.ts",
-    "build:x_better": "node build.mjs src/x_better.ts",
+    "build:jd": "node build.mjs src/jd.ts",
+    "build:bilibili": "node build.mjs src/bilibili.ts",
+    "build:douyu": "node build.mjs src/douyu.ts",
+    "build:x": "node build.mjs src/x.ts",
     "build:dexscreener": "node build.mjs src/dexscreener.ts"
   },
   "devDependencies": {

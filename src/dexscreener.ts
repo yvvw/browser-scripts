@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         dexscreener
+// @name         Better Dexscreener
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.2
+// @version      0.0.3
 // @description
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -13,32 +13,26 @@
 // ==/UserScript==
 
 window.onload = async function main() {
-  await Promise.all([hideAd(), expandWatchList()])
+  let times = 0
+  while (times < 10) {
+    times++
+    await Promise.all([hideAd(), expandWatchList()])
+    await delay(1000)
+  }
 }
 
 async function hideAd() {
-  let times = 0
-  while (true) {
-    if (times > 10) break
-    times++
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    const el = document.querySelector<HTMLButtonElement>('button[aria-label="Hide"]')
-    if (el !== null) el.click()
-  }
-  while (true) {
-    await new Promise((resolve) => setTimeout(resolve, 5000))
-    const el = document.querySelector<HTMLButtonElement>('button[aria-label="Hide"]')
-    if (el !== null) el.click()
-  }
+  const els = Array.from(document.querySelectorAll<HTMLButtonElement>('button')).filter(
+    (it) => it.innerText === 'Hide ad',
+  )
+  if (els.length > 0) els.forEach((el) => el.click())
 }
 
 async function expandWatchList() {
-  let times = 0
-  while (true) {
-    if (times > 10) break
-    times++
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    const el = document.querySelector<HTMLButtonElement>('button[aria-label="Expand watchlist"]')
-    if (el !== null) el.click()
-  }
+  const el = document.querySelector<HTMLButtonElement>('button[aria-label="Expand watchlist"]')
+  if (el !== null) el.click()
+}
+
+async function delay(time: number) {
+  return new Promise((resolve) => setTimeout(resolve, time))
 }
