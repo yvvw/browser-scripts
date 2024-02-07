@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.13
+// @version      0.0.14
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -40,13 +40,10 @@ interface IPlayer {
 function getPlayer(): IPlayer | undefined {
   let player: IPlayer | undefined
   const href = document.location.href
-  if (href.match('live')) {
+  if (/live/.test(href)) {
     player = new LivePlayer()
-  } else {
-    const match = href.match(/video|list|bangumi|blackboard/)
-    if (match) {
-      player = new VideoPlayer(match[0] as IVideoType)
-    }
+  } else if (/video|list|bangumi|blackboard/.test(href)) {
+    player = new VideoPlayer()
   }
   return player
 }
@@ -135,37 +132,18 @@ type IVideoType = 'video' | 'list' | 'bangumi' | 'blackboard'
 
 class VideoPlayer implements IPlayer {
   static CONFIG = {
-    'video|list|blackboard': {
-      waitSelector: 'ul.bpx-player-ctrl-quality-menu',
-      bigVipQualityClassName: 'bpx-player-ctrl-quality-badge-bigvip',
-      qualitySelector: 'ul.bpx-player-ctrl-quality-menu',
-      activeQualityClassName: 'bpx-state-active',
-      webFullscreenSelector: '.bpx-player-ctrl-web',
-      activeWebFullscreenClassName: 'bpx-state-entered',
-    },
-    bangumi: {
-      waitSelector: '.squirtle-video-pagefullscreen',
-      bigVipQualityClassName: 'squirtle-bigvip',
-      qualitySelector: 'ul.squirtle-quality-select-list',
-      activeQualityClassName: 'active',
-      webFullscreenSelector: '.squirtle-video-pagefullscreen',
-      activeWebFullscreenClassName: 'active',
-    },
-  } as const
+    waitSelector: 'ul.bpx-player-ctrl-quality-menu',
+    bigVipQualityClassName: 'bpx-player-ctrl-quality-badge-bigvip',
+    qualitySelector: 'ul.bpx-player-ctrl-quality-menu',
+    activeQualityClassName: 'bpx-state-active',
+    webFullscreenSelector: '.bpx-player-ctrl-web',
+    activeWebFullscreenClassName: 'bpx-state-entered',
+  }
 
   config: IVideoConfig
 
-  constructor(type: IVideoType) {
-    let config: IVideoConfig | undefined
-    for (const key of Object.keys(VideoPlayer.CONFIG)) {
-      if (key.includes(type)) {
-        // @ts-ignore
-        config = VideoPlayer.CONFIG[key]
-      }
-    }
-    if (!config) throw new Error(`Can't find config for ${type}`)
-
-    this.config = config
+  constructor() {
+    this.config = VideoPlayer.CONFIG
   }
 
   async optimistic() {

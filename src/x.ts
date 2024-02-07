@@ -16,8 +16,7 @@ window.onload = function main() {
   const callback: MutationCallback = (records) => {
     const twitterEls = records
       .filter((it) => it.addedNodes.length > 0)
-      .map((it) => Array.from(it.addedNodes) as HTMLDivElement[])
-      .flat()
+      .flatMap((it) => Array.from(it.addedNodes) as HTMLDivElement[])
       .filter(
         (it) => it.dataset?.testid === 'cellInnerDiv' && it.querySelector('article[data-testid="tweet"]') !== null,
       )
