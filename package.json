@@ -3,17 +3,6 @@
   "version": "1.0.0",
   "description": "some tampermonkey scripts.",
   "license": "MIT",
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yvvw/tampermonkey-scripts.git"
-  },
-  "author": {
-    "name": "yvvw",
-    "email": "15168529+yvvw@users.noreply.github.com"
-  },
   "scripts": {
     "rome:check": "rome check --verbose --apply-unsafe .",
     "rome:format": "rome format --write .",
@@ -25,11 +14,11 @@
     "build:dexscreener": "node build.mjs src/dexscreener.ts"
   },
   "devDependencies": {
-    "@types/node": "^18.18.7",
+    "@types/node": "^20.11.17",
     "@types/tampermonkey": "^4.20.4",
     "esbuild": "^0.17.19",
     "npm-run-all": "^4.1.5",
     "rome": "^12.1.3",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.3"
   }
 }

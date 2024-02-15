@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         Better JD
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.2
+// @version      0.0.3
 // @description  一键保价、复制购物车链接
 // @author       yvvw
 // @icon         https://www.jd.com/favicon.ico
 // @license      MIT
-// @updateURL    https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/jd.user.js
-// @downloadURL  https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/jd.user.js
+// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/jd.user.js
+// @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/jd.user.js
 // @match        https://pcsitepp-fm.jd.com/
 // @match        https://cart.jd.com/*
 // @grant        none

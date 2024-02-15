@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         Better Dexscreener
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.3
+// @version      0.0.4
 // @description
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
 // @license      MIT
-// @updateURL    https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/dexscreener.user.js
-// @downloadURL  https://ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/dexscreener.user.js
+// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/dexscreener.user.js
+// @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/dexscreener.user.js
 // @match        https://dexscreener.com/*
 // @grant        none
 // ==/UserScript==
@@ -16,7 +16,7 @@ window.onload = async function main() {
   let times = 0
   while (times < 10) {
     times++
-    await Promise.all([hideAd(), expandWatchList()])
+    await Promise.all([hideAd(), hideTransaction(), expandWatchList()])
     await delay(1000)
   }
 }
@@ -30,7 +30,12 @@ async function hideAd() {
 
 async function expandWatchList() {
   const el = document.querySelector<HTMLButtonElement>('button[aria-label="Expand watchlist"]')
-  if (el !== null) el.click()
+  if (el) el.click()
+}
+
+async function hideTransaction() {
+  const el = document.querySelector<HTMLButtonElement>('button[aria-label="Minimize"]')
+  if (el) el.click()
 }
 
 async function delay(time: number) {
