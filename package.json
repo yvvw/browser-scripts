@@ -11,7 +11,8 @@
     "build:bilibili": "node build.mjs src/bilibili.ts",
     "build:douyu": "node build.mjs src/douyu.ts",
     "build:x": "node build.mjs src/x.ts",
-    "build:dexscreener": "node build.mjs src/dexscreener.ts"
+    "build:dexscreener": "node build.mjs src/dexscreener.ts",
+    "build:dextools": "node build.mjs src/dextools.ts"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",

@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Better Dexscreener
+// @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.4
+// @version      0.0.5
 // @description
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -12,32 +12,38 @@
 // @grant        none
 // ==/UserScript==
 
-window.onload = async function main() {
+import { delay } from './util'
+
+const defers: Function[] = []
+
+window.onload = async function load() {
+  autoHideAd()
+
   let times = 0
-  while (times < 10) {
+  while (times < 3) {
     times++
-    await Promise.all([hideAd(), hideTransaction(), expandWatchList()])
-    await delay(1000)
+    await delay(2000)
+    expandWatchList()
   }
 }
 
-async function hideAd() {
-  const els = Array.from(document.querySelectorAll<HTMLButtonElement>('button')).filter(
-    (it) => it.innerText === 'Hide ad',
-  )
-  if (els.length > 0) els.forEach((el) => el.click())
+window.onunload = async function unload() {
+  defers.forEach((it) => it())
 }
 
-async function expandWatchList() {
+function autoHideAd() {
+  const observer = new MutationObserver(hideAd)
+  observer.observe(document.body, { subtree: true, childList: true })
+  defers.push(() => observer.disconnect())
+}
+
+function expandWatchList() {
   const el = document.querySelector<HTMLButtonElement>('button[aria-label="Expand watchlist"]')
   if (el) el.click()
 }
 
-async function hideTransaction() {
-  const el = document.querySelector<HTMLButtonElement>('button[aria-label="Minimize"]')
-  if (el) el.click()
-}
-
-async function delay(time: number) {
-  return new Promise((resolve) => setTimeout(resolve, time))
+function hideAd() {
+  Array.from(document.querySelectorAll<HTMLButtonElement>('button'))
+    .filter((it) => it.innerText === 'Hide ad')
+    .forEach((el) => el.click())
 }
