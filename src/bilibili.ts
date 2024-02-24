@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.15
+// @version      0.0.16
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -63,15 +63,16 @@ class LivePlayer implements IPlayer {
     }, 60000)
   }
 
-  async prepare(maxTimes = 30) {
-    let times = 0
-    while (true) {
-      times++
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      const el = document.querySelector('video')
-      if (el !== null) break
-      if (times >= maxTimes) throw new Error("Can't find `video`")
-    }
+  async prepare() {
+    return new Promise<void>((resolve) => {
+      const observer = new MutationObserver(() => {
+        if (document.querySelector('video')) {
+          resolve()
+          observer.disconnect()
+        }
+      })
+      observer.observe(document.body, { subtree: true, childList: true })
+    })
   }
 
   hideElement() {
@@ -128,8 +129,6 @@ interface IVideoConfig {
   activeWebFullscreenClassName?: string
 }
 
-type IVideoType = 'video' | 'list' | 'bangumi' | 'blackboard'
-
 class VideoPlayer implements IPlayer {
   static CONFIG = {
     waitSelector: 'ul.bpx-player-ctrl-quality-menu',
@@ -138,12 +137,6 @@ class VideoPlayer implements IPlayer {
     activeQualityClassName: 'bpx-state-active',
     webFullscreenSelector: '.bpx-player-ctrl-web',
     activeWebFullscreenClassName: 'bpx-state-entered',
-  }
-
-  config: IVideoConfig
-
-  constructor() {
-    this.config = VideoPlayer.CONFIG
   }
 
   async optimistic() {
@@ -158,47 +151,47 @@ class VideoPlayer implements IPlayer {
     }, 60000)
   }
 
-  async prepare(maxTimes = 30) {
-    if (!this.config.waitSelector) return
-    let times = 0
-    while (true) {
-      times++
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      const el = document.querySelector(this.config.waitSelector)
-      if (el !== null) break
-      if (times >= maxTimes) throw new Error(`Can't find \`${this.config.waitSelector}\``)
-    }
+  async prepare() {
+    return new Promise<void>((resolve) => {
+      const observer = new MutationObserver(() => {
+        if (document.querySelector(VideoPlayer.CONFIG.waitSelector)) {
+          resolve()
+          observer.disconnect()
+        }
+      })
+      observer.observe(document.body, { subtree: true, childList: true })
+    })
   }
 
   switchWebFullscreen() {
-    if (!this.config.webFullscreenSelector || !this.config.activeWebFullscreenClassName) return
-    const el = document.querySelector(this.config.webFullscreenSelector) as HTMLElement | null
+    if (!VideoPlayer.CONFIG.webFullscreenSelector || !VideoPlayer.CONFIG.activeWebFullscreenClassName) return
+    const el = document.querySelector(VideoPlayer.CONFIG.webFullscreenSelector) as HTMLElement | null
     if (el === null) return
-    if (el.classList.contains(this.config.activeWebFullscreenClassName)) return
+    if (el.classList.contains(VideoPlayer.CONFIG.activeWebFullscreenClassName)) return
     el.click()
   }
 
   switchBestQuality() {
-    if (!this.config.qualitySelector || !this.config.activeQualityClassName) return
-    const el = document.querySelector(this.config.qualitySelector)
+    if (!VideoPlayer.CONFIG.qualitySelector || !VideoPlayer.CONFIG.activeQualityClassName) return
+    const el = document.querySelector(VideoPlayer.CONFIG.qualitySelector)
     if (el === null) return
     const length = el.children.length
     for (let i = 0; i < length; i++) {
       const childEl = el.children.item(i) as HTMLElement | null
       if (childEl === null) break
-      if (childEl.classList.contains(this.config.activeQualityClassName)) break
+      if (childEl.classList.contains(VideoPlayer.CONFIG.activeQualityClassName)) break
       if (!IS_VIP && this.isBigVipQuality(childEl)) continue
       childEl.click()
     }
   }
 
   isBigVipQuality(el: HTMLElement) {
-    if (!this.config.bigVipQualityClassName) return false
+    if (!VideoPlayer.CONFIG.bigVipQualityClassName) return false
     const length = el.children.length
     for (let i = 0; i < length; i++) {
       const childEl = el.children.item(i) as HTMLElement | null
       if (childEl === null) break
-      if (childEl.classList.contains(this.config.bigVipQualityClassName)) {
+      if (childEl.classList.contains(VideoPlayer.CONFIG.bigVipQualityClassName)) {
         return true
       }
     }

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.5
+// @version      0.0.6
 // @description
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -38,8 +38,15 @@ function autoHideAd() {
 }
 
 function expandWatchList() {
-  const el = document.querySelector<HTMLButtonElement>('button[aria-label="Expand watchlist"]')
-  if (el) el.click()
+  const observer = new MutationObserver(() => {
+    const el = document.querySelector<HTMLButtonElement>('button[aria-label="Expand watchlist"]')
+    if (el) {
+      el.click()
+      observer.disconnect()
+    }
+  })
+  observer.observe(document.body, { subtree: true, childList: true })
+  defers.push(() => observer.disconnect())
 }
 
 function hideAd() {
