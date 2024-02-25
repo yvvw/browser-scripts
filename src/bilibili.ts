@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.16
+// @version      0.0.17
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -131,7 +131,6 @@ interface IVideoConfig {
 
 class VideoPlayer implements IPlayer {
   static CONFIG = {
-    waitSelector: 'ul.bpx-player-ctrl-quality-menu',
     bigVipQualityClassName: 'bpx-player-ctrl-quality-badge-bigvip',
     qualitySelector: 'ul.bpx-player-ctrl-quality-menu',
     activeQualityClassName: 'bpx-state-active',
@@ -154,7 +153,7 @@ class VideoPlayer implements IPlayer {
   async prepare() {
     return new Promise<void>((resolve) => {
       const observer = new MutationObserver(() => {
-        if (document.querySelector(VideoPlayer.CONFIG.waitSelector)) {
+        if (document.querySelector(VideoPlayer.CONFIG.webFullscreenSelector)) {
           resolve()
           observer.disconnect()
         }
@@ -164,7 +163,6 @@ class VideoPlayer implements IPlayer {
   }
 
   switchWebFullscreen() {
-    if (!VideoPlayer.CONFIG.webFullscreenSelector || !VideoPlayer.CONFIG.activeWebFullscreenClassName) return
     const el = document.querySelector(VideoPlayer.CONFIG.webFullscreenSelector) as HTMLElement | null
     if (el === null) return
     if (el.classList.contains(VideoPlayer.CONFIG.activeWebFullscreenClassName)) return
@@ -172,7 +170,6 @@ class VideoPlayer implements IPlayer {
   }
 
   switchBestQuality() {
-    if (!VideoPlayer.CONFIG.qualitySelector || !VideoPlayer.CONFIG.activeQualityClassName) return
     const el = document.querySelector(VideoPlayer.CONFIG.qualitySelector)
     if (el === null) return
     const length = el.children.length
