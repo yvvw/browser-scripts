@@ -22,11 +22,10 @@ window.onload = async function main() {
   const player = getPlayer()
   if (!player) return
 
-  const api = new BiApi('https://api.bilibili.com')
+  const api = new BilibiliApi('https://api.bilibili.com')
+  IS_VIP = await api.isVip()
 
-  const [isVip] = await Promise.all([api.isVip(), player.prepare()])
-  IS_VIP = isVip
-
+  await player.prepare()
   player.optimistic()
   player.daemon()
 }
@@ -196,7 +195,7 @@ class VideoPlayer implements IPlayer {
   }
 }
 
-class BiApi {
+class BilibiliApi {
   constructor(private url: string) {}
 
   async getNavInfo() {
