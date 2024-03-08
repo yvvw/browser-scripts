@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better X(Twitter)
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.5
+// @version      0.0.6
 // @description  自动屏蔽AD，快捷屏蔽
 // @author       yvvw
 // @icon         https://abs.twimg.com/responsive-web/client-web/icon-default-maskable.bacea37a.png
@@ -32,7 +32,7 @@ function addBlockEl(twitterEl: HTMLDivElement, times: number) {
   if (times === 0) return
 
   // twitter right corner `...` button
-  const moreBtnEl = twitterEl.querySelector<HTMLDivElement>('div[aria-label="More"].r-bt1l66')
+  const moreBtnEl = twitterEl.querySelector<HTMLDivElement>('div[aria-label="More"][data-testid="caret"]')
   if (moreBtnEl === null) {
     setTimeout(() => addBlockEl(twitterEl, times - 1), 100)
     return
