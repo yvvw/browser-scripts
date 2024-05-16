@@ -32,7 +32,10 @@ function hideAd() {
   Array.from(document.querySelectorAll<HTMLSpanElement>('span'))
     .filter((it) => it.innerText === 'Ad')
     .forEach((el) => {
-      if (el.nextElementSibling?.tagName === 'BUTTON' && el.nextElementSibling?.ariaLabel === 'Close') {
+      if (
+        el.nextElementSibling?.tagName === 'BUTTON' &&
+        el.nextElementSibling?.ariaLabel === 'Close'
+      ) {
         ;(el.nextElementSibling as HTMLButtonElement).click()
       }
     })

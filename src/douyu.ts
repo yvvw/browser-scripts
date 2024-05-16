@@ -75,7 +75,8 @@ function hideElement() {
   css += '.layout-Aside{display:none !important;}'
   css += '.Header-download-wrap{display:none !important;}'
   css += '.Header-broadcast-wrap{display:none !important;}'
-  css += '#js-header > div > div > div.Header-left > div > ul > li:nth-child(5){display:none !important;}'
+  css +=
+    '#js-header > div > div > div.Header-left > div > ul > li:nth-child(5){display:none !important;}'
   css += '.ChatNobleBarrage{display:none !important;}'
   css += '.ChatFansBarrage{display:none !important;}'
   css += '.Horn4Category{display:none !important;}'

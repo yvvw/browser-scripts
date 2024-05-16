@@ -22,9 +22,9 @@ window.onload = function main() {
     button.onclick = async () => {
       while (true) {
         // 排除超过价保周期及正在进行价保
-        const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('[id^=applyBT]')).filter(
-          (btn) => btn.innerText === '申请价保' && !btn.hasAttribute('style'),
-        )
+        const buttons = Array.from(
+          document.querySelectorAll<HTMLButtonElement>('[id^=applyBT]')
+        ).filter((btn) => btn.innerText === '申请价保' && !btn.hasAttribute('style'))
         if (buttons.length === 0) {
           break
         }
@@ -72,7 +72,7 @@ color: #fff;
 font-family: "Microsoft YaHei";
 background-color: #e2231a;
 border: none;
-`,
+`
   )
   document.body.appendChild(button)
 }

@@ -18,21 +18,28 @@ window.onload = function main() {
       .filter((it) => it.addedNodes.length > 0)
       .flatMap((it) => Array.from(it.addedNodes) as HTMLDivElement[])
       .filter(
-        (it) => it.dataset?.testid === 'cellInnerDiv' && it.querySelector('article[data-testid="tweet"]') !== null,
+        (it) =>
+          it.dataset?.testid === 'cellInnerDiv' &&
+          it.querySelector('article[data-testid="tweet"]') !== null
       )
     if (twitterEls.length === 0) return
 
     twitterEls.forEach((it) => addBlockEl(it, 5))
   }
 
-  new MutationObserver(callback).observe(document.body, { childList: true, subtree: true })
+  new MutationObserver(callback).observe(document.body, {
+    childList: true,
+    subtree: true,
+  })
 }
 
 function addBlockEl(twitterEl: HTMLDivElement, times: number) {
   if (times === 0) return
 
   // twitter right corner `...` button
-  const moreBtnEl = twitterEl.querySelector<HTMLDivElement>('button[aria-label="More"][data-testid="caret"]')
+  const moreBtnEl = twitterEl.querySelector<HTMLDivElement>(
+    'button[aria-label="More"][data-testid="caret"]'
+  )
   if (moreBtnEl === null) {
     setTimeout(() => addBlockEl(twitterEl, times - 1), 100)
     return
@@ -45,7 +52,9 @@ function addBlockEl(twitterEl: HTMLDivElement, times: number) {
     if (blockBtn2 === null) return
     blockBtn2.click()
 
-    const confirmBtn = document.querySelector<HTMLButtonElement>('div[data-testid="confirmationSheetConfirm"]')
+    const confirmBtn = document.querySelector<HTMLButtonElement>(
+      'div[data-testid="confirmationSheetConfirm"]'
+    )
     if (confirmBtn === null) return
     confirmBtn.click()
   }

@@ -162,7 +162,9 @@ class VideoPlayer implements IPlayer {
   }
 
   switchWebFullscreen() {
-    const el = document.querySelector(VideoPlayer.CONFIG.webFullscreenSelector) as HTMLElement | null
+    const el = document.querySelector(
+      VideoPlayer.CONFIG.webFullscreenSelector
+    ) as HTMLElement | null
     if (el === null) return
     if (el.classList.contains(VideoPlayer.CONFIG.activeWebFullscreenClassName)) return
     el.click()
