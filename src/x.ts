@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         Better X(Twitter)
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.7
+// @version      0.0.8
 // @description  自动屏蔽AD，快捷屏蔽
 // @author       yvvw
-// @icon         https://abs.twimg.com/responsive-web/client-web/icon-default-maskable.bacea37a.png
+// @icon         https://abs.twimg.com/favicons/twitter.3.ico
 // @license      MIT
 // @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/x.user.js
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/x.user.js
+// @match        https://x.com/*
 // @match        https://twitter.com/*
 // @grant        none
 // ==/UserScript==
