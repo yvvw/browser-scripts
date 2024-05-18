@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         Better GMGN.ai
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.1
+// @version      0.0.2
 // @description  调整屏宽
 // @author       yvvw
 // @icon         https://gmgn.ai/static/favicon2.ico
 // @license      MIT
 // @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/gmgn_ai.user.js
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/gmgn_ai.user.js
-// @match        https://gmgn.ai/sol/token/*
+// @match        https://gmgn.ai/*/token/*
 // @grant        none
 // ==/UserScript==
 
