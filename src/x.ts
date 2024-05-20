@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better X(Twitter)
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.8
+// @version      0.0.9
 // @description  自动屏蔽AD，快捷屏蔽
 // @author       yvvw
 // @icon         https://abs.twimg.com/favicons/twitter.3.ico
@@ -46,15 +46,17 @@ function addBlockEl(twitterEl: HTMLDivElement, times: number) {
     return
   }
 
-  const block = () => {
+  const block = async () => {
     moreBtnEl.click()
 
+    await new Promise(resolve => setTimeout(resolve, 0))
     const blockBtn2 = document.querySelector<HTMLButtonElement>('div[data-testid="block"]')
     if (blockBtn2 === null) return
     blockBtn2.click()
 
+    await new Promise(resolve => setTimeout(resolve, 0))
     const confirmBtn = document.querySelector<HTMLButtonElement>(
-      'div[data-testid="confirmationSheetConfirm"]'
+      'button[data-testid="confirmationSheetConfirm"]'
     )
     if (confirmBtn === null) return
     confirmBtn.click()
