@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better GMGN.ai
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.3
+// @version      0.0.4
 // @description  调整屏宽
 // @author       yvvw
 // @icon         https://gmgn.ai/static/favicon2.ico
@@ -16,7 +16,7 @@ window.onload = function main() {
   const callback: MutationCallback = (records) => {
     const tab = document.getElementById('leftTabs')
     if (tab === null) return
-    tab.style.width = '70%'
+    tab.style.width = '80%'
   }
   new MutationObserver(callback).observe(document.body, { childList: true, subtree: true })
 }
