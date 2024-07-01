@@ -1,10 +1,11 @@
 import * as esbuild from 'esbuild'
-import { open, writeFile } from 'fs/promises'
+import { open, writeFile, mkdir } from 'node:fs/promises'
 import path from 'node:path'
 
 async function main() {
-  const entry = parseEntry()
+  await mkdir('dist')
 
+  const entry = parseEntry()
   const banner = await parseBanner(entry.path)
   await Promise.all([
     esbuild.build({
