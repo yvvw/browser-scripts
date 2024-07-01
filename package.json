@@ -16,12 +16,12 @@
     "build:pumpfun": "node build.mjs src/pumpfun.ts"
   },
   "devDependencies": {
-    "@types/node": "^20.12.12",
-    "@types/tampermonkey": "^4.20.4",
-    "esbuild": "^0.17.19",
+    "@types/node": "^20.14.9",
+    "@types/tampermonkey": "^5.0.3",
+    "esbuild": "^0.22.0",
     "npm-run-all": "^4.1.5",
-    "prettier": "^3.2.5",
-    "typescript": "^5.4.5"
+    "prettier": "^3.3.2",
+    "typescript": "^5.5.3"
   },
   "packageManager": "pnpm@8.10.4+sha1.ad75b0e775742692244c8e5e17c358390abf2025"
 }
