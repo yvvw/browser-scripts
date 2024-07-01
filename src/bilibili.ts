@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.17
+// @version      0.0.18
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
 // @license      MIT
-// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/bilibili.user.js
+// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/bilibili.meta.js
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/bilibili.user.js
 // @match        https://www.bilibili.com/video/*
 // @match        https://www.bilibili.com/list/*
@@ -15,6 +15,8 @@
 // @match        https://live.bilibili.com/*
 // @grant        none
 // ==/UserScript==
+
+import { delay } from './util'
 
 let IS_VIP = false
 
@@ -26,6 +28,7 @@ window.onload = async function main() {
   IS_VIP = await api.isVip()
 
   await player.prepare()
+  await delay(1000)
   player.optimistic()
   player.daemon()
 }

@@ -1,21 +1,25 @@
 import * as esbuild from 'esbuild'
-import { open } from 'fs/promises'
+import { open, writeFile } from 'fs/promises'
 import path from 'node:path'
 
 async function main() {
   const entry = parseEntry()
 
-  await esbuild.build({
-    entryPoints: [entry.path],
-    banner: {
-      js: await parseBanner(entry.path),
-    },
-    outfile: `dist/${entry.object.name}.user.js`,
-    bundle: true,
-    minify: true,
-    target: ['es2015'],
-    legalComments: 'none',
-  })
+  const banner = await parseBanner(entry.path)
+  await Promise.all([
+    esbuild.build({
+      entryPoints: [entry.path],
+      banner: {
+        js: banner,
+      },
+      outfile: `dist/${entry.object.name}.user.js`,
+      bundle: true,
+      minify: true,
+      target: ['es2015'],
+      legalComments: 'none',
+    }),
+    writeFile(`dist/${entry.object.name}.meta.js`, banner),
+  ])
 }
 
 main().catch((err) => {

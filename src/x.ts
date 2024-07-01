@@ -1,20 +1,24 @@
 // ==UserScript==
 // @name         Better X(Twitter)
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.9
+// @version      0.0.10
 // @description  自动屏蔽AD，快捷屏蔽
 // @author       yvvw
 // @icon         https://abs.twimg.com/favicons/twitter.3.ico
 // @license      MIT
-// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/x.user.js
+// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/x.meta.js
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/x.user.js
 // @match        https://x.com/*
 // @match        https://twitter.com/*
+// @exclude      https://x.com/i/*
+// @exclude      https://twitter.com/i/*
 // @grant        none
 // ==/UserScript==
 
+import { observe } from './util'
+
 window.onload = function main() {
-  const callback: MutationCallback = (records) => {
+  observe((records) => {
     const twitterEls = records
       .filter((it) => it.addedNodes.length > 0)
       .flatMap((it) => Array.from(it.addedNodes) as HTMLDivElement[])
@@ -26,11 +30,6 @@ window.onload = function main() {
     if (twitterEls.length === 0) return
 
     twitterEls.forEach((it) => addBlockEl(it, 5))
-  }
-
-  new MutationObserver(callback).observe(document.body, {
-    childList: true,
-    subtree: true,
   })
 }
 
@@ -49,12 +48,12 @@ function addBlockEl(twitterEl: HTMLDivElement, times: number) {
   const block = async () => {
     moreBtnEl.click()
 
-    await new Promise(resolve => setTimeout(resolve, 0))
+    await new Promise((resolve) => setTimeout(resolve, 0))
     const blockBtn2 = document.querySelector<HTMLButtonElement>('div[data-testid="block"]')
     if (blockBtn2 === null) return
     blockBtn2.click()
 
-    await new Promise(resolve => setTimeout(resolve, 0))
+    await new Promise((resolve) => setTimeout(resolve, 0))
     const confirmBtn = document.querySelector<HTMLButtonElement>(
       'button[data-testid="confirmationSheetConfirm"]'
     )

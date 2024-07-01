@@ -12,7 +12,8 @@
     "build:x": "node build.mjs src/x.ts",
     "build:dexscreener": "node build.mjs src/dexscreener.ts",
     "build:dextools": "node build.mjs src/dextools.ts",
-    "build:gmgn": "node build.mjs src/gmgn_ai.ts"
+    "build:gmgn": "node build.mjs src/gmgn_ai.ts",
+    "build:pumpfun": "node build.mjs src/pumpfun.ts"
   },
   "devDependencies": {
     "@types/node": "^20.12.12",
@@ -21,5 +22,6 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^3.2.5",
     "typescript": "^5.4.5"
-  }
+  },
+  "packageManager": "pnpm@8.10.4+sha1.ad75b0e775742692244c8e5e17c358390abf2025"
 }
