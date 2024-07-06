@@ -9,19 +9,37 @@
 // @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/pumpfun.meta.js
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/pumpfun.user.js
 // @match        https://www.pump.fun/*
+// @match        https://pump.fun/*
 // @grant        none
 // ==/UserScript==
 
 import { waitingElement } from './util'
 
+const clearChannel = new Set<Function>()
+
 window.onload = function main() {
   let running = false
+  let prevToken = ''
+
   new MutationObserver(() => {
-    if (running || location.pathname.length !== 45) {
+    const token = location.pathname.slice(1)
+    if (running || token.length <= 40 || prevToken === token) {
       return
     }
     running = true
-    addExternalLinks().finally(() => (running = false))
+    prevToken = token
+
+    if (clearChannel.size > 0) {
+      clearChannel.forEach((fn) => fn())
+      clearChannel.clear()
+    }
+
+    Promise.allSettled([
+      addExternalLinks(),
+      autoSwitchTradePanel(),
+      labelDevInTradePanel(),
+    ]).finally(() => (running = false))
+
   }).observe(document.body, {
     childList: true,
     subtree: true,
@@ -29,10 +47,6 @@ window.onload = function main() {
 }
 
 async function addExternalLinks() {
-  if (document.getElementById('gmgn') !== null) {
-    return
-  }
-
   const threadEl = await waitingElement(
     () => document.evaluate('//div[text()="Thread"]', document).iterateNext() as HTMLDivElement
   )
@@ -59,4 +73,61 @@ async function addExternalLinks() {
   divWrapEl.appendChild(bullXLinkEl)
 
   threadEl.parentElement?.appendChild(divWrapEl)
+}
+
+async function autoSwitchTradePanel() {
+  const tradesEl = await waitingElement(
+    () => document.evaluate('//div[text()="Trades"]', document).iterateNext() as HTMLDivElement
+  )
+  tradesEl.click()
+}
+
+async function labelDevInTradePanel() {
+  const labelEl = await waitingElement(
+    () =>
+      document
+        .evaluate('//label[text()="Filter by following"]', document)
+        .iterateNext() as HTMLLabelElement
+  )
+
+  const tableEl = labelEl.parentElement?.parentElement
+  if (!tableEl) {
+    throw new Error('未发现交易面板')
+  }
+
+  const devSibEl = await waitingElement(
+    () =>
+      document.evaluate('//span[text()="created by"]', document).iterateNext() as HTMLSpanElement
+  )
+  const devEl = devSibEl.nextSibling as HTMLAnchorElement | undefined
+  if (!devEl) {
+    throw new Error('未发现dev标签')
+  }
+  const devName = devEl.href.split('/').pop()
+
+  const observer = new MutationObserver((records) => {
+    for (const record of records) {
+      if (record.addedNodes.length === 0) {
+        continue
+      }
+      for (const node of record.addedNodes) {
+        const nodeEl = node as HTMLDivElement
+        const nameEl = nodeEl.firstElementChild?.firstElementChild as HTMLAnchorElement | undefined
+        if (!nameEl) {
+          throw new Error('未发现a标签')
+        }
+        const operateType = nodeEl.children.item(1)!.innerHTML
+        const rowName = nameEl.href.split('/').pop()
+        if (rowName === devName) {
+          if (operateType === 'buy') {
+            nodeEl.className += 'text-white bg-green-500'
+          } else if (operateType === 'sell') {
+            nodeEl.className += 'text-white bg-red-500'
+          }
+        }
+      }
+    }
+  })
+  observer.observe(tableEl, { childList: true, subtree: true })
+  clearChannel.add(() => observer.disconnect())
 }
