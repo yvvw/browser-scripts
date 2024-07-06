@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.2
+// @version      0.0.3
 // @description  增加gmgn、bullx跳转，标记dev交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -124,6 +124,11 @@ async function labelDevInTradePanel() {
         .replace('text-white bg-green-500', '')
         .replace('text-white bg-red-500', '')
     }
+  }
+
+  // 跳过前两个表头和最后一个翻页组件
+  for (let i = 2; i < tableEl.children.length - 1; i++) {
+    labelDev(tableEl.children.item(i) as HTMLDivElement)
   }
 
   const observer = observe(() => {
