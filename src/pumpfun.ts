@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.1
-// @description  增加gmgn、bullx跳转
+// @version      0.0.2
+// @description  增加gmgn、bullx跳转，标记dev交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
 // @license      MIT
@@ -13,7 +13,7 @@
 // @grant        none
 // ==/UserScript==
 
-import { waitingElement } from './util'
+import { observe, waitingElement } from './util'
 
 const clearChannel = new Set<Function>()
 
@@ -34,12 +34,7 @@ window.onload = function main() {
       clearChannel.clear()
     }
 
-    Promise.allSettled([
-      addExternalLinks(),
-      autoSwitchTradePanel(),
-      labelDevInTradePanel(),
-    ]).finally(() => (running = false))
-
+    Promise.allSettled([addExternalLinks(), switchTradePanel()]).finally(() => (running = false))
   }).observe(document.body, {
     childList: true,
     subtree: true,
@@ -75,11 +70,17 @@ async function addExternalLinks() {
   threadEl.parentElement?.appendChild(divWrapEl)
 }
 
-async function autoSwitchTradePanel() {
+async function switchTradePanel() {
   const tradesEl = await waitingElement(
     () => document.evaluate('//div[text()="Trades"]', document).iterateNext() as HTMLDivElement
   )
-  tradesEl.click()
+
+  const click = tradesEl.click
+  tradesEl.removeEventListener('click', click)
+  tradesEl.addEventListener('click', function () {
+    labelDevInTradePanel()
+  })
+  click.apply(tradesEl)
 }
 
 async function labelDevInTradePanel() {
@@ -105,29 +106,31 @@ async function labelDevInTradePanel() {
   }
   const devName = devEl.href.split('/').pop()
 
-  const observer = new MutationObserver((records) => {
-    for (const record of records) {
-      if (record.addedNodes.length === 0) {
-        continue
-      }
-      for (const node of record.addedNodes) {
-        const nodeEl = node as HTMLDivElement
-        const nameEl = nodeEl.firstElementChild?.firstElementChild as HTMLAnchorElement | undefined
-        if (!nameEl) {
-          throw new Error('未发现a标签')
-        }
-        const operateType = nodeEl.children.item(1)!.innerHTML
-        const rowName = nameEl.href.split('/').pop()
-        if (rowName === devName) {
-          if (operateType === 'buy') {
-            nodeEl.className += 'text-white bg-green-500'
-          } else if (operateType === 'sell') {
-            nodeEl.className += 'text-white bg-red-500'
-          }
-        }
-      }
+  function labelDev(el: HTMLDivElement) {
+    const nameEl = el.firstElementChild?.firstElementChild as HTMLAnchorElement | undefined
+    if (!nameEl) {
+      throw new Error('未发现a标签')
     }
-  })
-  observer.observe(tableEl, { childList: true, subtree: true })
+    const operateType = (el.children.item(1) as HTMLDivElement).innerText
+    const rowName = nameEl.href.split('/').pop()
+    if (rowName === devName) {
+      if (operateType === 'buy') {
+        el.className += 'text-white bg-green-500'
+      } else if (operateType === 'sell') {
+        el.className += 'text-white bg-red-500'
+      }
+    } else {
+      el.className = el.className
+        .replace('text-white bg-green-500', '')
+        .replace('text-white bg-red-500', '')
+    }
+  }
+
+  const observer = observe(() => {
+    // 跳过前两个表头和最后一个翻页组件
+    for (let i = 2; i < tableEl.children.length - 1; i++) {
+      labelDev(tableEl.children.item(i) as HTMLDivElement)
+    }
+  }, tableEl)
   clearChannel.add(() => observer.disconnect())
 }
