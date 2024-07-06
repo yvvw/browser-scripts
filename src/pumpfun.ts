@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.3
-// @description  增加gmgn、bullx跳转，标记dev交易
+// @version      0.0.4
+// @description  增加gmgn、bullx跳转，标记dev交易，自动点击交易确认按钮
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
 // @license      MIT
@@ -34,7 +34,9 @@ window.onload = function main() {
       clearChannel.clear()
     }
 
-    Promise.allSettled([addExternalLinks(), switchTradePanel()]).finally(() => (running = false))
+    Promise.allSettled([addExternalLinks(), switchTradePanel(), autoTrade()]).finally(
+      () => (running = false)
+    )
   }).observe(document.body, {
     childList: true,
     subtree: true,
@@ -68,6 +70,28 @@ async function addExternalLinks() {
   divWrapEl.appendChild(bullXLinkEl)
 
   threadEl.parentElement?.appendChild(divWrapEl)
+}
+
+async function autoTrade() {
+  const buttonEl = await waitingElement(
+    () =>
+      document
+        .evaluate('//button[text()="place trade"]', document)
+        .iterateNext() as HTMLButtonElement
+  )
+
+  const click = buttonEl.click
+  buttonEl.removeEventListener('click', click)
+  buttonEl.addEventListener('click', async function () {
+    const cancelEl = await waitingElement(
+      () =>
+        document.evaluate('//div[text()="[cancel]"]', document).iterateNext() as HTMLButtonElement
+    )
+    ;(cancelEl.previousElementSibling as HTMLButtonElement).click()
+    cancelEl.click()
+  })
+
+  click.apply(buttonEl)
 }
 
 async function switchTradePanel() {
