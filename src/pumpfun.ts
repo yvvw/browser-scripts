@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.6
+// @version      0.0.7
 // @description  增加gmgn、bullx跳转，标记dev交易，快速交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -13,7 +13,7 @@
 // @grant        none
 // ==/UserScript==
 
-import { observe, waitingElement } from './util'
+import { delay, observe, waitingElement } from './util'
 
 const clearChannel = new Set<Function>()
 
@@ -53,8 +53,7 @@ async function addExternalLinks() {
   const address = location.pathname.replace('/', '')
 
   const divWrapEl = document.createElement('div')
-  divWrapEl.className = 'flex gap-2'
-  divWrapEl.style.color = 'rgb(134 239 172/var(--tw-bg-opacity))'
+  divWrapEl.className = 'flex gap-2 text-green-300'
 
   divWrapEl.appendChild(createExternalLink('GMGN', `https://gmgn.ai/sol/token/${address}`))
   divWrapEl.appendChild(
@@ -79,25 +78,31 @@ async function addQuickButton() {
   divWrapEl.className = 'flex'
   divWrapEl.style.marginLeft = 'auto'
   divWrapEl.style.marginRight = '20px'
-  divWrapEl.style.color = 'rgb(134 239 172/var(--tw-bg-opacity))'
-  divWrapEl.appendChild(createQuickButton('0.5', () => quickBuy('0.5')))
-  divWrapEl.appendChild(createQuickButton('1', () => quickBuy('1')))
-  divWrapEl.appendChild(createQuickButton('1.5', () => quickBuy('1.5')))
-  divWrapEl.appendChild(createQuickButton('2', () => quickBuy('2')))
-  divWrapEl.appendChild(createQuickButton('2.5', () => quickBuy('2.5')))
-  divWrapEl.appendChild(createQuickButton('3', () => quickBuy('3')))
+  divWrapEl.appendChild(createQuickButton('0.5 ', () => quickBuy('0.5'), 'text-green-400'))
+  divWrapEl.appendChild(createQuickButton('1 ', () => quickBuy('1'), 'text-green-400'))
+  divWrapEl.appendChild(createQuickButton('1.5 ', () => quickBuy('1.5'), 'text-green-400'))
+  divWrapEl.appendChild(createQuickButton('2 ', () => quickBuy('2'), 'text-green-400'))
+  divWrapEl.appendChild(createQuickButton('2.5 ', () => quickBuy('2.5'), 'text-green-400'))
+  divWrapEl.appendChild(createQuickButton('3 ', () => quickBuy('3'), 'text-green-400'))
+  divWrapEl.appendChild(createQuickButton('25% ', () => quickSell('25%'), 'text-red-400'))
+  divWrapEl.appendChild(createQuickButton('50% ', () => quickSell('50%'), 'text-red-400'))
+  divWrapEl.appendChild(createQuickButton('75% ', () => quickSell('75%'), 'text-red-400'))
+  divWrapEl.appendChild(createQuickButton('100% ', () => quickSell('100%'), 'text-red-400'))
   threadEl.parentElement?.appendChild(divWrapEl)
 }
 
-function createQuickButton(text: string, onClick: EventListener) {
+function createQuickButton(text: string, onClick: EventListener, colorClassname: string) {
   const el = document.createElement('button')
   el.innerText = text
-  el.className = 'px-3 hover:bg-gray-800'
+  el.className = `px-2 hover:bg-gray-800 ${colorClassname}`
   el.addEventListener('click', onClick)
   return el
 }
 
 async function quickBuy(text: string) {
+  await switchMode('Buy')
+  await delay(100)
+
   const inputEl = await waitingElement(() => document.getElementById('amount') as HTMLInputElement)
   setNativeValue(inputEl, text)
 
@@ -108,6 +113,35 @@ async function quickBuy(text: string) {
         .iterateNext() as HTMLButtonElement
   )
   tradeEl.click()
+}
+
+async function quickSell(percent: string) {
+  await switchMode('Sell')
+  await delay(100)
+
+  const percentBtnEl = await waitingElement(
+    () =>
+      document
+        .evaluate(`//button[text()="${percent}"]`, document)
+        .iterateNext() as HTMLButtonElement
+  )
+  percentBtnEl.click()
+  await delay(100)
+
+  const tradeEl = await waitingElement(
+    () =>
+      document
+        .evaluate('//button[text()="place trade"]', document)
+        .iterateNext() as HTMLButtonElement
+  )
+  tradeEl.click()
+}
+
+async function switchMode(mode: 'Buy' | 'Sell') {
+  const buyEl = await waitingElement(
+    () => document.evaluate(`//button[text()="${mode}"]`, document).iterateNext() as HTMLDivElement
+  )
+  buyEl.click()
 }
 
 function setNativeValue(el: Element, value: string) {
