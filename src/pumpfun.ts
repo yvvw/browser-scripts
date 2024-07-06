@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.5
-// @description  增加gmgn、bullx跳转，标记dev交易，自动点击交易确认按钮
+// @version      0.0.6
+// @description  增加gmgn、bullx跳转，标记dev交易，快速交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
 // @license      MIT
@@ -34,9 +34,11 @@ window.onload = function main() {
       clearChannel.clear()
     }
 
-    Promise.allSettled([addExternalLinks(), switchTradePanel(), autoTrade()]).finally(
-      () => (running = false)
-    )
+    Promise.allSettled([
+      addQuickButton().then(addExternalLinks),
+      switchTradePanel(),
+      autoTrade(),
+    ]).finally(() => (running = false))
   }).observe(document.body, {
     childList: true,
     subtree: true,
@@ -52,24 +54,81 @@ async function addExternalLinks() {
 
   const divWrapEl = document.createElement('div')
   divWrapEl.className = 'flex gap-2'
-  divWrapEl.style.marginLeft = 'auto'
   divWrapEl.style.color = 'rgb(134 239 172/var(--tw-bg-opacity))'
 
-  const gmgnLinkEl = document.createElement('a')
-  gmgnLinkEl.id = 'gmgn'
-  gmgnLinkEl.href = `https://gmgn.ai/sol/token/${address}`
-  gmgnLinkEl.target = '_blank'
-  gmgnLinkEl.innerText = 'GMGN'
-  divWrapEl.appendChild(gmgnLinkEl)
-
-  const bullXLinkEl = document.createElement('a')
-  bullXLinkEl.id = 'bullx'
-  bullXLinkEl.href = `https://bullx.io/terminal?chainId=1399811149&address=${address}`
-  bullXLinkEl.target = '_blank'
-  bullXLinkEl.innerText = 'BullX'
-  divWrapEl.appendChild(bullXLinkEl)
-
+  divWrapEl.appendChild(createExternalLink('GMGN', `https://gmgn.ai/sol/token/${address}`))
+  divWrapEl.appendChild(
+    createExternalLink('BullX', `https://bullx.io/terminal?chainId=1399811149&address=${address}`)
+  )
   threadEl.parentElement?.appendChild(divWrapEl)
+}
+
+function createExternalLink(text: string, href: string) {
+  const el = document.createElement('a')
+  el.href = href
+  el.target = '_blank'
+  el.innerText = text
+  return el
+}
+
+async function addQuickButton() {
+  const threadEl = await waitingElement(
+    () => document.evaluate('//div[text()="Thread"]', document).iterateNext() as HTMLDivElement
+  )
+  const divWrapEl = document.createElement('div')
+  divWrapEl.className = 'flex'
+  divWrapEl.style.marginLeft = 'auto'
+  divWrapEl.style.marginRight = '20px'
+  divWrapEl.style.color = 'rgb(134 239 172/var(--tw-bg-opacity))'
+  divWrapEl.appendChild(createQuickButton('0.5', () => quickBuy('0.5')))
+  divWrapEl.appendChild(createQuickButton('1', () => quickBuy('1')))
+  divWrapEl.appendChild(createQuickButton('1.5', () => quickBuy('1.5')))
+  divWrapEl.appendChild(createQuickButton('2', () => quickBuy('2')))
+  divWrapEl.appendChild(createQuickButton('2.5', () => quickBuy('2.5')))
+  divWrapEl.appendChild(createQuickButton('3', () => quickBuy('3')))
+  threadEl.parentElement?.appendChild(divWrapEl)
+}
+
+function createQuickButton(text: string, onClick: EventListener) {
+  const el = document.createElement('button')
+  el.innerText = text
+  el.className = 'px-3 hover:bg-gray-800'
+  el.addEventListener('click', onClick)
+  return el
+}
+
+async function quickBuy(text: string) {
+  const inputEl = await waitingElement(() => document.getElementById('amount') as HTMLInputElement)
+  setNativeValue(inputEl, text)
+
+  const tradeEl = await waitingElement(
+    () =>
+      document
+        .evaluate('//button[text()="place trade"]', document)
+        .iterateNext() as HTMLButtonElement
+  )
+  tradeEl.click()
+}
+
+function setNativeValue(el: Element, value: string) {
+  const valueDescriptor = Object.getOwnPropertyDescriptor(el, 'value')
+  const prototypeValueDescriptor = Object.getOwnPropertyDescriptor(
+    Object.getPrototypeOf(el),
+    'value'
+  )
+
+  if (valueDescriptor && prototypeValueDescriptor) {
+    const valueSetter = valueDescriptor.set!
+    const prototypeValueSetter = prototypeValueDescriptor.set!
+
+    if (valueSetter && valueSetter !== prototypeValueSetter) {
+      prototypeValueSetter.call(el, value)
+    } else {
+      valueSetter.call(el, value)
+    }
+
+    el.dispatchEvent(new Event('input', { bubbles: true }))
+  }
 }
 
 async function autoTrade() {
