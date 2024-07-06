@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.4
+// @version      0.0.5
 // @description  增加gmgn、bullx跳转，标记dev交易，自动点击交易确认按钮
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -90,8 +90,6 @@ async function autoTrade() {
     ;(cancelEl.previousElementSibling as HTMLButtonElement).click()
     cancelEl.click()
   })
-
-  click.apply(buttonEl)
 }
 
 async function switchTradePanel() {
