@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.9
+// @version      0.0.10
 // @description  增加gmgn、bullx跳转，标记dev，快速交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -49,6 +49,7 @@ async function addExternalLinks() {
   const threadEl = await HTMLUtils.waitingElement(
     () => document.evaluate('//div[text()="Thread"]', document).iterateNext() as HTMLDivElement
   )
+  ;(threadEl.parentElement as HTMLDivElement).style.fontSize = '1.5rem'
 
   const address = location.pathname.replace('/', '')
 
@@ -78,23 +79,18 @@ async function addQuickButton() {
   divWrapEl.className = 'flex'
   divWrapEl.style.marginLeft = 'auto'
   divWrapEl.style.marginRight = '20px'
-  divWrapEl.appendChild(createQuickButton('0.5 ', () => quickBuy('0.5'), 'text-green-400'))
-  divWrapEl.appendChild(createQuickButton('1 ', () => quickBuy('1'), 'text-green-400'))
-  divWrapEl.appendChild(createQuickButton('1.5 ', () => quickBuy('1.5'), 'text-green-400'))
-  divWrapEl.appendChild(createQuickButton('2 ', () => quickBuy('2'), 'text-green-400'))
-  divWrapEl.appendChild(createQuickButton('2.5 ', () => quickBuy('2.5'), 'text-green-400'))
-  divWrapEl.appendChild(createQuickButton('3 ', () => quickBuy('3'), 'text-green-400'))
-  divWrapEl.appendChild(createQuickButton('25% ', () => quickSell('25%'), 'text-red-400'))
-  divWrapEl.appendChild(createQuickButton('50% ', () => quickSell('50%'), 'text-red-400'))
-  divWrapEl.appendChild(createQuickButton('75% ', () => quickSell('75%'), 'text-red-400'))
-  divWrapEl.appendChild(createQuickButton('100% ', () => quickSell('100%'), 'text-red-400'))
+  divWrapEl.appendChild(createQuickButton('0.5', () => quickBuy('0.5'), 'text-green-400'))
+  divWrapEl.appendChild(createQuickButton('_1_', () => quickBuy('1'), 'text-green-400'))
+  divWrapEl.appendChild(createQuickButton('_2_', () => quickBuy('2'), 'text-green-400'))
+  divWrapEl.appendChild(createQuickButton('50', () => quickSell('50%'), 'text-red-400'))
+  divWrapEl.appendChild(createQuickButton('100', () => quickSell('100%'), 'text-red-400'))
   threadEl.parentElement?.appendChild(divWrapEl)
 }
 
-function createQuickButton(text: string, onClick: EventListener, colorClassname: string) {
+function createQuickButton(text: string, onClick: EventListener, className: string) {
   const el = document.createElement('button')
   el.innerText = text
-  el.className = `px-2 hover:bg-gray-800 ${colorClassname}`
+  el.className = `px-2 hover:bg-gray-800 ${className}`
   el.addEventListener('click', onClick)
   return el
 }
