@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.8
-// @description  增加gmgn、bullx跳转，标记dev交易，快速交易
+// @version      0.0.9
+// @description  增加gmgn、bullx跳转，标记dev，快速交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
 // @license      MIT
@@ -223,7 +223,7 @@ async function labelDevInTradePanel() {
   }
   const devName = devEl.href.split('/').pop()
 
-  function labelDev(el: HTMLDivElement) {
+  function labelDev(el: HTMLDivElement, idx: number) {
     const nameEl = el.firstElementChild?.firstElementChild as HTMLAnchorElement | undefined
     if (!nameEl) {
       throw new Error('未发现a标签')
@@ -235,6 +235,9 @@ async function labelDevInTradePanel() {
         el.className += 'text-white bg-green-500'
       } else if (operateType === 'sell') {
         el.className += 'text-white bg-red-500'
+        if (idx < 5) {
+          playSellAudio()
+        }
       }
     } else {
       el.className = el.className
@@ -245,14 +248,25 @@ async function labelDevInTradePanel() {
 
   // 跳过前两个表头和最后一个翻页组件
   for (let i = 2; i < tableEl.children.length - 1; i++) {
-    labelDev(tableEl.children.item(i) as HTMLDivElement)
+    labelDev(tableEl.children.item(i) as HTMLDivElement, i)
   }
 
   const observer = HTMLUtils.observe(() => {
     // 跳过前两个表头和最后一个翻页组件
     for (let i = 2; i < tableEl.children.length - 1; i++) {
-      labelDev(tableEl.children.item(i) as HTMLDivElement)
+      labelDev(tableEl.children.item(i) as HTMLDivElement, i)
     }
   }, tableEl)
   clearChannel.add(() => observer.disconnect())
+}
+
+let playing = false
+
+function playSellAudio() {
+  if (playing) {
+    return
+  }
+  playing = true
+  const audio = new Audio('https://downsc.chinaz.net/Files/upload/yinxiao/2023/08/21/5414638.wav')
+  audio.play().finally(() => (playing = false))
 }
