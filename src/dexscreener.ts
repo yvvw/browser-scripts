@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.7
+// @version      0.0.8
 // @description
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -12,26 +12,29 @@
 // @grant        none
 // ==/UserScript==
 
-import { observe, waitingElement } from './util'
+import { HTMLUtils } from './util'
 
 window.onload = function main() {
-  observe(async () => {
+  HTMLUtils.observe(() => {
     hideAd()
-    await expandWatchList()
+    expandWatchList().catch((e) => console.error(e))
   })
 }
 
 async function expandWatchList() {
-  try {
-    const el = await waitingElement(() =>
-      document.querySelector<HTMLButtonElement>('button[title="Expand watchlist"]')
-    )
-    el.click()
-  } catch {}
+  const el = await HTMLUtils.waitingElement(() =>
+    document.querySelector<HTMLButtonElement>('button[title="Expand watchlist"]')
+  )
+  el.click()
 }
 
 function hideAd() {
-  Array.from(document.querySelectorAll<HTMLButtonElement>('button'))
-    .filter((it) => it.innerText === 'Hide ad')
-    .forEach((el) => el.click())
+  const res = document.evaluate('//button[title="Hide Ad"]', document)
+  while (true) {
+    const btn = res.iterateNext() as HTMLButtonElement
+    if (btn === null) {
+      break
+    }
+    btn.click()
+  }
 }

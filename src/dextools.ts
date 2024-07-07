@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEXTools
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.2
+// @version      0.0.3
 // @description
 // @author       yvvw
 // @icon         https://www.dextools.io/app/favicon.ico
@@ -12,10 +12,10 @@
 // @grant        none
 // ==/UserScript==
 
-import { observe } from './util'
+import { HTMLUtils } from './util'
 
 window.onload = function main() {
-  observe(() => hideAd())
+  HTMLUtils.observe(() => hideAd())
 }
 
 function hideAd() {

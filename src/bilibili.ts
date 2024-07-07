@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.18
+// @version      0.0.19
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -18,14 +18,14 @@
 
 import { delay } from './util'
 
-let IS_VIP = false
+let vip = false
 
 window.onload = async function main() {
   const player = getPlayer()
   if (!player) return
 
-  const api = new BilibiliApi('https://api.bilibili.com')
-  IS_VIP = await api.isVip()
+  const api = new BilibiliApi()
+  vip = await api.isVip()
 
   await player.prepare()
   await delay(1000)
@@ -122,15 +122,6 @@ class LivePlayer implements IPlayer {
   }
 }
 
-interface IVideoConfig {
-  waitSelector?: string
-  bigVipQualityClassName?: string
-  qualitySelector?: string
-  activeQualityClassName?: string
-  webFullscreenSelector?: string
-  activeWebFullscreenClassName?: string
-}
-
 class VideoPlayer implements IPlayer {
   static CONFIG = {
     bigVipQualityClassName: 'bpx-player-ctrl-quality-badge-bigvip',
@@ -181,7 +172,7 @@ class VideoPlayer implements IPlayer {
       const childEl = el.children.item(i) as HTMLElement | null
       if (childEl === null) break
       if (childEl.classList.contains(VideoPlayer.CONFIG.activeQualityClassName)) break
-      if (!IS_VIP && this.isBigVipQuality(childEl)) continue
+      if (!vip && this.isBigVipQuality(childEl)) continue
       childEl.click()
     }
   }
@@ -201,30 +192,30 @@ class VideoPlayer implements IPlayer {
 }
 
 class BilibiliApi {
-  constructor(private url: string) {}
+  constructor(private url = 'https://api.bilibili.com') {}
 
-  async getNavInfo() {
+  async fetchNavInfo() {
     const res = await fetch(`${this.url}/x/web-interface/nav`, {
       credentials: 'include',
     })
-    const data = (await res.json()) as IBiNavInfo
+    const data = (await res.json()) as IBilibiliNavInfo
     if (data.code !== 0) throw new Error(`NavInfo ${data.message}`)
     return data.data
   }
 
   async isVip() {
-    const navInfo = await this.getNavInfo()
+    const navInfo = await this.fetchNavInfo()
     return navInfo.isLogin && navInfo.vipStatus === 1
   }
 }
 
-interface IBiResponse<D> {
+interface IBilibiliResponse<D> {
   code: number
   data: D
   message: string
 }
 
-type IBiNavInfo = IBiResponse<{
+type IBilibiliNavInfo = IBilibiliResponse<{
   isLogin: boolean
   vipStatus: number
 }>

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.7
+// @version      0.0.8
 // @description  增加gmgn、bullx跳转，标记dev交易，快速交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -13,7 +13,7 @@
 // @grant        none
 // ==/UserScript==
 
-import { delay, observe, waitingElement } from './util'
+import { delay, HTMLUtils } from './util'
 
 const clearChannel = new Set<Function>()
 
@@ -46,7 +46,7 @@ window.onload = function main() {
 }
 
 async function addExternalLinks() {
-  const threadEl = await waitingElement(
+  const threadEl = await HTMLUtils.waitingElement(
     () => document.evaluate('//div[text()="Thread"]', document).iterateNext() as HTMLDivElement
   )
 
@@ -71,7 +71,7 @@ function createExternalLink(text: string, href: string) {
 }
 
 async function addQuickButton() {
-  const threadEl = await waitingElement(
+  const threadEl = await HTMLUtils.waitingElement(
     () => document.evaluate('//div[text()="Thread"]', document).iterateNext() as HTMLDivElement
   )
   const divWrapEl = document.createElement('div')
@@ -103,10 +103,12 @@ async function quickBuy(text: string) {
   await switchMode('Buy')
   await delay(100)
 
-  const inputEl = await waitingElement(() => document.getElementById('amount') as HTMLInputElement)
+  const inputEl = await HTMLUtils.waitingElement(
+    () => document.getElementById('amount') as HTMLInputElement
+  )
   setNativeValue(inputEl, text)
 
-  const tradeEl = await waitingElement(
+  const tradeEl = await HTMLUtils.waitingElement(
     () =>
       document
         .evaluate('//button[text()="place trade"]', document)
@@ -119,7 +121,7 @@ async function quickSell(percent: string) {
   await switchMode('Sell')
   await delay(100)
 
-  const percentBtnEl = await waitingElement(
+  const percentBtnEl = await HTMLUtils.waitingElement(
     () =>
       document
         .evaluate(`//button[text()="${percent}"]`, document)
@@ -128,7 +130,7 @@ async function quickSell(percent: string) {
   percentBtnEl.click()
   await delay(100)
 
-  const tradeEl = await waitingElement(
+  const tradeEl = await HTMLUtils.waitingElement(
     () =>
       document
         .evaluate('//button[text()="place trade"]', document)
@@ -138,7 +140,7 @@ async function quickSell(percent: string) {
 }
 
 async function switchMode(mode: 'Buy' | 'Sell') {
-  const buyEl = await waitingElement(
+  const buyEl = await HTMLUtils.waitingElement(
     () => document.evaluate(`//button[text()="${mode}"]`, document).iterateNext() as HTMLDivElement
   )
   buyEl.click()
@@ -166,7 +168,7 @@ function setNativeValue(el: Element, value: string) {
 }
 
 async function autoTrade() {
-  const buttonEl = await waitingElement(
+  const buttonEl = await HTMLUtils.waitingElement(
     () =>
       document
         .evaluate('//button[text()="place trade"]', document)
@@ -176,7 +178,7 @@ async function autoTrade() {
   const click = buttonEl.click
   buttonEl.removeEventListener('click', click)
   buttonEl.addEventListener('click', async function () {
-    const cancelEl = await waitingElement(
+    const cancelEl = await HTMLUtils.waitingElement(
       () =>
         document.evaluate('//div[text()="[cancel]"]', document).iterateNext() as HTMLButtonElement
     )
@@ -186,7 +188,7 @@ async function autoTrade() {
 }
 
 async function switchTradePanel() {
-  const tradesEl = await waitingElement(
+  const tradesEl = await HTMLUtils.waitingElement(
     () => document.evaluate('//div[text()="Trades"]', document).iterateNext() as HTMLDivElement
   )
 
@@ -199,7 +201,7 @@ async function switchTradePanel() {
 }
 
 async function labelDevInTradePanel() {
-  const labelEl = await waitingElement(
+  const labelEl = await HTMLUtils.waitingElement(
     () =>
       document
         .evaluate('//label[text()="Filter by following"]', document)
@@ -211,7 +213,7 @@ async function labelDevInTradePanel() {
     throw new Error('未发现交易面板')
   }
 
-  const devSibEl = await waitingElement(
+  const devSibEl = await HTMLUtils.waitingElement(
     () =>
       document.evaluate('//span[text()="created by"]', document).iterateNext() as HTMLSpanElement
   )
@@ -246,7 +248,7 @@ async function labelDevInTradePanel() {
     labelDev(tableEl.children.item(i) as HTMLDivElement)
   }
 
-  const observer = observe(() => {
+  const observer = HTMLUtils.observe(() => {
     // 跳过前两个表头和最后一个翻页组件
     for (let i = 2; i < tableEl.children.length - 1; i++) {
       labelDev(tableEl.children.item(i) as HTMLDivElement)

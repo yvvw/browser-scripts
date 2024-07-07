@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Douyu
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.6
+// @version      0.0.7
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.douyu.com/favicon.ico
@@ -22,44 +22,36 @@
 // @grant        none
 // ==/UserScript==
 
+import { HTMLUtils } from './util'
+
 window.onload = async function main() {
-  hideElement()
-  await Promise.all([switchBestQuality(), switchWebFullscreen(), hideDanmuPanel()])
+  hideAd()
+  switchWebFullscreen()
+  switchBestQuality()
+  hideDanmuPanel()
 }
 
-async function switchWebFullscreen() {
-  await waitingElementLoaded('.wfs-2a8e83')
-  const el = document.querySelector('.wfs-2a8e83') as HTMLElement | null
-  if (el === null) return
-  el.click()
+function switchWebFullscreen() {
+  HTMLUtils.waitingElement(() => document.querySelector('.wfs-2a8e83') as HTMLElement)
+    .then((el) => el.click())
+    .catch((err) => console.error('switchWebFullscreen', err))
 }
 
-async function switchBestQuality() {
-  await waitingElementLoaded('.tipItem-898596')
-  const el = document.querySelector('.tipItem-898596 > ul > li') as HTMLElement | null
-  if (el === null) return
-  el.click()
+function switchBestQuality() {
+  HTMLUtils.waitingElement(() => document.querySelector('.tipItem-898596 > ul > li') as HTMLElement)
+    .then((el) => el.click())
+    .catch((err) => console.error('switchBestQuality', err))
 }
 
-async function hideDanmuPanel() {
-  await waitingElementLoaded('.layout-Player-asidetoggleButton')
-  const el = document.querySelector('.layout-Player-asidetoggleButton') as HTMLElement | null
-  if (el === null) return
-  el.click()
+function hideDanmuPanel() {
+  HTMLUtils.waitingElement(
+    () => document.querySelector('.layout-Player-asidetoggleButton') as HTMLElement
+  )
+    .then((el) => el.click())
+    .catch((err) => console.error('hideDanmuPanel', err))
 }
 
-async function waitingElementLoaded(selector: string, maxTimes = 100) {
-  let times = 0
-  while (true) {
-    times++
-    await new Promise((resolve) => setTimeout(resolve, 100))
-    const el = document.querySelector(selector)
-    if (el !== null) break
-    if (times >= maxTimes) throw new Error(`Can't find \`${selector}\``)
-  }
-}
-
-function hideElement() {
+function hideAd() {
   const head = document.querySelector('head')
   if (head === null) return
 

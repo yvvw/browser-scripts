@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better X(Twitter)
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.10
+// @version      0.0.11
 // @description  自动屏蔽AD，快捷屏蔽
 // @author       yvvw
 // @icon         https://abs.twimg.com/favicons/twitter.3.ico
@@ -15,10 +15,10 @@
 // @grant        none
 // ==/UserScript==
 
-import { observe } from './util'
+import { HTMLUtils } from './util'
 
 window.onload = function main() {
-  observe((records) => {
+  HTMLUtils.observe((records) => {
     const twitterEls = records
       .filter((it) => it.addedNodes.length > 0)
       .flatMap((it) => Array.from(it.addedNodes) as HTMLDivElement[])
