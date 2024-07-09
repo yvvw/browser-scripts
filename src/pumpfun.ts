@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.12
+// @version      0.0.13
 // @description  增加gmgn、bullx跳转，标记dev，快速交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -250,7 +250,7 @@ async function labelDevInTradePanel() {
         el.classList.add('text-white', 'bg-green-500')
       } else if (operateType === 'sell') {
         el.classList.add('text-white', 'bg-red-500')
-        if (idx < 5) {
+        if (idx < 4) {
           playSellAudio()
         }
       }
@@ -260,7 +260,7 @@ async function labelDevInTradePanel() {
   }
 
   // 显示完整时间
-  tableEl.children.item(1)!.querySelector('button')!.click()
+  // tableEl.children.item(1)!.querySelector('button')!.click()
 
   // 跳过前两个表头和最后一个翻页组件
   for (let i = 2; i < tableEl.children.length - 1; i++) {
@@ -284,5 +284,5 @@ function playSellAudio() {
   }
   playing = true
   const audio = new Audio('https://downsc.chinaz.net/Files/upload/yinxiao/2023/08/21/5414638.wav')
-  audio.play().finally(() => (playing = false))
+  audio.play().finally(() => setTimeout(() => (playing = false), 5000))
 }
