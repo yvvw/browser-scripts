@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEXTools
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.3
+// @version      0.0.4
 // @description
 // @author       yvvw
 // @icon         https://www.dextools.io/app/favicon.ico
@@ -23,8 +23,8 @@ function hideAd() {
     .filter((it) => it.innerText === 'Ad')
     .forEach((el) => {
       if (
-        el.nextElementSibling?.tagName === 'BUTTON' &&
-        el.nextElementSibling?.ariaLabel === 'Close'
+        el.nextElementSibling?.getAttribute('tagName') === 'BUTTON' &&
+        el.nextElementSibling?.getAttribute('ariaLabel') === 'Close'
       ) {
         ;(el.nextElementSibling as HTMLButtonElement).click()
       }

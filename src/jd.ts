@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better JD
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.4
+// @version      0.0.5
 // @description  一键保价、复制购物车链接
 // @author       yvvw
 // @icon         https://www.jd.com/favicon.ico
@@ -18,8 +18,8 @@ window.onload = function main() {
 
   const site = location.host.split('.')[0]
   if ('pcsitepp-fm' === site) {
-    button.innerText = '一键价保'
-    button.onclick = async () => {
+    button.setHTMLUnsafe('一键价保')
+    button.addEventListener('click', async () => {
       while (true) {
         // 排除超过价保周期及正在进行价保
         const buttons = Array.from(
@@ -37,10 +37,10 @@ window.onload = function main() {
           await new Promise((resolve) => setTimeout(resolve, 1000))
         }
       }
-    }
+    })
   } else if ('cart' === site) {
-    button.innerText = '复制链接'
-    button.onclick = async () => {
+    button.setHTMLUnsafe('复制链接')
+    button.addEventListener('click', async () => {
       let linkText = ''
       for (const el of Array.from(document.getElementsByClassName('item-selected'))) {
         linkText += `https://item.jd.com/${el.getAttribute('skuid')}.html\n\n`
@@ -53,7 +53,7 @@ window.onload = function main() {
       linkText += '复制'
       await navigator.clipboard.writeText(linkText)
       alert('复制成功')
-    }
+    })
   } else {
     return
   }

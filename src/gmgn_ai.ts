@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better GMGN.ai
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.9
+// @version      0.0.10
 // @description  调整屏宽，移除buy more，增加bullx跳转，加强dev卖出标记
 // @author       yvvw
 // @icon         https://gmgn.ai/static/favicon2.ico
@@ -68,7 +68,7 @@ async function adjustRecordSize() {
   if (tab === null) {
     throw new Error('查询不到leftTabs，需要升级代码')
   }
-  tab.style.width = '80%'
+  tab.style.setProperty('width', '80%')
 }
 
 async function markSellAll() {
@@ -154,24 +154,24 @@ const bullxIcon =
 function createBullXEl(path: string) {
   const href = decodeBullXLink(path)
   const el = document.createElement('a')
-  el.href = href
-  el.target = '_blank'
+  el.setAttribute('href', href)
+  el.setAttribute('target', '_blank')
+  el.setHTMLUnsafe(bullxIcon)
   el.dataset['bullx'] = 'bullx'
-  el.innerHTML = bullxIcon
-  el.onclick = (e) => {
+  el.addEventListener('click', (e) => {
     e.preventDefault()
     GM_openInTab(href, { active: true })
-  }
+  })
   return el
 }
 
 function updateBullXEl(el: HTMLAnchorElement, path: string) {
   const href = decodeBullXLink(path)
-  el.href = href
-  el.onclick = (e) => {
+  el.setAttribute('href', href)
+  el.addEventListener('click', (e) => {
     e.preventDefault()
     GM_openInTab(href, { active: true })
-  }
+  })
 }
 
 function decodeBullXLink(path: string) {

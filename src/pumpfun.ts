@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.11
+// @version      0.0.12
 // @description  增加gmgn、bullx跳转，标记dev，快速交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -49,12 +49,12 @@ async function addExternalLinks() {
   const threadEl = await HTMLUtils.waitingElement(
     () => document.evaluate('//div[text()="Thread"]', document).iterateNext() as HTMLDivElement
   )
-  ;(threadEl.parentElement as HTMLDivElement).style.fontSize = '1.5rem'
+  ;(threadEl.parentElement as HTMLDivElement).style.setProperty('font-size', '1.5rem')
 
   const address = location.pathname.replace('/', '')
 
   const divWrapEl = document.createElement('div')
-  divWrapEl.className = 'flex gap-2 text-green-300'
+  divWrapEl.classList.add('flex', 'gap-2', 'text-green-300')
 
   divWrapEl.appendChild(createExternalLink('GMGN', `https://gmgn.ai/sol/token/${address}`))
   divWrapEl.appendChild(
@@ -65,9 +65,9 @@ async function addExternalLinks() {
 
 function createExternalLink(text: string, href: string) {
   const el = document.createElement('a')
-  el.href = href
-  el.target = '_blank'
-  el.innerText = text
+  el.setAttribute('href', href)
+  el.setAttribute('target', '_blank')
+  el.setHTMLUnsafe(text)
   return el
 }
 
@@ -76,9 +76,9 @@ async function addQuickButton() {
     () => document.evaluate('//div[text()="Thread"]', document).iterateNext() as HTMLDivElement
   )
   const divWrapEl = document.createElement('div')
-  divWrapEl.className = 'flex'
-  divWrapEl.style.marginLeft = 'auto'
-  divWrapEl.style.marginRight = '20px'
+  divWrapEl.classList.add('flex')
+  divWrapEl.style.setProperty('marginLeft', 'auto')
+  divWrapEl.style.setProperty('marginRight', '20px')
   divWrapEl.appendChild(createQuickButton('0.5', () => quickBuy('0.5'), 'text-green-400'))
   divWrapEl.appendChild(createQuickButton('_1_', () => quickBuy('1'), 'text-green-400'))
   divWrapEl.appendChild(createQuickButton('_2_', () => quickBuy('2'), 'text-green-400'))
@@ -87,10 +87,17 @@ async function addQuickButton() {
   threadEl.parentElement?.appendChild(divWrapEl)
 }
 
-function createQuickButton(text: string, onClick: EventListener, className: string) {
+function createQuickButton(text: string, onClick: EventListener, classNames: string) {
   const el = document.createElement('button')
-  el.innerText = text
-  el.className = `px-2 hover:bg-gray-800 ${className}`
+  el.setHTMLUnsafe(text)
+  el.classList.add(
+    'px-2',
+    'hover:bg-gray-800',
+    ...classNames
+      .split(' ')
+      .map((it) => it.trim())
+      .filter((it) => it !== '')
+  )
   el.addEventListener('click', onClick)
   return el
 }
@@ -228,29 +235,27 @@ async function labelDevInTradePanel() {
 
     const solEl = el.children.item(3) as HTMLDivElement
     const solAmount = parseFloat(solEl.innerText)
-    solEl.className = solEl.className.replace(' text-green-300', '').replace(' text-red-300', '')
+    solEl.classList.remove('text-green-300', 'text-red-300')
     if (solAmount >= 1) {
       if (operateType === 'buy') {
-        solEl.className += ' text-green-300'
+        solEl.classList.add('text-green-300')
       } else if (operateType === 'sell') {
-        solEl.className += ' text-red-300'
+        solEl.classList.add('text-red-300')
       }
     }
 
     const rowName = nameEl.href.split('/').pop()
     if (rowName === devName) {
       if (operateType === 'buy') {
-        el.className += ' text-white bg-green-500'
+        el.classList.add('text-white', 'bg-green-500')
       } else if (operateType === 'sell') {
-        el.className += ' text-white bg-red-500'
+        el.classList.add('text-white', 'bg-red-500')
         if (idx < 5) {
           playSellAudio()
         }
       }
     } else {
-      el.className = el.className
-        .replace(' text-white bg-green-500', '')
-        .replace(' text-white bg-red-500', '')
+      el.classList.remove('text-white', 'bg-green-500', 'bg-red-500')
     }
   }
 
