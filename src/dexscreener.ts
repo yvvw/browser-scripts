@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.8
+// @version      0.0.9
 // @description
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -29,7 +29,7 @@ async function expandWatchList() {
 }
 
 function hideAd() {
-  const res = document.evaluate('//button[title="Hide Ad"]', document)
+  const res = document.evaluate('//button[text()="Hide ad"]', document)
   while (true) {
     const btn = res.iterateNext() as HTMLButtonElement
     if (btn === null) {
