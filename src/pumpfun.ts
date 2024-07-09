@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.10
+// @version      0.0.11
 // @description  增加gmgn、bullx跳转，标记dev，快速交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -219,38 +219,53 @@ async function labelDevInTradePanel() {
   }
   const devName = devEl.href.split('/').pop()
 
-  function labelDev(el: HTMLDivElement, idx: number) {
+  function labelTrade(el: HTMLDivElement, idx: number) {
     const nameEl = el.firstElementChild?.firstElementChild as HTMLAnchorElement | undefined
     if (!nameEl) {
       throw new Error('未发现a标签')
     }
     const operateType = (el.children.item(1) as HTMLDivElement).innerText
+
+    const solEl = el.children.item(3) as HTMLDivElement
+    const solAmount = parseFloat(solEl.innerText)
+    solEl.className = solEl.className.replace(' text-green-300', '').replace(' text-red-300', '')
+    if (solAmount >= 1) {
+      if (operateType === 'buy') {
+        solEl.className += ' text-green-300'
+      } else if (operateType === 'sell') {
+        solEl.className += ' text-red-300'
+      }
+    }
+
     const rowName = nameEl.href.split('/').pop()
     if (rowName === devName) {
       if (operateType === 'buy') {
-        el.className += 'text-white bg-green-500'
+        el.className += ' text-white bg-green-500'
       } else if (operateType === 'sell') {
-        el.className += 'text-white bg-red-500'
+        el.className += ' text-white bg-red-500'
         if (idx < 5) {
           playSellAudio()
         }
       }
     } else {
       el.className = el.className
-        .replace('text-white bg-green-500', '')
-        .replace('text-white bg-red-500', '')
+        .replace(' text-white bg-green-500', '')
+        .replace(' text-white bg-red-500', '')
     }
   }
 
+  // 显示完整时间
+  tableEl.children.item(1)!.querySelector('button')!.click()
+
   // 跳过前两个表头和最后一个翻页组件
   for (let i = 2; i < tableEl.children.length - 1; i++) {
-    labelDev(tableEl.children.item(i) as HTMLDivElement, i)
+    labelTrade(tableEl.children.item(i) as HTMLDivElement, i)
   }
 
   const observer = HTMLUtils.observe(() => {
     // 跳过前两个表头和最后一个翻页组件
     for (let i = 2; i < tableEl.children.length - 1; i++) {
-      labelDev(tableEl.children.item(i) as HTMLDivElement, i)
+      labelTrade(tableEl.children.item(i) as HTMLDivElement, i)
     }
   }, tableEl)
   clearChannel.add(() => observer.disconnect())

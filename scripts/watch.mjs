@@ -1,6 +1,6 @@
-import path from 'node:path'
-import childProcess from 'node:child_process'
 import chokidar from 'chokidar'
+import childProcess from 'node:child_process'
+import path from 'node:path'
 
 chokidar.watch('src/*.ts').on('change', (_path) => {
   const name = path.parse(_path).name
