@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better GMGN.ai
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.10
+// @version      0.0.11
 // @description  调整屏宽，移除buy more，增加bullx跳转，加强dev卖出标记
 // @author       yvvw
 // @icon         https://gmgn.ai/static/favicon2.ico
@@ -35,7 +35,7 @@ window.onload = function main() {
     } else if (pathParts.includes('token')) {
       await adjustRecordSize()
     } else if (pathParts.includes('meme') || pathParts.includes('pump')) {
-      await addBullLink()
+      await updateExternalLink()
       await markSellAll()
     }
   })
@@ -94,39 +94,45 @@ async function markSellAll() {
   clearChannel.add(() => observer.disconnect())
 }
 
-async function addBullLink() {
+async function updateExternalLink() {
   const table = await HTMLUtils.waitingElement(() =>
     document.querySelector<HTMLTableElement>('.g-table-tbody')
   )
   const addLink = (rowEl: HTMLDivElement) => {
     const linkEL = rowEl.querySelector<HTMLAnchorElement>('a')
     if (linkEL === null) {
-      console.error('行结构更改需要更新')
+      console.error('行结构更改')
       return
     }
 
     const [path, search] = linkEL.href.split('?')
     const query = NavigatorUtil.parseQuery(search)
     if (!('symbol' in query)) {
-      console.error('未发现symbol需要更新')
+      console.error('未发现symbol')
       return
     }
     const symbol = decodeURIComponent(query.symbol)
 
     const divEl = rowEl.querySelector(`div[title="${symbol}"]`)
     if (divEl === null) {
-      console.error('未发现div元素需要更新')
+      console.error('未发现div元素')
       return
     }
     const divChildEl = divEl.firstElementChild as HTMLDivElement
     if (divChildEl === null) {
-      console.error('未发现div子元素需要更新')
+      console.error('未发现div子元素')
       return
     }
 
-    const pumpSVGEl = divChildEl.lastElementChild!.firstElementChild as SVGSVGElement
-    pumpSVGEl.setAttribute('width', '24')
-    pumpSVGEl.setAttribute('height', '24')
+    // 调大图标尺寸
+    for (let i = 2; i < divChildEl.children.length; i++) {
+      const childEl = divChildEl.children.item(i) as HTMLElement
+      const svgEl = childEl.querySelector('svg')
+      if (svgEl) {
+        svgEl.setAttribute('width', '20')
+        svgEl.setAttribute('height', '20')
+      }
+    }
 
     if (rowEl.dataset['modified'] === '1') {
       updateBullXEl(rowEl.querySelector('a[data-bullx]') as HTMLAnchorElement, path)
@@ -179,7 +185,7 @@ function decodeBullXLink(path: string) {
 
   const address = parts.pop()
   if (address === undefined || address.length < 10) {
-    throw new Error('链接格式更改需要更新')
+    throw new Error('链接格式更改')
   }
 
   let chainId: number
