@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better GMGN.ai
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.12
+// @version      0.0.13
 // @description  调整屏宽，移除buy more，增加bullx跳转，加强dev卖出标记
 // @author       yvvw
 // @icon         https://gmgn.ai/static/favicon2.ico
@@ -69,8 +69,9 @@ async function adjustRecordSize() {
     throw new Error('查询不到leftTabs，需要升级代码')
   }
   const parentEl = tabEl.parentElement as HTMLDivElement
+  const sibEl = tabEl.previousElementSibling as HTMLDivElement
   const observer = HTMLUtils.observe(() => {
-    if (tabEl.clientWidth > (parentEl.clientWidth * 3) / 4) {
+    if (parentEl.clientWidth === sibEl.clientWidth) {
       tabEl.style.removeProperty('width')
     } else {
       tabEl.style.setProperty('width', '80%')
