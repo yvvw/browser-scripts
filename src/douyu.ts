@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Douyu
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.7
+// @version      0.0.8
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.douyu.com/favicon.ico
@@ -132,6 +132,7 @@ function hideAd() {
   css += '.Live-Act-Annual-Answer {display:none !important;}'
   css += '.JinChanChanGame {display:none !important;}'
   css += '.Widget {display:none !important;}'
+  css += '.dy-Modal-wrap {display:none !important;}'
   css += '#tc {display:none !important;}'
 
   const style = document.createElement('style')
