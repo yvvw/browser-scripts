@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.13
+// @version      0.0.14
 // @description  增加gmgn、bullx跳转，标记dev，快速交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -36,7 +36,8 @@ window.onload = function main() {
 
     Promise.allSettled([
       addQuickButton().then(addExternalLinks),
-      switchTradePanel(),
+      markTradePanel(),
+      markTopHolder(),
       autoTrade(),
     ]).finally(() => (running = false))
   }).observe(document.body, {
@@ -190,7 +191,7 @@ async function autoTrade() {
   })
 }
 
-async function switchTradePanel() {
+async function markTradePanel() {
   const tradesEl = await HTMLUtils.waitingElement(
     () => document.evaluate('//div[text()="Trades"]', document).iterateNext() as HTMLDivElement
   )
@@ -273,6 +274,29 @@ async function labelDevInTradePanel() {
       labelTrade(tableEl.children.item(i) as HTMLDivElement, i)
     }
   }, tableEl)
+  clearChannel.add(() => observer.disconnect())
+}
+
+async function markTopHolder() {
+  const holderTextEl = await HTMLUtils.waitingElement(
+    () =>
+      document
+        .evaluate('//div[text()="Holder distribution"]', document)
+        .iterateNext() as HTMLDivElement
+  )
+  const holderListEls = holderTextEl.nextSibling!.firstChild as HTMLDivElement
+  const observer = HTMLUtils.observe(() => {
+    if (holderListEls.childElementCount === 0) {
+      return
+    }
+    for (const holderListEl of holderListEls.children) {
+      const percentEl = holderListEl.lastElementChild as HTMLDivElement
+      const percent = parseFloat(percentEl.innerText.replace('%', ''))
+      if (percent >= 5) {
+        holderListEl.classList.add('text-red-400')
+      }
+    }
+  }, holderListEls)
   clearChannel.add(() => observer.disconnect())
 }
 
