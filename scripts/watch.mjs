@@ -7,6 +7,7 @@ chokidar.watch('src/*.ts').on('change', (_path) => {
   const script = `npm_package_scripts_build_${name}`
   if (script in process.env) {
     console.log(`${new Date().toISOString()} ${name}`)
-    childProcess.spawn(process.env[script], { shell: true, stdio: 'inherit' })
+    const command = process.env[script] + ' --dev'
+    childProcess.spawn(command, { shell: true, stdio: 'inherit' })
   }
 })

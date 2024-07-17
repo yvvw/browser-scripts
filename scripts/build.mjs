@@ -4,7 +4,7 @@ import path from 'node:path'
 
 async function main() {
   const entry = parseEntry()
-  const banner = await parseBanner(entry.path)
+  const banner = await parseBanner(entry)
   await esbuild.build({
     entryPoints: [entry.path],
     banner: {
@@ -12,11 +12,13 @@ async function main() {
     },
     outfile: `dist/${entry.object.name}.user.js`,
     bundle: true,
-    minify: true,
+    minify: !entry.dev,
     target: ['es2015'],
     legalComments: 'none',
   })
-  await writeFile(`dist/${entry.object.name}.meta.js`, banner)
+  if (!entry.dev) {
+    await writeFile(`dist/${entry.object.name}.meta.js`, banner)
+  }
 }
 
 main().catch((err) => {
@@ -31,16 +33,25 @@ function parseEntry() {
   return {
     object: entry,
     path: path.join(entry.dir, entry.base),
+    dev: process.argv.includes('--dev'),
   }
 }
 
-async function parseBanner(file) {
-  const fd = await open(file)
+async function parseBanner(entry) {
+  const fd = await open(entry.path)
   const bannerLines = []
   for await (let line of fd.readLines()) {
     line = line.trim()
-    if (line === '// ==UserScript==' || bannerLines.length > 0) bannerLines.push(line)
-    if (line === '// ==/UserScript==') break
+    if (line === '// ==UserScript==' || bannerLines.length > 0) {
+      if (line === '// ==/UserScript==' && entry.dev) {
+        const required = `// @require file://${path.resolve(`dist/${entry.object.name}.user.js`)}`
+        bannerLines.push(required)
+      }
+      bannerLines.push(line)
+    }
+    if (line === '// ==/UserScript==') {
+      break
+    }
   }
   await fd.close()
   return bannerLines.length > 0 ? `${bannerLines.join('\n')}\n` : ''
