@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.9
-// @description
+// @version      0.0.10
+// @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
 // @license      MIT
@@ -15,10 +15,15 @@
 import { HTMLUtils } from './util'
 
 window.onload = function main() {
-  HTMLUtils.observe(() => {
-    hideAd()
-    expandWatchList().catch((e) => console.error(e))
-  })
+  HTMLUtils.observe(
+    () => {
+      hideAd()
+      expandWatchList().catch(console.error)
+      addExternalLink().catch(console.error)
+    },
+    document.body,
+    1000
+  )
 }
 
 async function expandWatchList() {
@@ -37,4 +42,85 @@ function hideAd() {
     }
     btn.click()
   }
+}
+
+async function addExternalLink() {
+  if (document.querySelector('a[data-external]') !== null) {
+    return
+  }
+
+  const locateEl = await HTMLUtils.waitingElement(
+    () => document.evaluate('//span[text()="Pair"]', document).iterateNext() as HTMLSpanElement
+  )
+  const wrapEl = locateEl.parentElement!.parentElement!.parentElement as HTMLDivElement
+
+  const links = getExternalLinks(wrapEl)
+
+  const containerEl = document.createElement('div')
+  containerEl.style.setProperty('display', 'flex')
+  containerEl.style.setProperty('gap', '10px')
+  containerEl.style.setProperty('line-height', '36px')
+  containerEl.style.setProperty('border-color', 'var(--chakra-colors-blue-900)')
+  containerEl.style.setProperty('border-bottom-width', '1px')
+  containerEl.style.setProperty('font-size', 'var(--chakra-fontSizes-sm)')
+  const gmgnEl = createExternalLinkEl('GMGN', links.gmgn)
+  containerEl.appendChild(gmgnEl)
+  const bullxEl = createExternalLinkEl('BullX', links.bullx)
+  containerEl.appendChild(bullxEl)
+  wrapEl.insertBefore(containerEl, wrapEl.firstChild)
+}
+
+function createExternalLinkEl(text: string, href: string) {
+  const el = document.createElement('a')
+  el.setAttribute('href', href)
+  el.setAttribute('target', '_blank')
+  el.setAttribute('rel', 'noopener noreferrer nofollow')
+  el.setHTMLUnsafe(text)
+  el.dataset['external'] = text
+  el.classList.add('chakra-link', 'chakra-button')
+  return el
+}
+
+function getExternalLinks(el: HTMLDivElement) {
+  const parts = document.location.pathname.split('/')
+  if (parts.length !== 3) {
+    throw new Error('未发现有效格式')
+  }
+  const chain = parts[1]
+
+  const aEls = el.querySelectorAll('a[title="Open in block explorer"]')
+  if (aEls.length !== 3) {
+    throw new Error('未发现token地址')
+  }
+  const aEl = aEls.item(1) as HTMLAnchorElement
+  const address = aEl.href.split('/').pop()!
+
+  return {
+    gmgn: getGmGnLink(chain, address),
+    bullx: getBullxLink(chain, address),
+  }
+}
+
+function getGmGnLink(chain: string, token: string) {
+  let _chain: string
+  if (chain === 'solana') {
+    _chain = 'sol'
+  } else if (chain === 'ethereum') {
+    _chain = 'eth'
+  } else {
+    throw new Error(`${chain}暂不支持`)
+  }
+  return `https://gmgn.ai/${_chain}/token/${token}`
+}
+
+function getBullxLink(chain: string, token: string) {
+  let chainId: number
+  if (chain === 'solana') {
+    chainId = 1399811149
+  } else if (chain === 'ethereum') {
+    chainId = 1
+  } else {
+    throw new Error(`${chain}暂不支持`)
+  }
+  return `https://bullx.io/terminal?chainId=${chainId}&address=${token}`
 }
