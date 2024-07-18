@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.11
+// @version      0.0.12
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -45,6 +45,16 @@ function hideAd() {
 }
 
 async function addExternalLink() {
+  const parts = document.location.pathname.split('/')
+  if (parts.length !== 3) {
+    throw new Error('未发现有效格式')
+  }
+
+  const chain = parts[1]
+  if (!['ethereum', 'base', 'solana'].includes(chain)) {
+    return
+  }
+
   if (document.querySelector('a[data-external]') !== null) {
     return
   }
@@ -54,7 +64,11 @@ async function addExternalLink() {
   )
   const wrapEl = locateEl.parentElement!.parentElement!.parentElement as HTMLDivElement
 
-  const links = getExternalLinks(wrapEl)
+  const links = getExternalLinks(wrapEl, chain)
+
+  if (links === null) {
+    return
+  }
 
   const containerEl = document.createElement('div')
   containerEl.style.setProperty('display', 'flex')
@@ -63,11 +77,15 @@ async function addExternalLink() {
   containerEl.style.setProperty('border-color', 'var(--chakra-colors-blue-900)')
   containerEl.style.setProperty('border-bottom-width', '1px')
   containerEl.style.setProperty('font-size', 'var(--chakra-fontSizes-sm)')
-  containerEl.style.setProperty('color', 'var(--chakra-colors-green-400)')
-  const gmgnEl = createExternalLinkEl('GMGN', links.gmgn)
-  containerEl.appendChild(gmgnEl)
-  const bullxEl = createExternalLinkEl('BullX', links.bullx)
-  containerEl.appendChild(bullxEl)
+  containerEl.style.setProperty('color', 'var(--chakra-colors-green-300)')
+  if (links.gmgn) {
+    const gmgnEl = createExternalLinkEl('GMGN', links.gmgn)
+    containerEl.appendChild(gmgnEl)
+  }
+  if (links.bullx) {
+    const bullxEl = createExternalLinkEl('BullX', links.bullx)
+    containerEl.appendChild(bullxEl)
+  }
   wrapEl.insertBefore(containerEl, wrapEl.firstChild)
 }
 
@@ -82,13 +100,7 @@ function createExternalLinkEl(text: string, href: string) {
   return el
 }
 
-function getExternalLinks(el: HTMLDivElement) {
-  const parts = document.location.pathname.split('/')
-  if (parts.length !== 3) {
-    throw new Error('未发现有效格式')
-  }
-  const chain = parts[1]
-
+function getExternalLinks(el: HTMLDivElement, chain: string) {
   const aEls = el.querySelectorAll('a[title="Open in block explorer"]')
   if (aEls.length !== 3) {
     throw new Error('未发现token地址')
@@ -104,24 +116,30 @@ function getExternalLinks(el: HTMLDivElement) {
 
 function getGmGnLink(chain: string, token: string) {
   let _chain: string
-  if (chain === 'solana') {
-    _chain = 'sol'
-  } else if (chain === 'ethereum') {
+  if (chain === 'ethereum') {
     _chain = 'eth'
+  } else if (chain === 'base') {
+    _chain = 'base'
+  } else if (chain === 'solana') {
+    _chain = 'sol'
   } else {
-    throw new Error(`${chain}暂不支持`)
+    console.warn(`${chain}暂不支持`)
+    return null
   }
   return `https://gmgn.ai/${_chain}/token/${token}`
 }
 
 function getBullxLink(chain: string, token: string) {
   let chainId: number
-  if (chain === 'solana') {
-    chainId = 1399811149
-  } else if (chain === 'ethereum') {
+  if (chain === 'ethereum') {
     chainId = 1
+  } else if (chain === 'base') {
+    chainId = 8453
+  } else if (chain === 'solana') {
+    chainId = 1399811149
   } else {
-    throw new Error(`${chain}暂不支持`)
+    console.warn(`${chain}暂不支持`)
+    return null
   }
   return `https://bullx.io/terminal?chainId=${chainId}&address=${token}`
 }
