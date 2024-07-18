@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/tampermonkey-scripts
-// @version      0.0.10
+// @version      0.0.11
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -63,6 +63,7 @@ async function addExternalLink() {
   containerEl.style.setProperty('border-color', 'var(--chakra-colors-blue-900)')
   containerEl.style.setProperty('border-bottom-width', '1px')
   containerEl.style.setProperty('font-size', 'var(--chakra-fontSizes-sm)')
+  containerEl.style.setProperty('color', 'var(--chakra-colors-green-400)')
   const gmgnEl = createExternalLinkEl('GMGN', links.gmgn)
   containerEl.appendChild(gmgnEl)
   const bullxEl = createExternalLinkEl('BullX', links.bullx)
