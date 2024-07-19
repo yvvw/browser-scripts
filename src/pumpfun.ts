@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         Better pump.fun
-// @namespace    https://github.com/yvvw/tampermonkey-scripts
+// @namespace    https://github.com/yvvw/browser-scripts
 // @version      0.0.14
 // @description  增加gmgn、bullx跳转，标记dev，快速交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
 // @license      MIT
-// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/pumpfun.meta.js
-// @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/pumpfun.user.js
+// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/pumpfun.meta.js
+// @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/pumpfun.user.js
 // @match        https://www.pump.fun/*
 // @match        https://pump.fun/*
 // @grant        none

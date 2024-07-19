@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         Better Douyu
-// @namespace    https://github.com/yvvw/tampermonkey-scripts
+// @namespace    https://github.com/yvvw/browser-scripts
 // @version      0.0.8
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.douyu.com/favicon.ico
 // @license      MIT
-// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/douyu.meta.js
-// @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/douyu.user.js
+// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/douyu.meta.js
+// @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/douyu.user.js
 // @match        https://www.douyu.com/topic/*
 // @match        https://www.douyu.com/0*
 // @match        https://www.douyu.com/1*

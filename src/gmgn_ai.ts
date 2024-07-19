@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         Better GMGN.ai
-// @namespace    https://github.com/yvvw/tampermonkey-scripts
+// @namespace    https://github.com/yvvw/browser-scripts
 // @version      0.0.14
 // @description  调整屏宽，移除buy more，增加bullx跳转，加强dev卖出标记
 // @author       yvvw
 // @icon         https://gmgn.ai/static/favicon2.ico
 // @license      MIT
-// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/gmgn_ai.meta.js
-// @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/tampermonkey-scripts/releases/download/latest/gmgn_ai.user.js
+// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/gmgn_ai.meta.js
+// @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/gmgn_ai.user.js
 // @match        https://gmgn.ai/*
 // @grant        GM_openInTab
 // ==/UserScript==
