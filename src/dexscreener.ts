@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.12
+// @version      0.0.13
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -14,13 +14,13 @@
 import { HTMLUtils } from './util'
 
 window.onload = function main() {
-  HTMLUtils.observe(
+  HTMLUtils.simpleObserve(
+    document.body,
     () => {
       hideAd()
       expandWatchList().catch(console.error)
       addExternalLink().catch(console.error)
     },
-    document.body,
     1000
   )
 }
@@ -33,13 +33,9 @@ async function expandWatchList() {
 }
 
 function hideAd() {
-  const res = document.evaluate('//button[text()="Hide ad"]', document)
-  while (true) {
-    const btn = res.iterateNext() as HTMLButtonElement
-    if (btn === null) {
-      break
-    }
-    btn.click()
+  const btnEls = HTMLUtils.getElementsByXPath<HTMLButtonElement>('//button[text()="Hide ad"]')
+  for (const btnEl of btnEls) {
+    btnEl.click()
   }
 }
 
@@ -58,8 +54,8 @@ async function addExternalLink() {
     return
   }
 
-  const locateEl = await HTMLUtils.waitingElement(
-    () => document.evaluate('//span[text()="Pair"]', document).iterateNext() as HTMLSpanElement
+  const locateEl = await HTMLUtils.waitingElement(() =>
+    HTMLUtils.getFirstElementByXPath<HTMLSpanElement>('//span[text()="Pair"]')
   )
   const wrapEl = locateEl.parentElement!.parentElement!.parentElement as HTMLDivElement
 

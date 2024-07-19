@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Douyu
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.9
+// @version      0.0.11
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.douyu.com/favicon.ico
@@ -20,12 +20,13 @@
 // @match        https://www.douyu.com/7*
 // @match        https://www.douyu.com/8*
 // @match        https://www.douyu.com/9*
+// @grant        GM_addStyle
 // ==/UserScript==
 
-import { HTMLUtils } from './util'
+import { GM, HTMLUtils } from './util'
 
 window.onload = function main() {
-  hideAd()
+  hideUnnecessaryElements()
   if (!location.pathname.includes('watchHistory')) {
     switchWebFullscreen()
     switchBestQuality()
@@ -53,10 +54,7 @@ function hideDanmuPanel() {
     .catch((err) => console.error('hideDanmuPanel', err))
 }
 
-function hideAd() {
-  const head = document.querySelector('head')
-  if (head === null) return
-
+function hideUnnecessaryElements() {
   let css = '{display:none !important;height:0 !important}'
   css += '.layout-Player-rank{display:none !important}'
   css += '.layout-Player-barrage{top:0px !important;}'
@@ -137,8 +135,5 @@ function hideAd() {
   css += '.dy-Modal-wrap {display:none !important;}'
   css += '#tc {display:none !important;}'
   css += '#js-history > :nth-child(1) {display:none !important;}'
-
-  const style = document.createElement('style')
-  style.appendChild(document.createTextNode(css))
-  head.appendChild(style)
+  GM.addStyle(css)
 }

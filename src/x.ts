@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better X(Twitter)
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.12
+// @version      0.0.13
 // @description  关闭广告，快捷屏蔽
 // @author       yvvw
 // @icon         https://abs.twimg.com/favicons/twitter.3.ico
@@ -17,7 +17,7 @@
 import { HTMLUtils } from './util'
 
 window.onload = function main() {
-  HTMLUtils.observe(async (records) => {
+  HTMLUtils.simpleObserve(document.body, async () => {
     const listEl = document.querySelector<HTMLDivElement>('section[role="region"]')
     if (listEl === null) {
       return

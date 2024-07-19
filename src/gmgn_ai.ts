@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better GMGN.ai
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.14
+// @version      0.0.15
 // @description  调整屏宽，移除buy more，增加bullx跳转，加强dev卖出标记
 // @author       yvvw
 // @icon         https://gmgn.ai/static/favicon2.ico
@@ -18,7 +18,7 @@ const clearChannel = new Set<Function>()
 
 window.onload = function main() {
   let previous = ''
-  HTMLUtils.observe(async () => {
+  HTMLUtils.simpleObserve(document.body, async () => {
     if (location.href === previous) {
       return
     }
@@ -42,15 +42,14 @@ window.onload = function main() {
 }
 
 async function removeBuyMoreActivities() {
-  const activityBtnEl = await HTMLUtils.waitingElement(
-    () =>
-      document.evaluate('//button[text()="Activity"]', document).iterateNext() as HTMLButtonElement
+  const activityBtnEl = await HTMLUtils.waitingElement(() =>
+    HTMLUtils.getFirstElementByXPath<HTMLButtonElement>('//button[text()="Activity"]')
   )
   if (activityBtnEl.getAttribute('tabindex') !== '0') {
     return
   }
   const container = await HTMLUtils.waitingElement(() => document.getElementById('gmgnCalls'))
-  const observer = HTMLUtils.observe(() => {
+  const disconnect = HTMLUtils.simpleObserve(container, () => {
     for (const childEl of container.children) {
       const buyMoreEl = childEl.querySelector('div[title="Buy More"]')
       if (buyMoreEl === null) {
@@ -58,8 +57,8 @@ async function removeBuyMoreActivities() {
       }
       container.removeChild(childEl)
     }
-  }, container)
-  clearChannel.add(() => observer.disconnect())
+  })
+  clearChannel.add(disconnect)
 }
 
 async function adjustRecordSize() {
@@ -75,14 +74,14 @@ async function adjustRecordSize() {
   } else {
     tabEl.style.setProperty('width', '80%')
   }
-  const observer = HTMLUtils.observe(() => {
+  const disconnect = HTMLUtils.simpleObserve(parentEl, () => {
     if (parentEl.clientWidth === sibEl.clientWidth) {
       tabEl.style.removeProperty('width')
     } else {
       tabEl.style.setProperty('width', '80%')
     }
-  }, parentEl)
-  clearChannel.add(() => observer.disconnect())
+  })
+  clearChannel.add(disconnect)
 }
 
 async function markSellAll() {
@@ -100,12 +99,12 @@ async function markSellAll() {
       rowEl.style.removeProperty('--table-hover-color')
     }
   }
-  const observer = HTMLUtils.observe(() => {
+  const disconnect = HTMLUtils.simpleObserve(table, () => {
     for (const row of table.children) {
       mark(row as HTMLDivElement)
     }
-  }, table)
-  clearChannel.add(() => observer.disconnect())
+  })
+  clearChannel.add(disconnect)
 }
 
 async function updateExternalLink() {
@@ -160,12 +159,12 @@ async function updateExternalLink() {
   for (const row of table.children) {
     addLink(row as HTMLDivElement)
   }
-  const observer = HTMLUtils.observe(() => {
+  const disconnect = HTMLUtils.simpleObserve(table, () => {
     for (const row of table.children) {
       addLink(row as HTMLDivElement)
     }
-  }, table)
-  clearChannel.add(() => observer.disconnect())
+  })
+  clearChannel.add(disconnect)
 }
 
 const bullxIcon =

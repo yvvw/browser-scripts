@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.19
+// @version      0.0.20
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -13,9 +13,11 @@
 // @match        https://www.bilibili.com/bangumi/play/*
 // @match        https://www.bilibili.com/blackboard/*
 // @match        https://live.bilibili.com/*
+// @grant        unsafeWindow
+// @grant        GM_addStyle
 // ==/UserScript==
 
-import { delay } from './util'
+import { delay, HTMLUtils } from './util'
 
 let vip = false
 
@@ -65,24 +67,23 @@ class LivePlayer implements IPlayer {
   }
 
   async prepare() {
-    return new Promise<void>((resolve) => {
-      const observer = new MutationObserver(() => {
-        if (document.querySelector('video')) {
-          resolve()
-          observer.disconnect()
-        }
-      })
-      observer.observe(document.body, { subtree: true, childList: true })
-    })
+    return new Promise<void>((resolve) =>
+      HTMLUtils.observe(
+        document.body,
+        () => {
+          if (document.querySelector('video')) {
+            resolve()
+            return true
+          }
+        },
+        { throttle: 500 }
+      )
+    )
   }
 
   hideElement() {
-    const head = document.querySelector('head')
-    if (head === null) return
     const css = '#my-dear-haruna-vm{display:none !important}'
-    const style = document.createElement('style')
-    style.appendChild(document.createTextNode(css))
-    head.appendChild(style)
+    GM.addStyle(css)
   }
 
   hideChatPanel() {
@@ -111,7 +112,7 @@ class LivePlayer implements IPlayer {
 
   switchBestQuality() {
     // @ts-ignore
-    const livePlayer = window.livePlayer || window.top.livePlayer
+    const livePlayer = unsafeWindow.livePlayer || unsafeWindow.top.livePlayer
     if (!livePlayer) return
     const playerInfo = livePlayer.getPlayerInfo()
     const qualityCandidates = playerInfo.qualityCandidates
@@ -143,15 +144,18 @@ class VideoPlayer implements IPlayer {
   }
 
   async prepare() {
-    return new Promise<void>((resolve) => {
-      const observer = new MutationObserver(() => {
-        if (document.querySelector(VideoPlayer.CONFIG.webFullscreenSelector)) {
-          resolve()
-          observer.disconnect()
-        }
-      })
-      observer.observe(document.body, { subtree: true, childList: true })
-    })
+    return new Promise<void>((resolve) =>
+      HTMLUtils.observe(
+        document.body,
+        () => {
+          if (document.querySelector(VideoPlayer.CONFIG.webFullscreenSelector)) {
+            resolve()
+            return true
+          }
+        },
+        { throttle: 500 }
+      )
+    )
   }
 
   switchWebFullscreen() {

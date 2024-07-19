@@ -3,8 +3,8 @@ export async function delay(time: number) {
 }
 
 export class HTMLUtils {
-  static async waitingElement<T extends Element>(
-    getElement: () => T | null,
+  static async waitingElement<EL extends Element>(
+    getElement: () => EL | null,
     timeout = 5000,
     interval = 500
   ) {
@@ -26,35 +26,85 @@ export class HTMLUtils {
     }
   }
 
-  static observe(
-    exec: (records: MutationRecord[]) => any,
-    target: Element = document.body,
+  static getFirstElementByXPath<EL extends Element>(
+    xpath: string,
+    context: Node = document
+  ): EL | null {
+    return document.evaluate(xpath, context, null, XPathResult.ANY_TYPE, null).iterateNext() as EL
+  }
+
+  static getElementsByXPath<EL extends Element>(xpath: string, context: Node = document): EL[] {
+    const iterator = document.evaluate(xpath, context, null, XPathResult.ANY_TYPE, null)
+    const result: EL[] = []
+    let item: EL | null
+    while ((item = iterator.iterateNext() as EL)) {
+      result.push(item)
+    }
+    return result
+  }
+
+  static simpleObserve(
+    node: Node = document.body,
+    callback: (
+      mutations: MutationRecord[],
+      observer: MutationObserver
+    ) => boolean | void | Promise<boolean | void>,
     throttle = 300
   ) {
+    return HTMLUtils.observe(node, callback, { waiting: true, throttle })
+  }
+
+  static observe(
+    node: Node,
+    callback: (
+      mutations: MutationRecord[],
+      observer: MutationObserver
+    ) => boolean | void | Promise<boolean | void>,
+    options?: MutationObserverInit & { waiting?: boolean; throttle?: number }
+  ): () => void {
     let running = false
-    let timerId: ReturnType<typeof setTimeout>
-    let lastInvokeAt = 0
-    const callback: MutationCallback = (records) => {
-      if (running) {
-        return
+    let timer: ReturnType<typeof setTimeout>
+    let lastCallAt = 0
+
+    const observer = new MutationObserver(async (mutations, ob) => {
+      const exec = async () => {
+        const result = callback(mutations, ob)
+        const ok = result instanceof Promise ? await result : result
+        if (ok) disconnect()
       }
-      const now = Date.now()
-      if (now - lastInvokeAt < throttle) {
-        clearTimeout(timerId)
+      const throttle = (callback: () => void, interval: number) => {
+        const now = Date.now()
+        if (now - lastCallAt < interval) clearTimeout(timer)
+        lastCallAt = now
+        timer = setTimeout(callback, interval)
       }
-      lastInvokeAt = now
-      timerId = setTimeout(async () => {
-        running = true
-        const res = exec(records)
-        if (res instanceof Promise) {
-          await res
+
+      if (!options?.waiting) {
+        if (options?.throttle === undefined) {
+          await exec()
+        } else {
+          throttle(exec, options.throttle)
         }
-        running = false
-      }, throttle)
-    }
-    const observer = new MutationObserver(callback)
-    observer.observe(target, { childList: true, subtree: true })
-    return observer
+      } else {
+        if (options?.throttle === undefined) {
+          if (running) return
+          running = true
+          await exec()
+          running = false
+        } else {
+          if (running) return
+          throttle(async () => {
+            running = true
+            await exec()
+            running = false
+          }, options.throttle)
+        }
+      }
+    })
+    observer.observe(node, { childList: true, subtree: true, ...options })
+
+    const disconnect = () => observer.disconnect()
+    return disconnect
   }
 }
 
@@ -69,5 +119,15 @@ export class NavigatorUtil {
         res[it[0]] = it[1]
         return res
       }, {})
+  }
+}
+
+export class GM {
+  static addElement(...args: Parameters<typeof GM_addElement>) {
+    return GM_addElement(...args)
+  }
+
+  static addStyle(...args: Parameters<typeof GM_addStyle>) {
+    return GM_addStyle(...args)
   }
 }

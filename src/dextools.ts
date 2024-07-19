@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEXTools
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.4
+// @version      0.0.5
 // @description  关闭广告
 // @author       yvvw
 // @icon         https://www.dextools.io/app/favicon.ico
@@ -14,7 +14,7 @@
 import { HTMLUtils } from './util'
 
 window.onload = function main() {
-  HTMLUtils.observe(() => hideAd())
+  HTMLUtils.simpleObserve(document.body, () => hideAd())
 }
 
 function hideAd() {

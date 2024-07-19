@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.14
+// @version      0.0.15
 // @description  增加gmgn、bullx跳转，标记dev，快速交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -46,8 +46,8 @@ window.onload = function main() {
 }
 
 async function addExternalLinks() {
-  const threadEl = await HTMLUtils.waitingElement(
-    () => document.evaluate('//div[text()="Thread"]', document).iterateNext() as HTMLDivElement
+  const threadEl = await HTMLUtils.waitingElement(() =>
+    HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[text()="Thread"]')
   )
   ;(threadEl.parentElement as HTMLDivElement).style.setProperty('font-size', '1.5rem')
 
@@ -72,8 +72,8 @@ function createExternalLink(text: string, href: string) {
 }
 
 async function addQuickButton() {
-  const threadEl = await HTMLUtils.waitingElement(
-    () => document.evaluate('//div[text()="Thread"]', document).iterateNext() as HTMLDivElement
+  const threadEl = await HTMLUtils.waitingElement(() =>
+    HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[text()="Thread"]')
   )
   const divWrapEl = document.createElement('div')
   divWrapEl.classList.add('flex')
@@ -143,8 +143,8 @@ async function quickSell(percent: string) {
 }
 
 async function switchMode(mode: 'Buy' | 'Sell') {
-  const buyEl = await HTMLUtils.waitingElement(
-    () => document.evaluate(`//button[text()="${mode}"]`, document).iterateNext() as HTMLDivElement
+  const buyEl = await HTMLUtils.waitingElement(() =>
+    HTMLUtils.getFirstElementByXPath<HTMLDivElement>(`//button[text()="${mode}"]`)
   )
   buyEl.click()
 }
@@ -181,9 +181,8 @@ async function autoTrade() {
   const click = buttonEl.click
   buttonEl.removeEventListener('click', click)
   buttonEl.addEventListener('click', async function () {
-    const cancelEl = await HTMLUtils.waitingElement(
-      () =>
-        document.evaluate('//div[text()="[cancel]"]', document).iterateNext() as HTMLButtonElement
+    const cancelEl = await HTMLUtils.waitingElement(() =>
+      HTMLUtils.getFirstElementByXPath<HTMLButtonElement>('//div[text()="[cancel]"]')
     )
     ;(cancelEl.previousElementSibling as HTMLButtonElement).click()
     cancelEl.click()
@@ -191,8 +190,8 @@ async function autoTrade() {
 }
 
 async function markTradePanel() {
-  const tradesEl = await HTMLUtils.waitingElement(
-    () => document.evaluate('//div[text()="Trades"]', document).iterateNext() as HTMLDivElement
+  const tradesEl = await HTMLUtils.waitingElement(() =>
+    HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[text()="Trades"]')
   )
 
   const click = tradesEl.click
@@ -216,9 +215,8 @@ async function labelDevInTradePanel() {
     throw new Error('未发现交易面板')
   }
 
-  const devSibEl = await HTMLUtils.waitingElement(
-    () =>
-      document.evaluate('//span[text()="created by"]', document).iterateNext() as HTMLSpanElement
+  const devSibEl = await HTMLUtils.waitingElement(() =>
+    HTMLUtils.getFirstElementByXPath<HTMLSpanElement>('//span[text()="created by"]')
   )
   const devEl = devSibEl.nextSibling as HTMLAnchorElement | undefined
   if (!devEl) {
@@ -267,13 +265,13 @@ async function labelDevInTradePanel() {
     labelTrade(tableEl.children.item(i) as HTMLDivElement, i)
   }
 
-  const observer = HTMLUtils.observe(() => {
+  const disconnect = HTMLUtils.simpleObserve(tableEl, () => {
     // 跳过前两个表头和最后一个翻页组件
     for (let i = 2; i < tableEl.children.length - 1; i++) {
       labelTrade(tableEl.children.item(i) as HTMLDivElement, i)
     }
-  }, tableEl)
-  clearChannel.add(() => observer.disconnect())
+  })
+  clearChannel.add(disconnect)
 }
 
 async function markTopHolder() {
@@ -284,7 +282,7 @@ async function markTopHolder() {
         .iterateNext() as HTMLDivElement
   )
   const holderListEls = holderTextEl.nextSibling!.firstChild as HTMLDivElement
-  const observer = HTMLUtils.observe(() => {
+  const disconnect = HTMLUtils.simpleObserve(holderListEls, () => {
     if (holderListEls.childElementCount === 0) {
       return
     }
@@ -295,8 +293,8 @@ async function markTopHolder() {
         holderListEl.classList.add('text-red-400')
       }
     }
-  }, holderListEls)
-  clearChannel.add(() => observer.disconnect())
+  })
+  clearChannel.add(disconnect)
 }
 
 let playing = false
