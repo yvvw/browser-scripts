@@ -9,7 +9,6 @@
 // @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/dexscreener.meta.js
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/dexscreener.user.js
 // @match        https://dexscreener.com/*
-// @grant        none
 // ==/UserScript==
 
 import { HTMLUtils } from './util'

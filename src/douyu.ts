@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         Better Douyu
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.8
+// @version      0.0.9
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.douyu.com/favicon.ico
 // @license      MIT
 // @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/douyu.meta.js
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/douyu.user.js
+// @match        https://www.douyu.com/directory/watchHistory
 // @match        https://www.douyu.com/topic/*
 // @match        https://www.douyu.com/0*
 // @match        https://www.douyu.com/1*
@@ -19,16 +20,17 @@
 // @match        https://www.douyu.com/7*
 // @match        https://www.douyu.com/8*
 // @match        https://www.douyu.com/9*
-// @grant        none
 // ==/UserScript==
 
 import { HTMLUtils } from './util'
 
-window.onload = async function main() {
+window.onload = function main() {
   hideAd()
-  switchWebFullscreen()
-  switchBestQuality()
-  hideDanmuPanel()
+  if (!location.pathname.includes('watchHistory')) {
+    switchWebFullscreen()
+    switchBestQuality()
+    hideDanmuPanel()
+  }
 }
 
 function switchWebFullscreen() {
@@ -134,6 +136,7 @@ function hideAd() {
   css += '.Widget {display:none !important;}'
   css += '.dy-Modal-wrap {display:none !important;}'
   css += '#tc {display:none !important;}'
+  css += '#js-history > :nth-child(1) {display:none !important;}'
 
   const style = document.createElement('style')
   style.appendChild(document.createTextNode(css))

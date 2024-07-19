@@ -10,7 +10,6 @@
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/pumpfun.user.js
 // @match        https://www.pump.fun/*
 // @match        https://pump.fun/*
-// @grant        none
 // ==/UserScript==
 
 import { delay, HTMLUtils } from './util'

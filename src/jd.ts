@@ -10,7 +10,6 @@
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/jd.user.js
 // @match        https://pcsitepp-fm.jd.com/
 // @match        https://cart.jd.com/*
-// @grant        none
 // ==/UserScript==
 
 window.onload = function main() {

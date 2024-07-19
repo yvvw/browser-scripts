@@ -13,7 +13,6 @@
 // @match        https://www.bilibili.com/bangumi/play/*
 // @match        https://www.bilibili.com/blackboard/*
 // @match        https://live.bilibili.com/*
-// @grant        none
 // ==/UserScript==
 
 import { delay } from './util'
