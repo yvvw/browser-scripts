@@ -8,9 +8,9 @@ devDependencies:
   '@types/node':
     specifier: ^20.14.9
     version: 20.14.9
-  '@types/tampermonkey':
-    specifier: ^5.0.3
-    version: 5.0.3
+  '@violentmonkey/types':
+    specifier: ^0.1.8
+    version: 0.1.8
   chokidar:
     specifier: ^3.6.0
     version: 3.6.0
@@ -328,10 +328,10 @@ packages:
       undici-types: 5.26.5
     dev: true
 
-  /@types/tampermonkey@5.0.3:
+  /@violentmonkey/types@0.1.8:
     resolution:
       {
-        integrity: sha512-i8+x8ipoib8xAfho25oNTbILgrO665oxq5tNr3LvH5DaW5UOPsc88Fe1mTVTDwsux5LYOcd8Syb6q+s95x878Q==,
+        integrity: sha512-ZudhwBz1wRZ44YH2O0jX4xokS17+7GsebNYHSe1IOjuJIl4IF8BC3MGCua0Lzm7IkKHKAm1smgyl8Ruzc4NTvA==,
       }
     dev: true
 
