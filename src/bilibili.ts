@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.20
+// @version      0.0.21
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -17,7 +17,7 @@
 // @grant        GM_addStyle
 // ==/UserScript==
 
-import { delay, HTMLUtils } from './util'
+import { delay, GM, HTMLUtils } from './util'
 
 let vip = false
 
@@ -68,16 +68,12 @@ class LivePlayer implements IPlayer {
 
   async prepare() {
     return new Promise<void>((resolve) =>
-      HTMLUtils.observe(
-        document.body,
-        () => {
-          if (document.querySelector('video')) {
-            resolve()
-            return true
-          }
-        },
-        { throttle: 500 }
-      )
+      HTMLUtils.observe(document.body, () => {
+        if (document.querySelector('video')) {
+          resolve()
+          return true
+        }
+      })
     )
   }
 
@@ -96,7 +92,7 @@ class LivePlayer implements IPlayer {
     const playerEl = document.querySelector('#live-player') as HTMLElement | null
     if (playerEl === null) return
     const event = new MouseEvent('mousemove', {
-      view: window,
+      view: unsafeWindow,
     })
     playerEl.dispatchEvent(event)
     const id = setTimeout(() => playerEl.dispatchEvent(event), 1000)
@@ -145,16 +141,12 @@ class VideoPlayer implements IPlayer {
 
   async prepare() {
     return new Promise<void>((resolve) =>
-      HTMLUtils.observe(
-        document.body,
-        () => {
-          if (document.querySelector(VideoPlayer.CONFIG.webFullscreenSelector)) {
-            resolve()
-            return true
-          }
-        },
-        { throttle: 500 }
-      )
+      HTMLUtils.observe(document.body, () => {
+        if (document.querySelector(VideoPlayer.CONFIG.webFullscreenSelector)) {
+          resolve()
+          return true
+        }
+      })
     )
   }
 
