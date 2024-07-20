@@ -13,6 +13,7 @@
 // @match        https://www.bilibili.com/bangumi/play/*
 // @match        https://www.bilibili.com/blackboard/*
 // @match        https://live.bilibili.com/*
+// @grant        unsafeWindow
 // @grant        GM_addStyle
 // ==/UserScript==
 
@@ -91,7 +92,7 @@ class LivePlayer implements IPlayer {
     const playerEl = document.querySelector('#live-player') as HTMLElement | null
     if (playerEl === null) return
     const event = new MouseEvent('mousemove', {
-      view: window,
+      view: unsafeWindow,
     })
     playerEl.dispatchEvent(event)
     const id = setTimeout(() => playerEl.dispatchEvent(event), 1000)
@@ -107,7 +108,7 @@ class LivePlayer implements IPlayer {
 
   switchBestQuality() {
     // @ts-ignore
-    const livePlayer = window.livePlayer || window.top.livePlayer
+    const livePlayer = unsafeWindow.livePlayer || unsafeWindow.top.livePlayer
     if (!livePlayer) return
     const playerInfo = livePlayer.getPlayerInfo()
     const qualityCandidates = playerInfo.qualityCandidates
