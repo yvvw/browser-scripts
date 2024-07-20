@@ -13,7 +13,7 @@ async function main() {
     outfile: `dist/${entry.object.name}.user.js`,
     bundle: true,
     minify: !entry.dev,
-    target: ['es2015'],
+    target: ['es2020', 'chrome57', 'firefox57'],
     legalComments: 'none',
   })
   if (!entry.dev) {
