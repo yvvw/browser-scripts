@@ -17,7 +17,7 @@
 // @grant        GM_addStyle
 // ==/UserScript==
 
-import { delay, GM, HTMLUtils } from './util'
+import { GM, HTMLUtils } from './util'
 
 let vip = false
 
@@ -28,16 +28,11 @@ window.onload = async function main() {
   const api = new BilibiliApi()
   vip = await api.isVip()
 
-  await player.prepare()
-  await delay(1000)
-  player.optimistic()
-  player.daemon()
+  await player.optimistic()
 }
 
 interface IPlayer {
-  prepare(): Promise<void>
-  optimistic(): void
-  daemon(): void
+  optimistic(): Promise<void>
 }
 
 function getPlayer(): IPlayer | undefined {
@@ -52,29 +47,12 @@ function getPlayer(): IPlayer | undefined {
 }
 
 class LivePlayer implements IPlayer {
-  optimistic() {
+  async optimistic() {
+    await HTMLUtils.waitingElement(() => document.querySelector('video'))
     this.hideElement()
     this.switchWebFullscreen()
     this.switchBestQuality()
     this.hideChatPanel()
-  }
-
-  daemon() {
-    setTimeout(() => {
-      this.switchBestQuality()
-      this.daemon()
-    }, 60000)
-  }
-
-  async prepare() {
-    return new Promise<void>((resolve) =>
-      HTMLUtils.observe(document.body, () => {
-        if (document.querySelector('video')) {
-          resolve()
-          return true
-        }
-      })
-    )
   }
 
   hideElement() {
@@ -83,27 +61,22 @@ class LivePlayer implements IPlayer {
   }
 
   hideChatPanel() {
-    const el = document.querySelector('#aside-area-toggle-btn') as HTMLElement | null
+    const el = document.querySelector<HTMLElement>('#aside-area-toggle-btn')
     if (el === null) return
     el.click()
   }
 
   switchWebFullscreen() {
-    const playerEl = document.querySelector('#live-player') as HTMLElement | null
+    const playerEl = document.querySelector<HTMLElement>('#live-player')
     if (playerEl === null) return
-    const event = new MouseEvent('mousemove', {
-      view: unsafeWindow,
-    })
-    playerEl.dispatchEvent(event)
-    const id = setTimeout(() => playerEl.dispatchEvent(event), 1000)
-    const areaEl = document.querySelector('.right-area')
-    if (areaEl === null) return clearTimeout(id)
+    playerEl.dispatchEvent(new MouseEvent('mousemove', { view: unsafeWindow }))
+    const areaEl = document.querySelector<HTMLElement>('.right-area')
+    if (areaEl === null) return
     const childEl = areaEl.children.item(1)
-    if (childEl === null) return clearTimeout(id)
-    const spanEl = childEl.querySelector('span') as HTMLElement | null
-    if (spanEl === null) return clearTimeout(id)
+    if (childEl === null) return
+    const spanEl = childEl.querySelector<HTMLElement>('span')
+    if (spanEl === null) return
     spanEl.click()
-    clearTimeout(id)
   }
 
   switchBestQuality() {
@@ -128,32 +101,15 @@ class VideoPlayer implements IPlayer {
   }
 
   async optimistic() {
+    await HTMLUtils.waitingElement(() =>
+      document.querySelector(VideoPlayer.CONFIG.webFullscreenSelector)
+    )
     this.switchWebFullscreen()
     this.switchBestQuality()
   }
 
-  daemon() {
-    setTimeout(() => {
-      this.switchBestQuality()
-      this.daemon()
-    }, 60000)
-  }
-
-  async prepare() {
-    return new Promise<void>((resolve) =>
-      HTMLUtils.observe(document.body, () => {
-        if (document.querySelector(VideoPlayer.CONFIG.webFullscreenSelector)) {
-          resolve()
-          return true
-        }
-      })
-    )
-  }
-
   switchWebFullscreen() {
-    const el = document.querySelector(
-      VideoPlayer.CONFIG.webFullscreenSelector
-    ) as HTMLElement | null
+    const el = document.querySelector<HTMLElement>(VideoPlayer.CONFIG.webFullscreenSelector)
     if (el === null) return
     if (el.classList.contains(VideoPlayer.CONFIG.activeWebFullscreenClassName)) return
     el.click()
@@ -164,7 +120,7 @@ class VideoPlayer implements IPlayer {
     if (el === null) return
     const length = el.children.length
     for (let i = 0; i < length; i++) {
-      const childEl = el.children.item(i) as HTMLElement | null
+      const childEl = el.children.item(i) as HTMLElement
       if (childEl === null) break
       if (childEl.classList.contains(VideoPlayer.CONFIG.activeQualityClassName)) break
       if (!vip && this.isBigVipQuality(childEl)) continue
@@ -176,7 +132,7 @@ class VideoPlayer implements IPlayer {
     if (!VideoPlayer.CONFIG.bigVipQualityClassName) return false
     const length = el.children.length
     for (let i = 0; i < length; i++) {
-      const childEl = el.children.item(i) as HTMLElement | null
+      const childEl = el.children.item(i) as HTMLElement
       if (childEl === null) break
       if (childEl.classList.contains(VideoPlayer.CONFIG.bigVipQualityClassName)) {
         return true
