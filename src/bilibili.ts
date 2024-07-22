@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.21
+// @version      0.0.22
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -48,11 +48,34 @@ function getPlayer(): IPlayer | undefined {
 
 class LivePlayer implements IPlayer {
   async optimistic() {
-    await HTMLUtils.waitingElement(() => document.querySelector('video'))
+    const player = await this.waitingPlayer()
     this.hideElement()
     this.switchWebFullscreen()
-    this.switchBestQuality()
+    this.switchBestQuality(player)
     this.hideChatPanel()
+  }
+
+  waitingPlayer(): Promise<ILivePlayer> {
+    return new Promise((resolve, reject) => {
+      let timeoutTimer: ReturnType<typeof setTimeout>
+      let intervalTimer: ReturnType<typeof setInterval>
+      const clearTimer = () => {
+        clearInterval(intervalTimer)
+        clearTimeout(timeoutTimer)
+      }
+
+      intervalTimer = setInterval(() => {
+        const livePlayer = unsafeWindow.livePlayer || unsafeWindow.top?.livePlayer
+        if (livePlayer) {
+          clearTimer()
+          resolve(livePlayer)
+        }
+      }, 100)
+      timeoutTimer = setTimeout(() => {
+        clearTimer()
+        reject(new Error('Timeout'))
+      }, 5000)
+    })
   }
 
   hideElement() {
@@ -69,7 +92,7 @@ class LivePlayer implements IPlayer {
   switchWebFullscreen() {
     const playerEl = document.querySelector<HTMLElement>('#live-player')
     if (playerEl === null) return
-    playerEl.dispatchEvent(new MouseEvent('mousemove', { view: unsafeWindow }))
+    playerEl.dispatchEvent(new MouseEvent('mousemove'))
     const areaEl = document.querySelector<HTMLElement>('.right-area')
     if (areaEl === null) return
     const childEl = areaEl.children.item(1)
@@ -79,15 +102,12 @@ class LivePlayer implements IPlayer {
     spanEl.click()
   }
 
-  switchBestQuality() {
-    // @ts-ignore
-    const livePlayer = unsafeWindow.livePlayer || unsafeWindow.top.livePlayer
-    if (!livePlayer) return
-    const playerInfo = livePlayer.getPlayerInfo()
+  switchBestQuality(player: ILivePlayer) {
+    const playerInfo = player.getPlayerInfo()
     const qualityCandidates = playerInfo.qualityCandidates
     if (qualityCandidates.length === 0) return
     if (qualityCandidates[0].qn === playerInfo.quality) return
-    livePlayer.switchQuality(qualityCandidates[0].qn)
+    player.switchQuality(qualityCandidates[0].qn)
   }
 }
 
