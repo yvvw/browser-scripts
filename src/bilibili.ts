@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.22
+// @version      0.0.23
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -17,16 +17,17 @@
 // @grant        GM_addStyle
 // ==/UserScript==
 
-import { GM, HTMLUtils } from './util'
+import type { IBiliUserLoginData } from '../types/bilibili_hook'
+import { GM } from './util'
 
-let vip = false
+let hook: BiliHook
 
 window.onload = async function main() {
   const player = getPlayer()
   if (!player) return
 
-  const api = new BilibiliApi()
-  vip = await api.isVip()
+  hook = new BiliHook()
+  await hook.prepare()
 
   await player.optimistic()
 }
@@ -46,36 +47,49 @@ function getPlayer(): IPlayer | undefined {
   return player
 }
 
-class LivePlayer implements IPlayer {
+class VideoPlayer implements IPlayer {
   async optimistic() {
-    const player = await this.waitingPlayer()
-    this.hideElement()
+    this.switchBestQuality()
     this.switchWebFullscreen()
-    this.switchBestQuality(player)
-    this.hideChatPanel()
   }
 
-  waitingPlayer(): Promise<ILivePlayer> {
-    return new Promise((resolve, reject) => {
-      let timeoutTimer: ReturnType<typeof setTimeout>
-      let intervalTimer: ReturnType<typeof setInterval>
-      const clearTimer = () => {
-        clearInterval(intervalTimer)
-        clearTimeout(timeoutTimer)
-      }
+  switchWebFullscreen() {
+    const el = document.querySelector<HTMLElement>('.bpx-player-ctrl-web')
+    if (el === null) return
+    if (el.classList.contains('bpx-state-entered')) return
+    el.click()
+  }
 
-      intervalTimer = setInterval(() => {
-        const livePlayer = unsafeWindow.livePlayer || unsafeWindow.top?.livePlayer
-        if (livePlayer) {
-          clearTimer()
-          resolve(livePlayer)
-        }
-      }, 100)
-      timeoutTimer = setTimeout(() => {
-        clearTimer()
-        reject(new Error('Timeout'))
-      }, 5000)
-    })
+  private get user() {
+    return unsafeWindow.__BiliUser__!!
+  }
+
+  private get isVip() {
+    return (this.user.cache?.data as IBiliUserLoginData)?.vipStatus === 1
+  }
+
+  switchBestQuality() {
+    const player = hook.player!!
+    const current = player.getQuality().realQ
+    const supported = player.getSupportedQualityList()
+    let quality: number
+    if (this.isVip) {
+      quality = supported[0]
+    } else {
+      quality = supported[supported.findIndex((it) => it < 112)]
+    }
+    if (current !== quality) {
+      player.requestQuality(quality)
+    }
+  }
+}
+
+class LivePlayer implements IPlayer {
+  async optimistic() {
+    this.hideElement()
+    this.switchWebFullscreen()
+    this.hideChatPanel()
+    this.switchBestQuality()
   }
 
   hideElement() {
@@ -102,91 +116,49 @@ class LivePlayer implements IPlayer {
     spanEl.click()
   }
 
-  switchBestQuality(player: ILivePlayer) {
-    const playerInfo = player.getPlayerInfo()
-    const qualityCandidates = playerInfo.qualityCandidates
-    if (qualityCandidates.length === 0) return
-    if (qualityCandidates[0].qn === playerInfo.quality) return
-    player.switchQuality(qualityCandidates[0].qn)
-  }
-}
-
-class VideoPlayer implements IPlayer {
-  static CONFIG = {
-    bigVipQualityClassName: 'bpx-player-ctrl-quality-badge-bigvip',
-    qualitySelector: 'ul.bpx-player-ctrl-quality-menu',
-    activeQualityClassName: 'bpx-state-active',
-    webFullscreenSelector: '.bpx-player-ctrl-web',
-    activeWebFullscreenClassName: 'bpx-state-entered',
-  }
-
-  async optimistic() {
-    await HTMLUtils.waitingElement(() =>
-      document.querySelector(VideoPlayer.CONFIG.webFullscreenSelector)
-    )
-    this.switchWebFullscreen()
-    this.switchBestQuality()
-  }
-
-  switchWebFullscreen() {
-    const el = document.querySelector<HTMLElement>(VideoPlayer.CONFIG.webFullscreenSelector)
-    if (el === null) return
-    if (el.classList.contains(VideoPlayer.CONFIG.activeWebFullscreenClassName)) return
-    el.click()
-  }
-
   switchBestQuality() {
-    const el = document.querySelector(VideoPlayer.CONFIG.qualitySelector)
-    if (el === null) return
-    const length = el.children.length
-    for (let i = 0; i < length; i++) {
-      const childEl = el.children.item(i) as HTMLElement
-      if (childEl === null) break
-      if (childEl.classList.contains(VideoPlayer.CONFIG.activeQualityClassName)) break
-      if (!vip && this.isBigVipQuality(childEl)) continue
-      childEl.click()
+    const player = hook.livePlayer!!
+    const current = player.getPlayerInfo().quality
+    const supported = player.getPlayerInfo().qualityCandidates.map((it) => it.qn)
+    const quality = supported[0]
+    if (current !== quality) {
+      player.switchQuality(quality)
     }
   }
+}
 
-  isBigVipQuality(el: HTMLElement) {
-    if (!VideoPlayer.CONFIG.bigVipQualityClassName) return false
-    const length = el.children.length
-    for (let i = 0; i < length; i++) {
-      const childEl = el.children.item(i) as HTMLElement
-      if (childEl === null) break
-      if (childEl.classList.contains(VideoPlayer.CONFIG.bigVipQualityClassName)) {
-        return true
+class BiliHook {
+  async prepare(option?: { timeout?: number; interval?: number }) {
+    return new Promise<void>((resolve, reject) => {
+      let timeout: ReturnType<typeof setTimeout>
+      let interval: ReturnType<typeof setInterval>
+
+      const clear = () => {
+        clearInterval(interval)
+        clearTimeout(timeout)
       }
-    }
-    return false
-  }
-}
 
-class BilibiliApi {
-  constructor(private url = 'https://api.bilibili.com') {}
+      if (option?.timeout && option.timeout > 0) {
+        timeout = setTimeout(() => {
+          clear()
+          reject(new Error('Timeout'))
+        }, option?.timeout ?? 10000)
+      }
 
-  async fetchNavInfo() {
-    const res = await fetch(`${this.url}/x/web-interface/nav`, {
-      credentials: 'include',
+      interval = setInterval(() => {
+        if ((unsafeWindow.__BiliUser__ && this.player) || this.livePlayer) {
+          clear()
+          resolve()
+        }
+      }, option?.interval ?? 100)
     })
-    const data = (await res.json()) as IBilibiliNavInfo
-    if (data.code !== 0) throw new Error(`NavInfo ${data.message}`)
-    return data.data
   }
 
-  async isVip() {
-    const navInfo = await this.fetchNavInfo()
-    return navInfo.isLogin && navInfo.vipStatus === 1
+  get player() {
+    return unsafeWindow.player
+  }
+
+  get livePlayer() {
+    return unsafeWindow.livePlayer
   }
 }
-
-interface IBilibiliResponse<D> {
-  code: number
-  data: D
-  message: string
-}
-
-type IBilibiliNavInfo = IBilibiliResponse<{
-  isLogin: boolean
-  vipStatus: number
-}>
