@@ -17,25 +17,29 @@
 import { HTMLUtils } from './util'
 
 window.onload = function main() {
-  HTMLUtils.simpleObserve(document.body, async () => {
-    const listEl = document.querySelector<HTMLDivElement>('section[role="region"]')
-    if (listEl === null) {
-      return
-    }
-    const itemEls = listEl.querySelectorAll<HTMLDivElement>('div[data-testid="cellInnerDiv"]')
-    for (const itemEl of itemEls) {
-      if (itemEl.querySelector('article[data-testid="tweet"]') !== null) {
-        await addBlockEl(itemEl)
+  HTMLUtils.observe(
+    document.body,
+    async () => {
+      const listEl = document.querySelector<HTMLDivElement>('section[role="region"]')
+      if (listEl === null) {
+        return
       }
-    }
-  })
+      const itemEls = listEl.querySelectorAll<HTMLDivElement>('div[data-testid="cellInnerDiv"]')
+      for (const itemEl of itemEls) {
+        if (itemEl.querySelector('article[data-testid="tweet"]') !== null) {
+          await addBlockEl(itemEl)
+        }
+      }
+    },
+    { waiting: true, throttle: 300 }
+  )
 }
 
 async function addBlockEl(twitterEl: HTMLDivElement) {
   if (twitterEl.querySelector('button[aria-label="Block"]') !== null) return
 
   // twitter right corner `...` button
-  const moreBtnEl = await HTMLUtils.waitingElement(() =>
+  const moreBtnEl = await HTMLUtils.query(() =>
     twitterEl.querySelector<HTMLDivElement>('button[aria-label="More"][data-testid="caret"]')
   )
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEXTools
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.5
+// @version      0.0.6
 // @description  关闭广告
 // @author       yvvw
 // @icon         https://www.dextools.io/app/favicon.ico
@@ -14,18 +14,14 @@
 import { HTMLUtils } from './util'
 
 window.onload = function main() {
-  HTMLUtils.simpleObserve(document.body, () => hideAd())
+  HTMLUtils.observe(document.body, closeAd)
 }
 
-function hideAd() {
+function closeAd() {
   Array.from(document.querySelectorAll<HTMLSpanElement>('span'))
     .filter((it) => it.innerText === 'Ad')
     .forEach((el) => {
-      if (
-        el.nextElementSibling?.getAttribute('tagName') === 'BUTTON' &&
-        el.nextElementSibling?.getAttribute('ariaLabel') === 'Close'
-      ) {
-        ;(el.nextElementSibling as HTMLButtonElement).click()
-      }
+      const btnEl = el.nextElementSibling as HTMLButtonElement | null
+      if (btnEl?.getAttribute('ariaLabel') === 'Close') btnEl.click()
     })
 }

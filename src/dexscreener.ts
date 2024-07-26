@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.13
+// @version      0.0.14
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -14,74 +14,62 @@
 import { HTMLUtils } from './util'
 
 window.onload = function main() {
-  HTMLUtils.simpleObserve(
+  HTMLUtils.observe(
     document.body,
     () => {
-      hideAd()
-      expandWatchList().catch(console.error)
-      addExternalLink().catch(console.error)
+      closeAd()
+      Promise.allSettled([addExternalLink(), expandWatchList()])
     },
-    1000
+    { throttle: 100 }
   )
 }
 
+function closeAd() {
+  const btnEls = HTMLUtils.getElementsByXPath<HTMLButtonElement>('//button[text()="Hide ad"]')
+  for (const btnEl of btnEls) btnEl.click()
+}
+
 async function expandWatchList() {
-  const el = await HTMLUtils.waitingElement(() =>
+  const el = await HTMLUtils.query(() =>
     document.querySelector<HTMLButtonElement>('button[title="Expand watchlist"]')
   )
   el.click()
 }
 
-function hideAd() {
-  const btnEls = HTMLUtils.getElementsByXPath<HTMLButtonElement>('//button[text()="Hide ad"]')
-  for (const btnEl of btnEls) {
-    btnEl.click()
-  }
-}
-
 async function addExternalLink() {
-  const parts = document.location.pathname.split('/')
-  if (parts.length !== 3) {
-    throw new Error('未发现有效格式')
-  }
-
-  const chain = parts[1]
-  if (!['ethereum', 'base', 'solana'].includes(chain)) {
-    return
-  }
-
+  // already added
   if (document.querySelector('a[data-external]') !== null) {
     return
   }
 
-  const locateEl = await HTMLUtils.waitingElement(() =>
+  const chain = getChainFromPath()
+  const aEl = await HTMLUtils.query(() =>
     HTMLUtils.getFirstElementByXPath<HTMLSpanElement>('//span[text()="Pair"]')
   )
-  const wrapEl = locateEl.parentElement!.parentElement!.parentElement as HTMLDivElement
+  const bEl = aEl.parentElement!.parentElement!.parentElement as HTMLDivElement
+  const links = getExternalLinks(bEl, chain)
+  if (links === null) return
 
-  const links = getExternalLinks(wrapEl, chain)
-
-  if (links === null) {
-    return
-  }
-
-  const containerEl = document.createElement('div')
-  containerEl.style.setProperty('display', 'flex')
-  containerEl.style.setProperty('gap', '10px')
-  containerEl.style.setProperty('line-height', '36px')
-  containerEl.style.setProperty('border-color', 'var(--chakra-colors-blue-900)')
-  containerEl.style.setProperty('border-bottom-width', '1px')
-  containerEl.style.setProperty('font-size', 'var(--chakra-fontSizes-sm)')
-  containerEl.style.setProperty('color', 'var(--chakra-colors-green-300)')
+  const containerEl = createExternalContainerEl()
   if (links.gmgn) {
-    const gmgnEl = createExternalLinkEl('GMGN', links.gmgn)
-    containerEl.appendChild(gmgnEl)
+    containerEl.appendChild(createExternalLinkEl('GMGN', links.gmgn))
   }
   if (links.bullx) {
-    const bullxEl = createExternalLinkEl('BullX', links.bullx)
-    containerEl.appendChild(bullxEl)
+    containerEl.appendChild(createExternalLinkEl('BullX', links.bullx))
   }
-  wrapEl.insertBefore(containerEl, wrapEl.firstChild)
+  bEl.insertBefore(containerEl, bEl.firstChild)
+}
+
+function createExternalContainerEl() {
+  const el = document.createElement('div')
+  el.style.setProperty('display', 'flex')
+  el.style.setProperty('gap', '10px')
+  el.style.setProperty('line-height', '36px')
+  el.style.setProperty('border-color', 'var(--chakra-colors-blue-900)')
+  el.style.setProperty('border-bottom-width', '1px')
+  el.style.setProperty('font-size', 'var(--chakra-fontSizes-sm)')
+  el.style.setProperty('color', 'var(--chakra-colors-green-300)')
+  return el
 }
 
 function createExternalLinkEl(text: string, href: string) {
@@ -95,10 +83,26 @@ function createExternalLinkEl(text: string, href: string) {
   return el
 }
 
+const SUPPORT_CHAIN_NAME = ['ethereum', 'base', 'solana']
+
+function getChainFromPath() {
+  const parts = document.location.pathname.split('/')
+  if (parts.length !== 3) {
+    throw new Error('location path not valid')
+  }
+
+  const chain = parts[1]
+  if (!SUPPORT_CHAIN_NAME.includes(chain)) {
+    throw new Error(`${chain} is not supported`)
+  }
+
+  return chain
+}
+
 function getExternalLinks(el: HTMLDivElement, chain: string) {
   const aEls = el.querySelectorAll('a[title="Open in block explorer"]')
   if (aEls.length !== 3) {
-    throw new Error('未发现token地址')
+    throw new Error('token address not found')
   }
   const aEl = aEls.item(1) as HTMLAnchorElement
   const address = aEl.href.split('/').pop()!
@@ -118,7 +122,7 @@ function getGmGnLink(chain: string, token: string) {
   } else if (chain === 'solana') {
     _chain = 'sol'
   } else {
-    console.warn(`${chain}暂不支持`)
+    console.warn(`${chain} unsupported`)
     return null
   }
   return `https://gmgn.ai/${_chain}/token/${token}`
@@ -133,7 +137,7 @@ function getBullxLink(chain: string, token: string) {
   } else if (chain === 'solana') {
     chainId = 1399811149
   } else {
-    console.warn(`${chain}暂不支持`)
+    console.warn(`${chain} unsupported`)
     return null
   }
   return `https://bullx.io/terminal?chainId=${chainId}&address=${token}`

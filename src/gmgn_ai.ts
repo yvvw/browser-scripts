@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better GMGN.ai
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.15
+// @version      0.0.16
 // @description  调整屏宽，移除buy more，增加bullx跳转，加强dev卖出标记
 // @author       yvvw
 // @icon         https://gmgn.ai/static/favicon2.ico
@@ -14,42 +14,44 @@
 
 import { HTMLUtils, NavigatorUtil } from './util'
 
-const clearChannel = new Set<Function>()
+const pendingClose = new Set<Function>()
 
 window.onload = function main() {
   let previous = ''
-  HTMLUtils.simpleObserve(document.body, async () => {
-    if (location.href === previous) {
-      return
-    }
-    previous = location.href
+  HTMLUtils.observe(
+    document.body,
+    async () => {
+      if (location.href === previous) return
+      previous = location.href
 
-    if (clearChannel.size > 0) {
-      clearChannel.forEach((it) => it())
-      clearChannel.clear()
-    }
+      if (pendingClose.size > 0) {
+        pendingClose.forEach((close) => close())
+        pendingClose.clear()
+      }
 
-    const pathParts = location.pathname.split('/').filter((it) => it !== '')
-    if (pathParts.includes('follow')) {
-      await removeBuyMoreActivities()
-    } else if (pathParts.includes('token')) {
-      await adjustRecordSize()
-    } else if (pathParts.includes('meme') || pathParts.includes('pump')) {
-      await updateExternalLink()
-      await markSellAll()
-    }
-  })
+      const parts = location.pathname.split('/').filter((it) => it !== '')
+      if (parts.includes('follow')) {
+        await removeBuyMoreActivities()
+      } else if (parts.includes('token')) {
+        await adjustRecordSize()
+      } else if (parts.includes('meme') || parts.includes('pump')) {
+        await updateExternalLink()
+        await markSellAll()
+      }
+    },
+    { waiting: true, throttle: 500 }
+  )
 }
 
 async function removeBuyMoreActivities() {
-  const activityBtnEl = await HTMLUtils.waitingElement(() =>
+  const activityBtnEl = await HTMLUtils.query(() =>
     HTMLUtils.getFirstElementByXPath<HTMLButtonElement>('//button[text()="Activity"]')
   )
   if (activityBtnEl.getAttribute('tabindex') !== '0') {
     return
   }
-  const container = await HTMLUtils.waitingElement(() => document.getElementById('gmgnCalls'))
-  const disconnect = HTMLUtils.simpleObserve(container, () => {
+  const container = await HTMLUtils.query(() => document.getElementById('gmgnCalls'))
+  const removeBuyMore = () => {
     for (const childEl of container.children) {
       const buyMoreEl = childEl.querySelector('div[title="Buy More"]')
       if (buyMoreEl === null) {
@@ -57,12 +59,12 @@ async function removeBuyMoreActivities() {
       }
       container.removeChild(childEl)
     }
-  })
-  clearChannel.add(disconnect)
+  }
+  pendingClose.add(HTMLUtils.observe(container, removeBuyMore, { throttle: 500 }))
 }
 
 async function adjustRecordSize() {
-  await HTMLUtils.waitingElement(() => document.getElementById('tokenCenter'))
+  await HTMLUtils.query(() => document.getElementById('tokenCenter'))
   const tabEl = document.getElementById('leftTabs')
   if (tabEl === null) {
     throw new Error('查询不到leftTabs，需要升级代码')
@@ -74,18 +76,18 @@ async function adjustRecordSize() {
   } else {
     tabEl.style.setProperty('width', '80%')
   }
-  const disconnect = HTMLUtils.simpleObserve(parentEl, () => {
+  const disconnect = HTMLUtils.observe(parentEl, () => {
     if (parentEl.clientWidth === sibEl.clientWidth) {
       tabEl.style.removeProperty('width')
     } else {
       tabEl.style.setProperty('width', '80%')
     }
   })
-  clearChannel.add(disconnect)
+  pendingClose.add(disconnect)
 }
 
 async function markSellAll() {
-  const table = await HTMLUtils.waitingElement(() =>
+  const table = await HTMLUtils.query(() =>
     document.querySelector<HTMLTableElement>('.g-table-tbody')
   )
   const mark = (rowEl: HTMLDivElement) => {
@@ -99,16 +101,21 @@ async function markSellAll() {
       rowEl.style.removeProperty('--table-hover-color')
     }
   }
-  const disconnect = HTMLUtils.simpleObserve(table, () => {
-    for (const row of table.children) {
-      mark(row as HTMLDivElement)
-    }
-  })
-  clearChannel.add(disconnect)
+  pendingClose.add(
+    HTMLUtils.observe(
+      table,
+      () => {
+        for (const row of table.children) {
+          mark(row as HTMLDivElement)
+        }
+      },
+      { throttle: 500 }
+    )
+  )
 }
 
 async function updateExternalLink() {
-  const table = await HTMLUtils.waitingElement(() =>
+  const table = await HTMLUtils.query(() =>
     document.querySelector<HTMLTableElement>('.g-table-tbody')
   )
   const addLink = (rowEl: HTMLDivElement) => {
@@ -140,8 +147,8 @@ async function updateExternalLink() {
     // 调大图标尺寸
     for (let i = 2; i < divChildEl.children.length; i++) {
       const childEl = divChildEl.children.item(i) as HTMLElement
-      const svgEl = childEl.querySelector('svg')
-      if (svgEl) {
+      const svgEls = childEl.querySelectorAll('svg')
+      for (const svgEl of svgEls) {
         svgEl.setAttribute('width', '20')
         svgEl.setAttribute('height', '20')
       }
@@ -159,12 +166,17 @@ async function updateExternalLink() {
   for (const row of table.children) {
     addLink(row as HTMLDivElement)
   }
-  const disconnect = HTMLUtils.simpleObserve(table, () => {
-    for (const row of table.children) {
-      addLink(row as HTMLDivElement)
-    }
-  })
-  clearChannel.add(disconnect)
+  pendingClose.add(
+    HTMLUtils.observe(
+      table,
+      () => {
+        for (const row of table.children) {
+          addLink(row as HTMLDivElement)
+        }
+      },
+      { throttle: 500 }
+    )
+  )
 }
 
 const bullxIcon =
@@ -179,7 +191,7 @@ function createBullXEl(path: string) {
   el.dataset['bullx'] = 'bullx'
   el.addEventListener('click', (e) => {
     e.preventDefault()
-    GM_openInTab(href, { active: true })
+    GM.openInTab(href, { active: true })
   })
   return el
 }
@@ -189,7 +201,7 @@ function updateBullXEl(el: HTMLAnchorElement, path: string) {
   el.setAttribute('href', href)
   el.addEventListener('click', (e) => {
     e.preventDefault()
-    GM_openInTab(href, { active: true })
+    GM.openInTab(href, { active: true })
   })
 }
 

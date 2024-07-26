@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.15
+// @version      0.0.16
 // @description  增加gmgn、bullx跳转，标记dev，快速交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -14,7 +14,7 @@
 
 import { delay, HTMLUtils } from './util'
 
-const clearChannel = new Set<Function>()
+const pendingClose = new Set<Function>()
 
 window.onload = function main() {
   let running = false
@@ -28,9 +28,9 @@ window.onload = function main() {
     running = true
     prevToken = token
 
-    if (clearChannel.size > 0) {
-      clearChannel.forEach((fn) => fn())
-      clearChannel.clear()
+    if (pendingClose.size > 0) {
+      pendingClose.forEach((fn) => fn())
+      pendingClose.clear()
     }
 
     Promise.allSettled([
@@ -46,7 +46,7 @@ window.onload = function main() {
 }
 
 async function addExternalLinks() {
-  const threadEl = await HTMLUtils.waitingElement(() =>
+  const threadEl = await HTMLUtils.query(() =>
     HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[text()="Thread"]')
   )
   ;(threadEl.parentElement as HTMLDivElement).style.setProperty('font-size', '1.5rem')
@@ -72,7 +72,7 @@ function createExternalLink(text: string, href: string) {
 }
 
 async function addQuickButton() {
-  const threadEl = await HTMLUtils.waitingElement(() =>
+  const threadEl = await HTMLUtils.query(() =>
     HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[text()="Thread"]')
   )
   const divWrapEl = document.createElement('div')
@@ -106,12 +106,10 @@ async function quickBuy(text: string) {
   await switchMode('Buy')
   await delay(100)
 
-  const inputEl = await HTMLUtils.waitingElement(
-    () => document.getElementById('amount') as HTMLInputElement
-  )
+  const inputEl = await HTMLUtils.query(() => document.getElementById('amount') as HTMLInputElement)
   setNativeValue(inputEl, text)
 
-  const tradeEl = await HTMLUtils.waitingElement(
+  const tradeEl = await HTMLUtils.query(
     () =>
       document
         .evaluate('//button[text()="place trade"]', document)
@@ -124,7 +122,7 @@ async function quickSell(percent: string) {
   await switchMode('Sell')
   await delay(100)
 
-  const percentBtnEl = await HTMLUtils.waitingElement(
+  const percentBtnEl = await HTMLUtils.query(
     () =>
       document
         .evaluate(`//button[text()="${percent}"]`, document)
@@ -133,7 +131,7 @@ async function quickSell(percent: string) {
   percentBtnEl.click()
   await delay(100)
 
-  const tradeEl = await HTMLUtils.waitingElement(
+  const tradeEl = await HTMLUtils.query(
     () =>
       document
         .evaluate('//button[text()="place trade"]', document)
@@ -143,7 +141,7 @@ async function quickSell(percent: string) {
 }
 
 async function switchMode(mode: 'Buy' | 'Sell') {
-  const buyEl = await HTMLUtils.waitingElement(() =>
+  const buyEl = await HTMLUtils.query(() =>
     HTMLUtils.getFirstElementByXPath<HTMLDivElement>(`//button[text()="${mode}"]`)
   )
   buyEl.click()
@@ -171,7 +169,7 @@ function setNativeValue(el: Element, value: string) {
 }
 
 async function autoTrade() {
-  const buttonEl = await HTMLUtils.waitingElement(
+  const buttonEl = await HTMLUtils.query(
     () =>
       document
         .evaluate('//button[text()="place trade"]', document)
@@ -181,7 +179,7 @@ async function autoTrade() {
   const click = buttonEl.click
   buttonEl.removeEventListener('click', click)
   buttonEl.addEventListener('click', async function () {
-    const cancelEl = await HTMLUtils.waitingElement(() =>
+    const cancelEl = await HTMLUtils.query(() =>
       HTMLUtils.getFirstElementByXPath<HTMLButtonElement>('//div[text()="[cancel]"]')
     )
     ;(cancelEl.previousElementSibling as HTMLButtonElement).click()
@@ -190,7 +188,7 @@ async function autoTrade() {
 }
 
 async function markTradePanel() {
-  const tradesEl = await HTMLUtils.waitingElement(() =>
+  const tradesEl = await HTMLUtils.query(() =>
     HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[text()="Trades"]')
   )
 
@@ -203,7 +201,7 @@ async function markTradePanel() {
 }
 
 async function labelDevInTradePanel() {
-  const labelEl = await HTMLUtils.waitingElement(
+  const labelEl = await HTMLUtils.query(
     () =>
       document
         .evaluate('//label[text()="Filter by following"]', document)
@@ -215,7 +213,7 @@ async function labelDevInTradePanel() {
     throw new Error('未发现交易面板')
   }
 
-  const devSibEl = await HTMLUtils.waitingElement(() =>
+  const devSibEl = await HTMLUtils.query(() =>
     HTMLUtils.getFirstElementByXPath<HTMLSpanElement>('//span[text()="created by"]')
   )
   const devEl = devSibEl.nextSibling as HTMLAnchorElement | undefined
@@ -265,36 +263,47 @@ async function labelDevInTradePanel() {
     labelTrade(tableEl.children.item(i) as HTMLDivElement, i)
   }
 
-  const disconnect = HTMLUtils.simpleObserve(tableEl, () => {
-    // 跳过前两个表头和最后一个翻页组件
-    for (let i = 2; i < tableEl.children.length - 1; i++) {
-      labelTrade(tableEl.children.item(i) as HTMLDivElement, i)
-    }
-  })
-  clearChannel.add(disconnect)
+  pendingClose.add(
+    HTMLUtils.observe(
+      tableEl,
+      () => {
+        // 跳过前两个表头和最后一个翻页组件
+        for (let i = 2; i < tableEl.children.length - 1; i++) {
+          labelTrade(tableEl.children.item(i) as HTMLDivElement, i)
+        }
+      },
+      { throttle: 500 }
+    )
+  )
 }
 
 async function markTopHolder() {
-  const holderTextEl = await HTMLUtils.waitingElement(
+  const holderTextEl = await HTMLUtils.query(
     () =>
       document
         .evaluate('//div[text()="Holder distribution"]', document)
         .iterateNext() as HTMLDivElement
   )
   const holderListEls = holderTextEl.nextSibling!.firstChild as HTMLDivElement
-  const disconnect = HTMLUtils.simpleObserve(holderListEls, () => {
-    if (holderListEls.childElementCount === 0) {
-      return
-    }
-    for (const holderListEl of holderListEls.children) {
-      const percentEl = holderListEl.lastElementChild as HTMLDivElement
-      const percent = parseFloat(percentEl.innerText.replace('%', ''))
-      if (percent >= 5) {
-        holderListEl.classList.add('text-red-400')
-      }
-    }
-  })
-  clearChannel.add(disconnect)
+
+  pendingClose.add(
+    HTMLUtils.observe(
+      holderListEls,
+      () => {
+        if (holderListEls.childElementCount === 0) {
+          return
+        }
+        for (const holderListEl of holderListEls.children) {
+          const percentEl = holderListEl.lastElementChild as HTMLDivElement
+          const percent = parseFloat(percentEl.innerText.replace('%', ''))
+          if (percent >= 5) {
+            holderListEl.classList.add('text-red-400')
+          }
+        }
+      },
+      { throttle: 500 }
+    )
+  )
 }
 
 let playing = false

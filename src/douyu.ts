@@ -26,35 +26,33 @@
 import { GM, HTMLUtils } from './util'
 
 window.onload = function main() {
-  hideUnnecessaryElements()
+  hideElements()
   if (!location.pathname.includes('watchHistory')) {
-    switchWebFullscreen()
-    switchBestQuality()
     hideDanmuPanel()
+    switchBestQuality()
+    switchWebFullscreen()
   }
 }
 
-function switchWebFullscreen() {
-  HTMLUtils.waitingElement(() => document.querySelector('.wfs-2a8e83') as HTMLElement)
-    .then((el) => el.click())
-    .catch((err) => console.error('switchWebFullscreen', err))
-}
-
-function switchBestQuality() {
-  HTMLUtils.waitingElement(() => document.querySelector('.tipItem-898596 > ul > li') as HTMLElement)
-    .then((el) => el.click())
-    .catch((err) => console.error('switchBestQuality', err))
-}
-
 function hideDanmuPanel() {
-  HTMLUtils.waitingElement(
-    () => document.querySelector('.layout-Player-asidetoggleButton') as HTMLElement
-  )
+  HTMLUtils.query(() => document.querySelector('.layout-Player-asidetoggleButton') as HTMLElement)
     .then((el) => el.click())
     .catch((err) => console.error('hideDanmuPanel', err))
 }
 
-function hideUnnecessaryElements() {
+function switchBestQuality() {
+  HTMLUtils.query(() => document.querySelector('.tipItem-898596 > ul > li') as HTMLElement)
+    .then((el) => el.click())
+    .catch((err) => console.error('switchBestQuality', err))
+}
+
+function switchWebFullscreen() {
+  HTMLUtils.query(() => document.querySelector('.wfs-2a8e83') as HTMLElement)
+    .then((el) => el.click())
+    .catch((err) => console.error('switchWebFullscreen', err))
+}
+
+function hideElements() {
   let css = '{display:none !important;height:0 !important}'
   css += '.layout-Player-rank{display:none !important}'
   css += '.layout-Player-barrage{top:0px !important;}'

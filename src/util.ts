@@ -1,57 +1,46 @@
-export async function delay(time: number) {
-  return new Promise((resolve) => setTimeout(resolve, time))
+export async function delay(time: number): Promise<void> {
+  return new Promise<void>((resolve) => setTimeout(resolve, time))
+}
+
+export async function getNotFalsyValue<R>(
+  callback: () => R | null | undefined | Promise<R | null | undefined>,
+  option?: { times?: number; interval?: number }
+): Promise<NonNullable<R>> {
+  let times = option?.times || 10
+  let interval = option?.interval || 200
+
+  while (true) {
+    times--
+    const r = callback()
+    const v = r instanceof Promise ? await r : r
+    if (v) return v
+    if (times === 0) throw new Error("can't get value")
+    await delay(interval)
+  }
 }
 
 export class HTMLUtils {
-  static async waitingElement<EL extends Element>(
-    getElement: () => EL | null,
-    timeout = 5000,
-    interval = 500
+  static async query<N extends Node>(
+    queryElement: () => N | null,
+    option?: { times: number; interval: number }
   ) {
-    if (typeof getElement !== 'function') {
-      throw new Error('first argument must be a function')
-    }
-    let time = 0
-
-    while (true) {
-      const el = getElement()
-      if (el !== null) {
-        return el
-      }
-      if (time > timeout) {
-        throw new Error('timeout')
-      }
-      await delay(interval)
-      time += interval
-    }
+    return getNotFalsyValue<N>(queryElement, { interval: 500, ...option })
   }
 
-  static getFirstElementByXPath<EL extends Element>(
-    xpath: string,
-    context: Node = document
-  ): EL | null {
-    return document.evaluate(xpath, context, null, XPathResult.ANY_TYPE, null).iterateNext() as EL
+  static evaluate(xpath: string, context: Node = document) {
+    return document.evaluate(xpath, context, null, XPathResult.ANY_TYPE, null)
   }
 
-  static getElementsByXPath<EL extends Element>(xpath: string, context: Node = document): EL[] {
-    const iterator = document.evaluate(xpath, context, null, XPathResult.ANY_TYPE, null)
-    const result: EL[] = []
-    let item: EL | null
-    while ((item = iterator.iterateNext() as EL)) {
-      result.push(item)
-    }
-    return result
+  static getFirstElementByXPath<E extends Element>(xpath: string, context?: Node): E | null {
+    return this.evaluate(xpath, context).iterateNext() as E
   }
 
-  static simpleObserve(
-    node: Node = document.body,
-    callback: (
-      mutations: MutationRecord[],
-      observer: MutationObserver
-    ) => boolean | void | Promise<boolean | void>,
-    throttle = 300
-  ) {
-    return HTMLUtils.observe(node, callback, { waiting: true, throttle })
+  static getElementsByXPath<E extends Element>(xpath: string, context?: Node): E[] {
+    const res = this.evaluate(xpath, context)
+    const r: E[] = []
+    let i: E | null
+    while ((i = res.iterateNext() as E)) r.push(i)
+    return r
   }
 
   static observe(
@@ -129,5 +118,9 @@ export class GM {
 
   static addStyle(...args: Parameters<typeof GM_addStyle>) {
     return GM_addStyle(...args)
+  }
+
+  static GM_openInTab(...args: Parameters<typeof GM_openInTab>) {
+    return GM_openInTab(...args)
   }
 }
