@@ -28,7 +28,7 @@ jobs:
       - name: Build
         run: |
           for script in src/*.user.ts; do
-            echo "$script"
+            pnpm build "$script"
           done
 
       - name: Release
