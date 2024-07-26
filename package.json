@@ -6,25 +6,17 @@
   "scripts": {
     "format": "prettier -w .",
     "dev": "node scripts/watch.mjs",
-    "build": "run-p build:*",
-    "build:jd": "node scripts/build.mjs src/jd.ts",
-    "build:bilibili": "node scripts/build.mjs src/bilibili.ts",
-    "build:douyu": "node scripts/build.mjs src/douyu.ts",
-    "build:x": "node scripts/build.mjs src/x.ts",
-    "build:dexscreener": "node scripts/build.mjs src/dexscreener.ts",
-    "build:dextools": "node scripts/build.mjs src/dextools.ts",
-    "build:gmgn_ai": "node scripts/build.mjs src/gmgn_ai.ts",
-    "build:pumpfun": "node scripts/build.mjs src/pumpfun.ts"
+    "build": "node scripts/build.mjs"
   },
   "devDependencies": {
-    "@types/node": "^20.14.9",
+    "@types/node": "^20.14.12",
     "@violentmonkey/types": "^0.1.8",
     "chokidar": "^3.6.0",
-    "esbuild": "^0.22.0",
+    "esbuild": "^0.23.0",
     "npm-run-all": "^4.1.5",
-    "prettier": "^3.3.2",
+    "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^4.0.0",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.4"
   },
   "packageManager": "pnpm@8.10.4+sha1.ad75b0e775742692244c8e5e17c358390abf2025"
 }

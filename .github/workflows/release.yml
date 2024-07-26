@@ -26,7 +26,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm build
+        run: |
+          for script in src/*.user.ts; do
+            echo "$script"
+          done
 
       - name: Release
         uses: softprops/action-gh-release@v2
