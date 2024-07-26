@@ -16,11 +16,12 @@ import { HTMLUtils } from './util'
 window.onload = function main() {
   HTMLUtils.observe(
     document.body,
-    () => {
+    async () => {
       closeAd()
-      Promise.allSettled([addExternalLink(), expandWatchList()])
+      expandWatchList()
+      await addExternalLink().catch(console.error)
     },
-    { throttle: 100 }
+    { waiting: true, throttle: 100 }
   )
 }
 
@@ -29,10 +30,9 @@ function closeAd() {
   for (const btnEl of btnEls) btnEl.click()
 }
 
-async function expandWatchList() {
-  const el = await HTMLUtils.query(() =>
-    document.querySelector<HTMLButtonElement>('button[title="Expand watchlist"]')
-  )
+function expandWatchList() {
+  const el = document.querySelector<HTMLButtonElement>('button[title="Expand watchlist"]')
+  if (el === null) return
   el.click()
 }
 
