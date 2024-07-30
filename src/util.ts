@@ -14,7 +14,7 @@ export async function getNotFalsyValue<R>(
     const r = callback()
     const v = r instanceof Promise ? await r : r
     if (v) return v
-    if (times === 0) throw new Error("can't get value")
+    if (times === 0) throw new Error(`can't get value: ${callback.toString()}`)
     await delay(interval)
   }
 }
