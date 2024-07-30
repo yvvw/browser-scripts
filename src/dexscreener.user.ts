@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.14
+// @version      0.0.15
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -17,11 +17,12 @@ window.onload = function main() {
   HTMLUtils.observe(
     document.body,
     async () => {
-      closeAd()
+      if (!document.getElementById('tv-chart-container')) return
       expandWatchList()
       await addExternalLink().catch(console.error)
+      closeAd()
     },
-    { waiting: true, throttle: 100 }
+    { waiting: true, throttle: 500 }
   )
 }
 
@@ -58,6 +59,8 @@ async function addExternalLink() {
     containerEl.appendChild(createExternalLinkEl('BullX', links.bullx))
   }
   bEl.insertBefore(containerEl, bEl.firstChild)
+
+  await HTMLUtils.query(() => document.querySelector('a[data-external]'))
 }
 
 function createExternalContainerEl() {
