@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.16
+// @version      0.0.17
 // @description  增加gmgn、bullx跳转，标记dev，快速交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -201,17 +201,7 @@ async function markTradePanel() {
 }
 
 async function labelDevInTradePanel() {
-  const labelEl = await HTMLUtils.query(
-    () =>
-      document
-        .evaluate('//label[text()="Filter by following"]', document)
-        .iterateNext() as HTMLLabelElement
-  )
-
-  const tableEl = labelEl.parentElement?.parentElement
-  if (!tableEl) {
-    throw new Error('未发现交易面板')
-  }
+  const tableEl = await HTMLUtils.query(() => document.querySelector<HTMLTableElement>('table'))
 
   const devSibEl = await HTMLUtils.query(() =>
     HTMLUtils.getFirstElementByXPath<HTMLSpanElement>('//span[text()="created by"]')
@@ -220,14 +210,15 @@ async function labelDevInTradePanel() {
   if (!devEl) {
     throw new Error('未发现dev标签')
   }
-  const devName = devEl.href.split('/').pop()
+  const devAddress = devEl.href.split('/').pop()
 
-  function labelTrade(el: HTMLDivElement, idx: number) {
-    const nameEl = el.firstElementChild?.firstElementChild as HTMLAnchorElement | undefined
+  function labelTrade(el: HTMLTableRowElement, idx: number) {
+    const nameEl = el.cells.item(0)?.firstElementChild as HTMLAnchorElement | null
     if (!nameEl) {
-      throw new Error('未发现a标签')
+      console.warn('未发现a标签')
+      return
     }
-    const operateType = (el.children.item(1) as HTMLDivElement).innerText
+    const operateType = (el.cells.item(1) as HTMLDivElement).innerText
 
     const solEl = el.children.item(3) as HTMLDivElement
     const solAmount = parseFloat(solEl.innerText)
@@ -240,8 +231,8 @@ async function labelDevInTradePanel() {
       }
     }
 
-    const rowName = nameEl.href.split('/').pop()
-    if (rowName === devName) {
+    const rowAddress = nameEl.href.split('/').pop()
+    if (rowAddress === devAddress) {
       if (operateType === 'buy') {
         el.classList.add('text-white', 'bg-green-500')
       } else if (operateType === 'sell') {
@@ -255,21 +246,13 @@ async function labelDevInTradePanel() {
     }
   }
 
-  // 显示完整时间
-  // tableEl.children.item(1)!.querySelector('button')!.click()
-
-  // 跳过前两个表头和最后一个翻页组件
-  for (let i = 2; i < tableEl.children.length - 1; i++) {
-    labelTrade(tableEl.children.item(i) as HTMLDivElement, i)
-  }
-
+  const tBodyEl = tableEl.tBodies.item(0)!
   pendingClose.add(
     HTMLUtils.observe(
       tableEl,
       () => {
-        // 跳过前两个表头和最后一个翻页组件
-        for (let i = 2; i < tableEl.children.length - 1; i++) {
-          labelTrade(tableEl.children.item(i) as HTMLDivElement, i)
+        for (let i = 0; i < tBodyEl.rows.length; i++) {
+          labelTrade(tBodyEl.rows.item(i)!, i)
         }
       },
       { throttle: 500 }
