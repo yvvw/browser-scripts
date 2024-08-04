@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.17
+// @version      0.0.18
 // @description  增加gmgn、bullx跳转，标记dev，快速交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -34,10 +34,11 @@ window.onload = function main() {
     }
 
     Promise.allSettled([
-      addQuickButton().then(addExternalLinks),
-      markTradePanel(),
-      markTopHolder(),
-      autoTrade(),
+      addQuickButton().then(addExternalLinks).catch(console.error),
+      markTradePanel().catch(console.error),
+      markTopHolder().catch(console.error),
+      autoTrade().catch(console.error),
+      replaceHereLink().catch(console.error),
     ]).finally(() => (running = false))
   }).observe(document.body, {
     childList: true,
@@ -69,6 +70,13 @@ function createExternalLink(text: string, href: string) {
   el.setAttribute('target', '_blank')
   el.setHTMLUnsafe(text)
   return el
+}
+
+async function replaceHereLink() {
+  const aEl = await HTMLUtils.query(() =>
+    HTMLUtils.getFirstElementByXPath<HTMLAnchorElement>('//a[text()="here"]')
+  )
+  aEl.href = `https://dexscreener.com/solana/${aEl.href.split('/').pop()}`
 }
 
 async function addQuickButton() {
