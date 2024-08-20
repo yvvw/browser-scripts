@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.25
+// @version      0.0.26
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -75,6 +75,7 @@ class BiliVideoPlayer implements IBiliPlayer {
 class BiliLivePlayer implements IBiliPlayer {
   async optimistic(hook: BiliHook) {
     this.hideElements()
+    await this.scrollToPlayer()
     await Promise.allSettled([this.hideChatPanel(), this.switchBestQuality(hook)])
     await this.switchWebFullscreen()
   }
@@ -92,6 +93,13 @@ class BiliLivePlayer implements IBiliPlayer {
       return
     }
     el.click()
+  }
+
+  async scrollToPlayer() {
+    const playerEl = await HTMLUtils.query(() =>
+      document.querySelector<HTMLElement>('#live-player')
+    )
+    playerEl.scrollIntoView()
   }
 
   async switchWebFullscreen() {
