@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.27
+// @version      0.0.28
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -30,6 +30,12 @@ window.onload = async function main() {
   }
   if (!player) {
     console.warn('player not found')
+    return
+  }
+  try {
+    await HTMLUtils.query(() => document.querySelector('video'))
+  } catch {
+    console.warn('video not found')
     return
   }
 
@@ -75,11 +81,9 @@ class BiliVideoPlayer implements IBiliPlayer {
 class BiliLivePlayer implements IBiliPlayer {
   async optimistic(hook: BiliHook) {
     this.hideElements()
-    await this.scrollToPlayer().catch(console.error)
-    await Promise.allSettled([this.hideChatPanel(), this.switchBestQuality(hook)]).catch(
-      console.error
-    )
-    await this.switchWebFullscreen().catch(console.error)
+    await this.scrollToPlayer()
+    await Promise.allSettled([this.hideChatPanel(), this.switchBestQuality(hook)])
+    await this.switchWebFullscreen()
   }
 
   hideElements() {
@@ -90,10 +94,6 @@ class BiliLivePlayer implements IBiliPlayer {
     const el = await HTMLUtils.query(() =>
       document.querySelector<HTMLElement>('#aside-area-toggle-btn')
     )
-    if (el === null) {
-      console.warn('chat panel element not found')
-      return
-    }
     el.click()
   }
 
