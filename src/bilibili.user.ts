@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.26
+// @version      0.0.27
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -75,9 +75,11 @@ class BiliVideoPlayer implements IBiliPlayer {
 class BiliLivePlayer implements IBiliPlayer {
   async optimistic(hook: BiliHook) {
     this.hideElements()
-    await this.scrollToPlayer()
-    await Promise.allSettled([this.hideChatPanel(), this.switchBestQuality(hook)])
-    await this.switchWebFullscreen()
+    await this.scrollToPlayer().catch(console.error)
+    await Promise.allSettled([this.hideChatPanel(), this.switchBestQuality(hook)]).catch(
+      console.error
+    )
+    await this.switchWebFullscreen().catch(console.error)
   }
 
   hideElements() {
@@ -96,16 +98,12 @@ class BiliLivePlayer implements IBiliPlayer {
   }
 
   async scrollToPlayer() {
-    const playerEl = await HTMLUtils.query(() =>
-      document.querySelector<HTMLElement>('#live-player')
-    )
+    const playerEl = await HTMLUtils.query(() => document.getElementById('live-player'))
     playerEl.scrollIntoView()
   }
 
   async switchWebFullscreen() {
-    const playerEl = await HTMLUtils.query(() =>
-      document.querySelector<HTMLElement>('#live-player')
-    )
+    const playerEl = await HTMLUtils.query(() => document.getElementById('live-player'))
     playerEl.dispatchEvent(new MouseEvent('mousemove'))
     const areaEl = document.querySelector<HTMLElement>('.right-area')
     if (areaEl === null) {
