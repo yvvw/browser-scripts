@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.15
+// @version      0.0.16
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -86,7 +86,7 @@ function createExternalLinkEl(text: string, href: string) {
   return el
 }
 
-const SUPPORT_CHAIN_NAME = ['ethereum', 'base', 'solana']
+const SUPPORT_CHAINS = ['ethereum', 'base', 'solana', 'tron']
 
 function getChainFromPath() {
   const parts = document.location.pathname.split('/')
@@ -95,7 +95,7 @@ function getChainFromPath() {
   }
 
   const chain = parts[1]
-  if (!SUPPORT_CHAIN_NAME.includes(chain)) {
+  if (!SUPPORT_CHAINS.includes(chain)) {
     throw new Error(`${chain} is not supported`)
   }
 
@@ -117,31 +117,29 @@ function getExternalLinks(el: HTMLDivElement, chain: string) {
 }
 
 function getGmGnLink(chain: string, token: string) {
-  let _chain: string
   if (chain === 'ethereum') {
-    _chain = 'eth'
+    return `https://gmgn.ai/eth/token/${token}`
   } else if (chain === 'base') {
-    _chain = 'base'
+    return `https://gmgn.ai/base/token/${token}`
   } else if (chain === 'solana') {
-    _chain = 'sol'
+    return `https://gmgn.ai/sol/token/${token}`
   } else {
     console.warn(`${chain} unsupported`)
     return null
   }
-  return `https://gmgn.ai/${_chain}/token/${token}`
 }
 
 function getBullxLink(chain: string, token: string) {
-  let chainId: number
   if (chain === 'ethereum') {
-    chainId = 1
+    return `https://bullx.io/terminal?chainId=1&address=${token}`
   } else if (chain === 'base') {
-    chainId = 8453
+    return `https://bullx.io/terminal?chainId=8453&address=${token}`
   } else if (chain === 'solana') {
-    chainId = 1399811149
+    return `https://bullx.io/terminal?chainId=1399811149&address=${token}`
+  } else if (chain === 'tron') {
+    return `https://tron.bullx.io/terminal?chainId=728126428&address=${token}`
   } else {
     console.warn(`${chain} unsupported`)
     return null
   }
-  return `https://bullx.io/terminal?chainId=${chainId}&address=${token}`
 }
