@@ -1,1 +1,3 @@
-import '@violentmonkey/types'
+declare global {
+  export * from '@violentmonkey/types'
+}

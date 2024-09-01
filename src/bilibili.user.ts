@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.29
-// @description  移除不需要组件、网页全屏、最高可用清晰度
+// @version      0.1.0
+// @description  移除不需要组件、网页全屏、最高可用清晰度、Anime4K画质增强
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
 // @license      MIT
@@ -16,6 +16,14 @@
 // @grant        unsafeWindow
 // @grant        GM_addStyle
 // ==/UserScript==
+
+// Credits
+// https://github.com/bloc97/Anime4K
+// https://github.com/Anime4KWebBoost/Anime4K-WebGPU
+
+import type { Anime4KPipeline, Anime4KPresetPipelineDescriptor } from 'anime4k-webgpu'
+import * as anime4k from 'anime4k-webgpu'
+import debounce from 'debounce'
 
 import type { IBiliUserLoginData } from '../types/bilibili_hook'
 import { getNotFalsyValue, GM, HTMLUtils } from './util'
@@ -35,6 +43,9 @@ window.onload = async function main() {
 
   const hook = new BiliHook()
   await player.optimistic(hook)
+
+  const biliAnime4k = new BiliAnime4K()
+  biliAnime4k.monitor()
 }
 
 interface IBiliPlayer {
@@ -137,5 +148,197 @@ class BiliHook {
 
   get livePlayer() {
     return unsafeWindow.livePlayer
+  }
+}
+
+type IBiliAnime4KPipelineMode =
+  | 'Mode A'
+  | 'Mode B'
+  | 'Mode C'
+  | 'Mode A+A'
+  | 'Mode B+B'
+  | 'Mode C+A'
+
+class BiliAnime4K {
+  private getPipelines(
+    mode: IBiliAnime4KPipelineMode,
+    descriptor: Anime4KPresetPipelineDescriptor
+  ): [...Anime4KPipeline[], Anime4KPipeline] {
+    switch (mode) {
+      case 'Mode A':
+        return [new anime4k.ModeA(descriptor)]
+      case 'Mode B':
+        return [new anime4k.ModeB(descriptor)]
+      case 'Mode C':
+        return [new anime4k.ModeC(descriptor)]
+      case 'Mode A+A':
+        return [new anime4k.ModeAA(descriptor)]
+      case 'Mode B+B':
+        return [new anime4k.ModeBB(descriptor)]
+      case 'Mode C+A':
+        return [new anime4k.ModeCA(descriptor)]
+      default:
+        throw new Error(`unknown mode ${mode}`)
+    }
+  }
+
+  #keyboardListener: ((ev: KeyboardEvent) => void) | undefined
+
+  monitor() {
+    const getOperateByKey = (key: string) => {
+      switch (key) {
+        case '`':
+          return 'CLEAR'
+        case '1':
+          return 'Mode A'
+        case '2':
+          return 'Mode A+A'
+        case '3':
+          return 'Mode B'
+        case '4':
+          return 'Mode B+B'
+        case '5':
+          return 'Mode C'
+        case '6':
+          return 'Mode C+A'
+      }
+    }
+    let lastOperate: string | undefined
+    this.#keyboardListener = (ev: KeyboardEvent) => {
+      const operate = getOperateByKey(ev.key)
+      if (operate === lastOperate) {
+        return
+      }
+      lastOperate = operate
+      if (operate === undefined) {
+        return
+      } else if (operate === 'CLEAR') {
+        this.stopRender()
+      } else {
+        this.render({ mode: operate })
+      }
+    }
+    window.addEventListener('keydown', this.#keyboardListener)
+  }
+
+  #observer: ResizeObserver | undefined
+
+  async render({ mode }: { mode: IBiliAnime4KPipelineMode }) {
+    const video = document.querySelector('video')
+    if (video === null) {
+      console.warn('video is not exist')
+      return
+    }
+    video.style.setProperty('visibility', 'hidden')
+
+    const { canvas, created } = this.getCanvas()
+    if (created) {
+      video.parentElement!.appendChild(canvas)
+    }
+
+    if (this.#observer) {
+      this.#observer.disconnect()
+    }
+
+    const render = debounce(
+      async ({ rectWidth, rectHeight }: { rectWidth: number; rectHeight: number }) => {
+        const { videoWidth, videoHeight } = video
+        const aspectRatio = videoWidth / videoHeight
+        const canvasWidth = rectWidth < rectHeight ? rectWidth : rectHeight * aspectRatio
+        const canvasHeight = rectHeight < rectWidth ? rectHeight : rectWidth / aspectRatio
+        canvas.width = canvasWidth
+        canvas.height = canvasHeight
+        canvas.style.setProperty('left', `${(rectWidth - canvasWidth) / 2}px`)
+        canvas.style.setProperty('top', `${(rectHeight - canvasHeight) / 2}px`)
+
+        await anime4k.render({
+          video,
+          canvas,
+          pipelineBuilder: (device, inputTexture) =>
+            this.getPipelines(mode, {
+              nativeDimensions: { width: videoWidth, height: videoHeight },
+              targetDimensions: { width: videoWidth * 2, height: videoHeight * 2 },
+              device,
+              inputTexture,
+            }),
+        })
+      },
+      100,
+      { immediate: false }
+    )
+
+    this.#observer = new ResizeObserver((entries) => {
+      if (entries.length === 0) return
+      const entry = entries[0]
+      if (!(entry.target instanceof HTMLVideoElement)) {
+        this.stopRender()
+        return
+      }
+      render({ rectWidth: entry.contentRect.width, rectHeight: entry.contentRect.height })
+    })
+    this.#observer!.observe(video)
+
+    await render({ rectWidth: video.clientWidth, rectHeight: video.clientHeight })
+
+    this.notice(video, mode)
+  }
+
+  stopRender() {
+    this.#observer?.disconnect()
+    this.#observer = undefined
+    const canvas = document.getElementById('gpu-canvas')
+    if (canvas) canvas.parentElement!.removeChild(canvas)
+    const video = document.querySelector('video')
+    if (video) {
+      video.style.removeProperty('visibility')
+      this.notice(video, 'Clear')
+    }
+  }
+
+  stop() {
+    this.stopRender()
+    if (this.#keyboardListener) {
+      window.removeEventListener('keydown', this.#keyboardListener)
+      this.#keyboardListener = undefined
+    }
+  }
+
+  private getCanvas() {
+    const id = 'gpu-canvas'
+
+    let canvas = document.getElementById(id) as HTMLCanvasElement | null
+    if (canvas !== null) return { canvas, created: false }
+
+    canvas = document.createElement('canvas')
+    canvas.id = id
+    canvas.style.setProperty('position', 'absolute')
+    return { canvas, created: true }
+  }
+
+  #noticeTimer: ReturnType<typeof setTimeout> | undefined
+
+  private notice(video: HTMLVideoElement, text: string) {
+    const id = 'gpu-notice'
+
+    let div = document.getElementById(id)
+    if (div === null) {
+      div = document.createElement('div')
+      div.id = id
+      div.style.setProperty('position', 'absolute')
+      div.style.setProperty('z-index', '1')
+      div.style.setProperty('top', '12px')
+      div.style.setProperty('left', '12px')
+      div.style.setProperty('padding', '12px')
+      div.style.setProperty('background', '#4b4b4be6')
+      div.style.setProperty('border-radius', '5px')
+      div.style.setProperty('font-size', '2rem')
+      div.style.setProperty('color', 'white')
+      video.parentElement!.appendChild(div)
+    }
+
+    div.innerText = text
+
+    clearTimeout(this.#noticeTimer)
+    this.#noticeTimer = setTimeout(() => video.parentElement!.removeChild(div), 1500)
   }
 }

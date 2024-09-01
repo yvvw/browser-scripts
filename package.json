@@ -8,6 +8,10 @@
     "dev": "node scripts/watch.mjs",
     "build": "node scripts/build.mjs"
   },
+  "dependencies": {
+    "anime4k-webgpu": "^1.0.0",
+    "debounce": "^2.1.0"
+  },
   "devDependencies": {
     "@types/node": "^20.14.12",
     "@violentmonkey/types": "^0.1.8",
