@@ -150,12 +150,12 @@ class BiliHook {
 }
 
 type IBiliAnime4KPipelineMode =
-  | 'Mode A'
-  | 'Mode B'
-  | 'Mode C'
-  | 'Mode A+A'
-  | 'Mode B+B'
-  | 'Mode C+A'
+  | 'Anime4K: A'
+  | 'Anime4K: B'
+  | 'Anime4K: C'
+  | 'Anime4K: A+A'
+  | 'Anime4K: B+B'
+  | 'Anime4K: C+A'
 
 class BiliAnime4K {
   private getPipelines(
@@ -163,17 +163,17 @@ class BiliAnime4K {
     descriptor: Anime4KPresetPipelineDescriptor
   ): [...Anime4KPipeline[], Anime4KPipeline] {
     switch (mode) {
-      case 'Mode A':
+      case 'Anime4K: A':
         return [new anime4k.ModeA(descriptor)]
-      case 'Mode B':
+      case 'Anime4K: B':
         return [new anime4k.ModeB(descriptor)]
-      case 'Mode C':
+      case 'Anime4K: C':
         return [new anime4k.ModeC(descriptor)]
-      case 'Mode A+A':
+      case 'Anime4K: A+A':
         return [new anime4k.ModeAA(descriptor)]
-      case 'Mode B+B':
+      case 'Anime4K: B+B':
         return [new anime4k.ModeBB(descriptor)]
-      case 'Mode C+A':
+      case 'Anime4K: C+A':
         return [new anime4k.ModeCA(descriptor)]
       default:
         throw new Error(`unknown mode ${mode}`)
@@ -186,19 +186,19 @@ class BiliAnime4K {
     const getModeByKey = (key: string) => {
       switch (key) {
         case '`':
-          return 'CLEAR'
+          return 'Clear'
         case '1':
-          return 'Mode A'
+          return 'Anime4K: A'
         case '2':
-          return 'Mode A+A'
+          return 'Anime4K: A+A'
         case '3':
-          return 'Mode B'
+          return 'Anime4K: B'
         case '4':
-          return 'Mode B+B'
+          return 'Anime4K: B+B'
         case '5':
-          return 'Mode C'
+          return 'Anime4K: C'
         case '6':
-          return 'Mode C+A'
+          return 'Anime4K: C+A'
       }
     }
     let lastMode: string | undefined
@@ -211,7 +211,7 @@ class BiliAnime4K {
       lastMode = mode
       if (mode === undefined) {
         return
-      } else if (mode === 'CLEAR') {
+      } else if (mode === 'Clear') {
         this.stopRender()
       } else {
         this.render({ mode }).catch(console.error)
