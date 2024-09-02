@@ -3,6 +3,8 @@
 // @namespace    https://github.com/yvvw/browser-scripts
 // @version      0.1.0
 // @description  移除不需要组件、网页全屏、最高可用清晰度、Anime4K画质增强
+// @credit       https://github.com/bloc97/Anime4K
+// @credit       https://github.com/Anime4KWebBoost/Anime4K-WebGPU
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
 // @license      MIT
@@ -16,10 +18,6 @@
 // @grant        unsafeWindow
 // @grant        GM_addStyle
 // ==/UserScript==
-
-// Credits
-// https://github.com/bloc97/Anime4K
-// https://github.com/Anime4KWebBoost/Anime4K-WebGPU
 
 import type { Anime4KPipeline, Anime4KPresetPipelineDescriptor } from 'anime4k-webgpu'
 import * as anime4k from 'anime4k-webgpu'

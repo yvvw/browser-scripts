@@ -14,6 +14,7 @@ async function main() {
     bundle: true,
     minify: !entry.dev,
     target: ['es2020', 'chrome57', 'firefox57'],
+    legalComments: 'none',
   })
   if (!entry.dev) {
     await writeFile(`dist/${entry.object.name.replace('user', 'meta')}.js`, banner)
