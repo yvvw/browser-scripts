@@ -183,7 +183,7 @@ class BiliAnime4K {
   #keyboardListener: ((ev: KeyboardEvent) => void) | undefined
 
   monitor() {
-    const getOperateByKey = (key: string) => {
+    const getModeByKey = (key: string) => {
       switch (key) {
         case '`':
           return 'CLEAR'
@@ -201,19 +201,20 @@ class BiliAnime4K {
           return 'Mode C+A'
       }
     }
-    let lastOperate: string | undefined
+    let lastMode: string | undefined
     this.#keyboardListener = (ev: KeyboardEvent) => {
-      const operate = getOperateByKey(ev.key)
-      if (operate === lastOperate) {
+      const mode = getModeByKey(ev.key)
+      if (mode === lastMode) {
+        if (mode !== undefined) this.notice(document.querySelector('video')!, mode)
         return
       }
-      lastOperate = operate
-      if (operate === undefined) {
+      lastMode = mode
+      if (mode === undefined) {
         return
-      } else if (operate === 'CLEAR') {
+      } else if (mode === 'CLEAR') {
         this.stopRender()
       } else {
-        this.render({ mode: operate })
+        this.render({ mode }).catch(console.error)
       }
     }
     window.addEventListener('keydown', this.#keyboardListener)
