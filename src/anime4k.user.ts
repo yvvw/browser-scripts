@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Anime4K
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.1
+// @version      0.0.2
 // @description  Anime4K画质增强
 // @credit       https://github.com/bloc97/Anime4K
 // @credit       https://github.com/Anime4KWebBoost/Anime4K-WebGPU
@@ -74,9 +74,9 @@ class Anime4K {
       if (preset === lastPreset) return this.#notice(preset)
       lastPreset = preset
       if (preset === 'Clear') {
-        this.#clear().catch(console.error)
+        this.#clear().catch(this.destroy)
       } else {
-        this.#start({ preset }).catch(console.error)
+        this.#start({ preset }).catch(this.destroy)
       }
     }
     window.addEventListener('keydown', this.#keyboardListener)
@@ -262,9 +262,10 @@ class Anime4K {
     const canvas = document.getElementById(this.#canvasId) as HTMLCanvasElement | null
     if (canvas) canvas.style.setProperty('display', 'none')
 
-    if (this.#video) this.#video.style.removeProperty('visibility')
-
-    this.#notice('Clear')
+    if (this.#video) {
+      this.#video.style.removeProperty('visibility')
+      this.#notice('Clear')
+    }
   }
 
   #video?: HTMLVideoElement
