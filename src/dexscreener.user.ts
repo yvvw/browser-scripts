@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.16
+// @version      0.0.17
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -13,7 +13,11 @@
 
 import { HTMLUtils } from './util'
 
-window.onload = function main() {
+main()
+
+function main() {
+  if (window.self !== window.top) return
+
   HTMLUtils.observe(
     document.body,
     async () => {
@@ -27,8 +31,11 @@ window.onload = function main() {
 }
 
 function closeAd() {
-  const btnEls = HTMLUtils.getElementsByXPath<HTMLButtonElement>('//button[text()="Hide ad"]')
+  const btnEls = document.querySelectorAll<HTMLButtonElement>('button[aria-label="Hide"]')
   for (const btnEl of btnEls) btnEl.click()
+
+  const adBtnEls = HTMLUtils.getElementsByXPath<HTMLButtonElement>('//button[text()="Hide ad"]')
+  for (const btnEl of adBtnEls) btnEl.click()
 }
 
 function expandWatchList() {
