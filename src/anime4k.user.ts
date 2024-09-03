@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Anime4K
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.2
+// @version      0.0.3
 // @description  Anime4K画质增强
 // @credit       https://github.com/bloc97/Anime4K
 // @credit       https://github.com/Anime4KWebBoost/Anime4K-WebGPU
@@ -15,9 +15,6 @@
 import type { Anime4KPipeline, Anime4KPresetPipelineDescriptor } from 'anime4k-webgpu'
 import { ModeA, ModeAA, ModeB, ModeBB, ModeC, ModeCA } from 'anime4k-webgpu'
 import debounce from 'debounce'
-
-import FullscreenTexturedQuadWGSL from './shaders/fullscreenTexturedQuad.wgsl'
-import SampleExternalTextureWGSL from './shaders/sampleExternalTexture.wgsl'
 
 window.onload = function main() {
   new Anime4K().watch()
@@ -98,8 +95,11 @@ class Anime4K {
 
     const render = debounce(
       async ({ rectWidth, rectHeight }: { rectWidth: number; rectHeight: number }) => {
-        const canvasWidth = rectWidth < rectHeight ? rectWidth : rectHeight * videoAspectRatio
-        const canvasHeight = rectHeight < rectWidth ? rectHeight : rectWidth / videoAspectRatio
+        const rectAspectRatio = rectWidth / rectHeight
+        const canvasWidth =
+          rectAspectRatio < videoAspectRatio ? rectWidth : rectHeight * videoAspectRatio
+        const canvasHeight =
+          videoAspectRatio < rectAspectRatio ? rectHeight : rectWidth / videoAspectRatio
         canvas.width = canvasWidth
         canvas.height = canvasHeight
         canvas.style.setProperty('left', `${(rectWidth - canvasWidth) / 2}px`)
@@ -262,25 +262,18 @@ class Anime4K {
     const canvas = document.getElementById(this.#canvasId) as HTMLCanvasElement | null
     if (canvas) canvas.style.setProperty('display', 'none')
 
-    if (this.#video) {
-      this.#video.style.removeProperty('visibility')
-      this.#notice('Clear')
-    }
+    this.#getVideo().style.removeProperty('visibility')
+    this.#notice('Clear')
   }
 
-  #video?: HTMLVideoElement
-
   #getVideo() {
-    if (this.#video) return this.#video!
-
     const videos = document.querySelectorAll('video')
     if (videos.length === 0) {
       throw new Error('video not found')
     }
     for (const video of videos) {
-      if (video.clientWidth * video.clientHeight * 4 > window.innerWidth * window.innerHeight) {
-        this.#video = video
-        return this.#video!
+      if (video.clientWidth * video.clientHeight * 6 > window.innerWidth * window.innerHeight) {
+        return video
       }
     }
     throw new Error('valid video not found')
@@ -356,3 +349,46 @@ class Anime4K {
     this.#noticeTimer = setTimeout(() => noticeEl.style.setProperty('opacity', '0'), 1500)
   }
 }
+
+const FullscreenTexturedQuadWGSL = `
+struct VertexOutput {
+  @builtin(position) Position : vec4<f32>,
+  @location(0) fragUV : vec2<f32>,
+}
+
+@vertex
+fn vert_main(@builtin(vertex_index) VertexIndex : u32) -> VertexOutput {
+  const pos = array(
+    vec2( 1.0,  1.0),
+    vec2( 1.0, -1.0),
+    vec2(-1.0, -1.0),
+    vec2( 1.0,  1.0),
+    vec2(-1.0, -1.0),
+    vec2(-1.0,  1.0),
+  );
+
+  const uv = array(
+    vec2(1.0, 0.0),
+    vec2(1.0, 1.0),
+    vec2(0.0, 1.0),
+    vec2(1.0, 0.0),
+    vec2(0.0, 1.0),
+    vec2(0.0, 0.0),
+  );
+
+  var output : VertexOutput;
+  output.Position = vec4(pos[VertexIndex], 0.0, 1.0);
+  output.fragUV = uv[VertexIndex];
+  return output;
+}
+`
+
+const SampleExternalTextureWGSL = `
+@group(0) @binding(1) var mySampler: sampler;
+@group(0) @binding(2) var myTexture: texture_2d<f32>;
+
+@fragment
+fn main(@location(0) fragUV : vec2f) -> @location(0) vec4f {
+  return textureSampleBaseClampToEdge(myTexture, mySampler, fragUV);
+}
+`
