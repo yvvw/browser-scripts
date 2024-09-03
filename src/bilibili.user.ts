@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.1.2
+// @version      0.1.3
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -14,36 +14,41 @@
 // @match        https://www.bilibili.com/blackboard/*
 // @match        https://live.bilibili.com/*
 // @grant        unsafeWindow
-// @grant        GM_addStyle
 // ==/UserScript==
 
-import type { IBiliUserLoginData } from '../types/bilibili_hook'
-import { getNotFalsyValue, GM, HTMLUtils } from './util'
+import type { IBiliLivePlayer, IBiliPlayer, IBiliUser } from '../types/bilibili_global'
+import { getNotFalsyValue, HTMLUtils } from './util'
 
-window.onload = async function main() {
-  let player: IBiliPlayer | undefined
+window.onload = function main() {
+  if (window.self !== window.top) return
+
+  let player: IPlayer | undefined
   const href = document.location.href
   if (/live/.test(href)) {
-    player = new BiliLivePlayer()
+    player = new LivePlayer()
   } else if (/video|list|bangumi|blackboard/.test(href)) {
-    player = new BiliVideoPlayer()
+    player = new VideoPlayer()
   }
   if (!player) {
     console.warn('player not found')
     return
   }
 
-  const hook = new BiliHook()
-  await player.optimistic(hook)
+  player.run(new BiliInject()).catch(console.error)
 }
 
-interface IBiliPlayer {
-  optimistic(hook: BiliHook): Promise<void>
+interface IPlayer {
+  run(inject: BiliInject): Promise<void>
 }
 
-class BiliVideoPlayer implements IBiliPlayer {
-  async optimistic(hook: BiliHook) {
-    await Promise.allSettled([this.switchWebFullscreen(), this.switchBestQuality(hook)])
+class VideoPlayer implements IPlayer {
+  async run(inject: BiliInject) {
+    const [biliPlayer, biliUser] = await Promise.all([inject.getPlayer(), inject.getUser()])
+
+    await Promise.allSettled([
+      this.switchWebFullscreen().catch(console.error),
+      this.switchBestQuality(biliPlayer, biliUser).catch(console.error),
+    ])
   }
 
   async switchWebFullscreen() {
@@ -51,43 +56,42 @@ class BiliVideoPlayer implements IBiliPlayer {
       document.querySelector<HTMLElement>('.bpx-player-ctrl-web')
     )
     if (playerEl.classList.contains('bpx-state-entered')) {
-      console.warn('entered fullscreen button classname changed')
+      console.warn('fullscreen button not found')
       return
     }
     playerEl.click()
   }
 
-  private isVip(hook: BiliHook) {
-    return (hook.user?.cache?.data as IBiliUserLoginData)?.vipStatus === 1
+  async switchBestQuality(player: IBiliPlayer, user: IBiliUser['cache']['data']) {
+    const current = player.getQuality().realQ
+    const supported = player.getSupportedQualityList()
+    const quality = !user.isLogin
+      ? supported.find((it) => it < 64)!
+      : this.#isVip(user)
+        ? supported[0]
+        : supported.find((it) => it < 112)!
+    if (current !== quality) player.requestQuality(quality)
   }
 
-  async switchBestQuality(hook: BiliHook) {
-    const player = await getNotFalsyValue(() => hook.player)
-    const curr = player.getQuality().realQ
-    const supported = player.getSupportedQualityList()
-    const quality = this.isVip(hook)
-      ? supported[0]
-      : supported[supported.findIndex((it) => it < 112)]
-    if (curr !== quality) player.requestQuality(quality)
+  #isVip(user: IBiliUser['cache']['data']) {
+    return user?.vipStatus === 1
   }
 }
 
-class BiliLivePlayer implements IBiliPlayer {
-  async optimistic(hook: BiliHook) {
-    this.hideElements()
-    await this.scrollToPlayer().catch(console.error)
-    await Promise.allSettled([this.hideChatPanel(), this.switchBestQuality(hook)])
-    await this.switchWebFullscreen()
-  }
+class LivePlayer implements IPlayer {
+  async run(inject: BiliInject) {
+    const livePlayer = await inject.getLivePlayer()
 
-  hideElements() {
-    GM.addStyle('#my-dear-haruna-vm{display:none !important}')
+    await Promise.allSettled([
+      this.hideChatPanel().catch(console.error),
+      this.scrollToPlayer().catch(console.error),
+      this.switchWebFullscreen().catch(console.error),
+      this.switchBestQuality(livePlayer).catch(console.error),
+    ])
   }
 
   async hideChatPanel() {
-    const el = await HTMLUtils.query(() =>
-      document.querySelector<HTMLElement>('#aside-area-toggle-btn')
-    )
+    const el = await HTMLUtils.query(() => document.getElementById('aside-area-toggle-btn'))
     el.click()
   }
 
@@ -101,41 +105,44 @@ class BiliLivePlayer implements IBiliPlayer {
     playerEl.dispatchEvent(new MouseEvent('mousemove'))
     const areaEl = document.querySelector<HTMLElement>('.right-area')
     if (areaEl === null) {
-      console.warn('player right area element not found')
+      console.warn('player right area not found')
       return
     }
     const childEl = areaEl.children.item(1)
     if (childEl === null) {
-      console.warn('fullscreen button element not found')
+      console.warn('fullscreen button not found')
       return
     }
     const spanEl = childEl.querySelector<HTMLElement>('span')
     if (spanEl === null) {
-      console.warn('fullscreen button element not found')
+      console.warn('fullscreen button not found')
       return
     }
     spanEl.click()
   }
 
-  async switchBestQuality(hook: BiliHook) {
-    const player = await getNotFalsyValue(() => hook.livePlayer)
+  async switchBestQuality(player: IBiliLivePlayer) {
     const current = player.getPlayerInfo().quality
-    const supported = player.getPlayerInfo().qualityCandidates.map((it) => it.qn)
-    const quality = supported[0]
+    const support = player.getPlayerInfo().qualityCandidates.map((it) => it.qn)
+    if (support.length === 0) {
+      console.warn('support qualities is empty')
+      return
+    }
+    const quality = support[0]
     if (current !== quality) player.switchQuality(quality)
   }
 }
 
-class BiliHook {
-  get user() {
-    return unsafeWindow.__BiliUser__
+class BiliInject {
+  async getUser() {
+    return getNotFalsyValue(() => unsafeWindow.__BiliUser__?.cache?.data)
   }
 
-  get player() {
-    return unsafeWindow.player
+  async getPlayer() {
+    return getNotFalsyValue(() => unsafeWindow.player)
   }
 
-  get livePlayer() {
-    return unsafeWindow.livePlayer
+  async getLivePlayer() {
+    return getNotFalsyValue(() => unsafeWindow.livePlayer)
   }
 }
