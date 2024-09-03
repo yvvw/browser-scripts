@@ -1,16 +1,15 @@
-import * as esbuild from 'esbuild'
+import { build } from 'esbuild'
 import { open, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 async function main() {
   const entry = parseEntry()
   const banner = await parseBanner(entry)
-  await esbuild.build({
+  await build({
     entryPoints: [entry.path],
-    banner: {
-      js: banner,
-    },
+    banner: { js: banner },
     outfile: `dist/${entry.object.name}.js`,
+    loader: { '.wgsl': 'text' },
     bundle: true,
     minify: !entry.dev,
     target: ['es2020', 'chrome57', 'firefox57'],
