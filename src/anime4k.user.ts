@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Anime4K
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.3
+// @version      0.0.4
 // @description  Anime4K画质增强
 // @credit       https://github.com/bloc97/Anime4K
 // @credit       https://github.com/Anime4KWebBoost/Anime4K-WebGPU
@@ -85,13 +85,10 @@ class Anime4K {
 
   async #start({ preset }: { preset: IAnime4KPipelinePreset }) {
     const video = this.#getVideo()
-    video.style.setProperty('visibility', 'hidden')
+    const canvas = this.#getCanvas(video.parentElement!)
 
     const { videoWidth, videoHeight } = video
     const videoAspectRatio = videoWidth / videoHeight
-
-    const canvas = this.#getCanvas(video.parentElement!)
-    canvas.style.removeProperty('display')
 
     const render = debounce(
       async ({ rectWidth, rectHeight }: { rectWidth: number; rectHeight: number }) => {
@@ -123,6 +120,9 @@ class Anime4K {
 
     render({ rectWidth: video.clientWidth, rectHeight: video.clientHeight })
 
+    canvas.style.removeProperty('display')
+    video.style.setProperty('visibility', 'hidden')
+
     this.#notice(preset)
   }
 
@@ -151,8 +151,8 @@ class Anime4K {
       size: [videoWidth, videoHeight, 1],
       format: 'rgba16float',
       usage:
-        GPUTextureUsage.TEXTURE_BINDING |
         GPUTextureUsage.COPY_DST |
+        GPUTextureUsage.TEXTURE_BINDING |
         GPUTextureUsage.RENDER_ATTACHMENT,
     })
 
@@ -257,12 +257,13 @@ class Anime4K {
       this.#resizeObserver = undefined
     }
 
-    if (this.#stop) await this.#stop()
+    this.#getVideo().style.removeProperty('visibility')
 
     const canvas = document.getElementById(this.#canvasId) as HTMLCanvasElement | null
     if (canvas) canvas.style.setProperty('display', 'none')
 
-    this.#getVideo().style.removeProperty('visibility')
+    if (this.#stop) await this.#stop()
+
     this.#notice('Clear')
   }
 
