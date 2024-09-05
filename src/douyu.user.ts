@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Douyu
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.12
+// @version      0.0.13
 // @description  自动网页全屏、切换最高清晰度
 // @author       yvvw
 // @icon         https://www.douyu.com/favicon.ico
@@ -22,10 +22,16 @@
 // @match        https://www.douyu.com/9*
 // ==/UserScript==
 
-import { HTMLUtils } from './util'
+import { getNotFalsyValue, HTMLUtils } from './util'
 
-window.onload = function main() {
+main()
+
+async function main() {
+  if (window.self !== window.top) return
+
   if (!location.pathname.includes('watchHistory')) {
+    await getNotFalsyValue(() => document.querySelector('video'))
+
     hideDanmuPanel()
     switchBestQuality()
     switchWebFullscreen()
