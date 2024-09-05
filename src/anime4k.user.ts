@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Anime4K
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.4
+// @version      0.0.5
 // @description  Anime4K画质增强
 // @credit       https://github.com/bloc97/Anime4K
 // @credit       https://github.com/Anime4KWebBoost/Anime4K-WebGPU
@@ -85,7 +85,7 @@ class Anime4K {
 
   async #start({ preset }: { preset: IAnime4KPipelinePreset }) {
     const video = this.#getVideo()
-    const canvas = this.#getCanvas(video.parentElement!)
+    const canvas = this.#getCanvas()
 
     const { videoWidth, videoHeight } = video
     const videoAspectRatio = videoWidth / videoHeight
@@ -119,9 +119,6 @@ class Anime4K {
     this.#resizeObserver!.observe(video)
 
     render({ rectWidth: video.clientWidth, rectHeight: video.clientHeight })
-
-    canvas.style.removeProperty('display')
-    video.style.setProperty('visibility', 'hidden')
 
     this.#notice(preset)
   }
@@ -256,12 +253,6 @@ class Anime4K {
       this.#resizeObserver.disconnect()
       this.#resizeObserver = undefined
     }
-
-    this.#getVideo().style.removeProperty('visibility')
-
-    const canvas = document.getElementById(this.#canvasId) as HTMLCanvasElement | null
-    if (canvas) canvas.style.setProperty('display', 'none')
-
     if (this.#stop) await this.#stop()
 
     this.#notice('Clear')
@@ -282,14 +273,15 @@ class Anime4K {
 
   #canvasId = '__gpu-canvas__'
 
-  #getCanvas(container: HTMLElement): HTMLCanvasElement {
+  #getCanvas(): HTMLCanvasElement {
     let canvas = document.getElementById(this.#canvasId) as HTMLCanvasElement | null
     if (canvas !== null) return canvas
 
     canvas = document.createElement('canvas')
     canvas.id = this.#canvasId
     canvas.style.setProperty('position', 'absolute')
-    container.appendChild(canvas)
+
+    this.#getVideo().parentElement!.appendChild(canvas)
 
     return canvas
   }
