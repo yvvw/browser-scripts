@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Anime4K
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.5
+// @version      0.0.6
 // @description  Anime4K画质增强
 // @credit       https://github.com/bloc97/Anime4K
 // @credit       https://github.com/Anime4KWebBoost/Anime4K-WebGPU
@@ -71,9 +71,9 @@ class Anime4K {
       if (preset === lastPreset) return this.#notice(preset)
       lastPreset = preset
       if (preset === 'Clear') {
-        this.#clear().catch(this.destroy)
+        this.#clear().catch(console.error)
       } else {
-        this.#start({ preset }).catch(this.destroy)
+        this.#start({ preset }).catch(this.destroy.bind(this))
       }
     }
     window.addEventListener('keydown', this.#keyboardListener)
@@ -313,8 +313,9 @@ class Anime4K {
   #noticeId = '__gpu-notice__'
 
   #notice(text: string) {
-    const container = this.#getVideo().parentElement!
-    if (container !== null) this.#notice1(container, text)
+    try {
+      this.#notice1(this.#getVideo().parentElement!, text)
+    } catch {}
   }
 
   #notice1(container: HTMLElement, text: string) {
