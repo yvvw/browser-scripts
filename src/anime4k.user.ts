@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Anime4K
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.6
+// @version      0.0.7
 // @description  Anime4K画质增强
 // @credit       https://github.com/bloc97/Anime4K
 // @credit       https://github.com/Anime4KWebBoost/Anime4K-WebGPU
@@ -84,8 +84,8 @@ class Anime4K {
   #stop?: () => Promise<void>
 
   async #start({ preset }: { preset: IAnime4KPipelinePreset }) {
-    const video = this.#getVideo()
-    const canvas = this.#getCanvas()
+    const video = this.#video()
+    const canvas = this.#canvas()
 
     const { videoWidth, videoHeight } = video
     const videoAspectRatio = videoWidth / videoHeight
@@ -139,7 +139,7 @@ class Anime4K {
     const { videoWidth, videoHeight } = video
     const { width: canvasWidth, height: canvasHeight } = canvas
 
-    const device = await this.#getGPUDevice()
+    const device = await this.#gpuDevice()
     const context = canvas.getContext('webgpu') as GPUCanvasContext
     const format = navigator.gpu.getPreferredCanvasFormat()
     context.configure({ device, format, alphaMode: 'premultiplied' })
@@ -258,38 +258,94 @@ class Anime4K {
     this.#notice('Clear')
   }
 
-  #getVideo() {
+  #video() {
     const videos = document.querySelectorAll('video')
     if (videos.length === 0) {
       throw new Error('video not found')
     }
     for (const video of videos) {
       if (video.clientWidth * video.clientHeight * 6 > window.innerWidth * window.innerHeight) {
+        this.#createElements(video)
         return video
       }
     }
     throw new Error('valid video not found')
   }
 
-  #canvasId = '__gpu-canvas__'
+  #mutationObserver?: MutationObserver
 
-  #getCanvas(): HTMLCanvasElement {
-    let canvas = document.getElementById(this.#canvasId) as HTMLCanvasElement | null
-    if (canvas !== null) return canvas
+  #createElements(video: HTMLVideoElement) {
+    if (document.getElementById(this.#canvasId)) return
 
-    canvas = document.createElement('canvas')
+    const container = video.parentElement! as HTMLElement
+
+    const videoZIndex = video.style.getPropertyValue('z-index')
+
+    const canvas = document.createElement('canvas')
     canvas.id = this.#canvasId
     canvas.style.setProperty('position', 'absolute')
+    canvas.style.setProperty('z-index', videoZIndex)
 
-    this.#getVideo().parentElement!.appendChild(canvas)
+    const notice = document.createElement('div')
+    notice.id = this.#noticeId
+    notice.style.setProperty('position', 'absolute')
+    notice.style.setProperty('z-index', videoZIndex)
+    notice.style.setProperty('top', '12px')
+    notice.style.setProperty('left', '12px')
+    notice.style.setProperty('padding', '12px')
+    notice.style.setProperty('background', '#4b4b4be6')
+    notice.style.setProperty('border-radius', '5px')
+    notice.style.setProperty('font-size', '2rem')
+    notice.style.setProperty('color', 'white')
+    notice.style.setProperty('transition', 'opacity 0.3s')
 
-    return canvas
+    container.appendChild(canvas)
+    container.appendChild(notice)
+
+    const handleVideoElAdded = debounce((video: HTMLVideoElement) => {
+      const videoZIndex = video.style.getPropertyValue('z-index')
+
+      canvas.style.setProperty('z-index', videoZIndex)
+      container.appendChild(container.removeChild(canvas))
+
+      notice.style.setProperty('z-index', videoZIndex)
+      container.appendChild(container.removeChild(notice))
+    }, 100)
+
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const addedNode of mutation.addedNodes.values()) {
+          if (addedNode instanceof HTMLVideoElement) handleVideoElAdded(video)
+        }
+      }
+    })
+    observer.observe(container, { childList: true })
+
+    this.#mutationObserver = observer
   }
 
-  async #getGPUDevice() {
+  #canvasId = '__gpu-canvas__'
+
+  #canvas(): HTMLCanvasElement {
+    return document.getElementById(this.#canvasId) as HTMLCanvasElement
+  }
+
+  async #gpuDevice() {
     const adapter = await navigator.gpu.requestAdapter()
     if (adapter === null) throw new Error('WebGPU not supported')
     return adapter.requestDevice()
+  }
+
+  #noticeId = '__gpu-notice__'
+  #noticeTimer?: ReturnType<typeof setTimeout>
+
+  #notice(text: string) {
+    const noticeEl = document.getElementById(this.#noticeId) as HTMLDivElement
+    noticeEl.innerText = text
+    noticeEl.style.setProperty('opacity', '1')
+
+    clearTimeout(this.#noticeTimer)
+    this.#noticeTimer = setTimeout(() => noticeEl.style.setProperty('opacity', '0'), 1500)
   }
 
   async destroy() {
@@ -300,6 +356,11 @@ class Anime4K {
       this.#keyboardListener = undefined
     }
 
+    if (this.#mutationObserver) {
+      this.#mutationObserver.disconnect()
+      this.#mutationObserver = undefined
+    }
+
     this.#destroyById(this.#canvasId)
     this.#destroyById(this.#noticeId)
   }
@@ -307,40 +368,6 @@ class Anime4K {
   #destroyById(id: string) {
     let el = document.getElementById(id)
     if (el !== null) el.parentElement?.removeChild(el)
-  }
-
-  #noticeTimer?: ReturnType<typeof setTimeout>
-  #noticeId = '__gpu-notice__'
-
-  #notice(text: string) {
-    try {
-      this.#notice1(this.#getVideo().parentElement!, text)
-    } catch {}
-  }
-
-  #notice1(container: HTMLElement, text: string) {
-    let noticeEl = document.getElementById(this.#noticeId)
-    if (noticeEl === null) {
-      noticeEl = document.createElement('div')
-      noticeEl.id = this.#noticeId
-      noticeEl.style.setProperty('position', 'absolute')
-      noticeEl.style.setProperty('z-index', '1')
-      noticeEl.style.setProperty('top', '12px')
-      noticeEl.style.setProperty('left', '12px')
-      noticeEl.style.setProperty('padding', '12px')
-      noticeEl.style.setProperty('background', '#4b4b4be6')
-      noticeEl.style.setProperty('border-radius', '5px')
-      noticeEl.style.setProperty('font-size', '2rem')
-      noticeEl.style.setProperty('color', 'white')
-      noticeEl.style.setProperty('transition', 'opacity 0.3s')
-      container.appendChild(noticeEl)
-    }
-
-    noticeEl.innerText = text
-    noticeEl.style.setProperty('opacity', '1')
-
-    clearTimeout(this.#noticeTimer)
-    this.#noticeTimer = setTimeout(() => noticeEl.style.setProperty('opacity', '0'), 1500)
   }
 }
 
