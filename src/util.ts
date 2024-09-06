@@ -6,8 +6,8 @@ export async function getNotFalsyValue<R>(
   callback: () => R | null | undefined | Promise<R | null | undefined>,
   option?: { times?: number; interval?: number }
 ): Promise<NonNullable<R>> {
-  let times = option?.times || 10
-  let interval = option?.interval || 200
+  let times = option?.times || 20
+  let interval = option?.interval || 500
 
   while (true) {
     times--
