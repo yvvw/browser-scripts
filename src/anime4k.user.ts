@@ -281,41 +281,38 @@ class Anime4K {
   #mutationObserver?: MutationObserver
 
   #createElements(video: HTMLVideoElement) {
-    if (document.getElementById(this.#canvasId)) return
+    if (document.getElementById(this.#CANVAS_ID)) return
 
     const container = video.parentElement! as HTMLElement
 
     const videoZIndex = video.style.getPropertyValue('z-index')
 
     const canvas = document.createElement('canvas')
-    canvas.id = this.#canvasId
+    canvas.id = this.#CANVAS_ID
     canvas.style.setProperty('position', 'absolute')
     canvas.style.setProperty('z-index', videoZIndex)
 
     const notice = document.createElement('div')
-    notice.id = this.#noticeId
+    notice.id = this.#NOTICE_ID
     notice.style.setProperty('position', 'absolute')
     notice.style.setProperty('z-index', videoZIndex)
     notice.style.setProperty('top', '12px')
     notice.style.setProperty('left', '12px')
-    notice.style.setProperty('padding', '12px')
+    notice.style.setProperty('padding', '6px 12px')
     notice.style.setProperty('background', '#4b4b4be6')
     notice.style.setProperty('border-radius', '5px')
     notice.style.setProperty('font-size', '2rem')
     notice.style.setProperty('color', 'white')
     notice.style.setProperty('transition', 'opacity 0.3s')
 
-    container.appendChild(canvas)
-    container.appendChild(notice)
+    video.after(canvas, notice)
 
     const handleVideoElAdded = debounce((video: HTMLVideoElement) => {
       const videoZIndex = video.style.getPropertyValue('z-index')
-
       canvas.style.setProperty('z-index', videoZIndex)
-      container.appendChild(container.removeChild(canvas))
-
       notice.style.setProperty('z-index', videoZIndex)
-      container.appendChild(container.removeChild(notice))
+
+      video.after(container.removeChild(canvas), container.removeChild(notice))
     }, 100)
 
     const observer = new MutationObserver((mutations) => {
@@ -330,10 +327,10 @@ class Anime4K {
     this.#mutationObserver = observer
   }
 
-  #canvasId = '__gpu-canvas__'
+  readonly #CANVAS_ID = '__anime4k-canvas__'
 
   #canvas(): HTMLCanvasElement {
-    return document.getElementById(this.#canvasId) as HTMLCanvasElement
+    return document.getElementById(this.#CANVAS_ID) as HTMLCanvasElement
   }
 
   async #gpuDevice() {
@@ -342,11 +339,11 @@ class Anime4K {
     return adapter.requestDevice()
   }
 
-  #noticeId = '__gpu-notice__'
+  readonly #NOTICE_ID = '__anime4k-notice__'
   #noticeTimer?: ReturnType<typeof setTimeout>
 
   #notice(text: string) {
-    const noticeEl = document.getElementById(this.#noticeId) as HTMLDivElement
+    const noticeEl = document.getElementById(this.#NOTICE_ID) as HTMLDivElement
     noticeEl.innerText = text
     noticeEl.style.setProperty('opacity', '1')
 
@@ -367,8 +364,8 @@ class Anime4K {
       this.#mutationObserver = undefined
     }
 
-    this.#destroyById(this.#canvasId)
-    this.#destroyById(this.#noticeId)
+    this.#destroyById(this.#CANVAS_ID)
+    this.#destroyById(this.#NOTICE_ID)
   }
 
   #destroyById(id: string) {
