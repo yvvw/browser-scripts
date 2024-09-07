@@ -17,7 +17,7 @@
 // @noframes
 // ==/UserScript==
 
-import type { IBiliLivePlayer, IBiliPlayer, IBiliUser } from '../types/bilibili_global'
+import type { IBiliLivePlayer, IBiliPlayer, IBiliUser } from '../types/bilibili_inject'
 import { getNotFalsyValue, HTMLUtils, Logger } from './util'
 
 const logger = Logger.new('Better Bilibili')

@@ -13,14 +13,24 @@
     "debounce": "^2.1.0"
   },
   "devDependencies": {
-    "@types/node": "^20.14.12",
-    "@violentmonkey/types": "^0.1.8",
+    "@types/node": "^20.16.5",
+    "@violentmonkey/types": "^0.1.9",
     "chokidar": "^3.6.0",
-    "esbuild": "^0.23.0",
+    "esbuild": "^0.23.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^4.0.0",
     "typescript": "^5.5.4"
+  },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-organize-imports"
+    ],
+    "printWidth": 100,
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true
   },
   "packageManager": "pnpm@8.10.4+sha1.ad75b0e775742692244c8e5e17c358390abf2025"
 }
