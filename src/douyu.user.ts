@@ -27,7 +27,7 @@ import { HTMLUtils, Logger } from './util'
 
 const logger = Logger.new('Better Douyu')
 
-window.onload = async function main() {
+async function main() {
   if (location.pathname.includes('watchHistory')) return
 
   const container = await HTMLUtils.query(() => document.getElementById('__h5player'))
@@ -65,3 +65,5 @@ function hideDanmuPanel() {
     .then((el) => el.click())
     .catch((err) => logger.error('hideDanmuPanel', err))
 }
+
+main().catch(logger.error.bind(logger))

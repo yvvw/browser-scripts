@@ -126,7 +126,7 @@ export class GM {
 }
 
 export class Logger {
-  static console = window.console
+  static #console = console
 
   static new(ns: string): Logger {
     return new this(ns)
@@ -135,15 +135,15 @@ export class Logger {
   constructor(private ns: string) {}
 
   log(...args: Parameters<Console['log']>) {
-    Logger.console.log.apply(Logger.console, this.#inject(args))
+    Logger.#console.log.apply(Logger.#console, this.#inject(args))
   }
 
   warn(...args: Parameters<Console['warn']>) {
-    Logger.console.warn.apply(Logger.console, this.#inject(args))
+    Logger.#console.warn.apply(Logger.#console, this.#inject(args))
   }
 
   error(...args: Parameters<Console['error']>) {
-    Logger.console.error.apply(Logger.console, this.#inject(args))
+    Logger.#console.error.apply(Logger.#console, this.#inject(args))
   }
 
   #inject(args: any[]) {
