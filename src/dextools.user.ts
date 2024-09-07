@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEXTools
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.6
+// @version      0.0.7
 // @description  关闭广告
 // @author       yvvw
 // @icon         https://www.dextools.io/app/favicon.ico
@@ -9,13 +9,12 @@
 // @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/dextools.meta.js
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/dextools.user.js
 // @match        https://www.dextools.io/*
+// @noframes
 // ==/UserScript==
 
 import { HTMLUtils } from './util'
 
-function main() {
-  if (window.self !== window.top) return
-
+window.onload = function main() {
   HTMLUtils.observe(document.body, closeAd)
 }
 
@@ -27,5 +26,3 @@ function closeAd() {
       if (btnEl?.getAttribute('ariaLabel') === 'Close') btnEl.click()
     })
 }
-
-main()

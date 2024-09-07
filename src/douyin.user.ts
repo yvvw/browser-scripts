@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Douyin
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.1
+// @version      0.0.2
 // @description  自动网页全屏、关闭礼物特效
 // @author       yvvw
 // @icon         https://www.douyin.com/favicon.ico
@@ -9,15 +9,14 @@
 // @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/douyin.meta.js
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/douyin.user.js
 // @match        https://live.douyin.com/*
+// @noframes
 // ==/UserScript==
 
 import { HTMLUtils, Logger } from './util'
 
 const logger = Logger.new('Better Douyin')
 
-function main() {
-  if (window.self !== window.top) return
-
+window.onload = function main() {
   hideGift()
   switchWebFullscreen()
 }
@@ -37,5 +36,3 @@ function switchWebFullscreen() {
     .then((el) => (el.parentElement!.parentElement!.nextElementSibling as HTMLDivElement).click())
     .catch((err) => logger.error('switchWebFullscreen', err))
 }
-
-main()

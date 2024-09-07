@@ -126,7 +126,7 @@ export class GM {
 }
 
 export class Logger {
-  static console = Object.freeze(window.console)
+  static console = window.console
 
   static new(ns: string): Logger {
     return new this(ns)

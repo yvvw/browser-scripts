@@ -1,17 +1,18 @@
-import { build } from 'esbuild'
 import { open, writeFile } from 'node:fs/promises'
 import path from 'node:path'
+
+import * as esbuild from 'esbuild'
 
 async function main() {
   const entry = parseEntry()
   const banner = await parseBanner(entry)
-  await build({
+  await esbuild.build({
     entryPoints: [entry.path],
     banner: { js: banner },
     outfile: `dist/${entry.object.name}.js`,
     loader: { '.wgsl': 'text' },
     bundle: true,
-    minify: !entry.dev,
+    minify: true,
     target: ['es2020', 'chrome57', 'firefox57'],
     legalComments: 'none',
   })
@@ -41,16 +42,8 @@ async function parseBanner(entry) {
   const bannerLines = []
   for await (let line of fd.readLines()) {
     line = line.trim()
-    if (line === '// ==UserScript==' || bannerLines.length > 0) {
-      if (line === '// ==/UserScript==' && entry.dev) {
-        const required = `// @require file://${path.resolve(`dist/${entry.object.name}.js`)}`
-        bannerLines.push(required)
-      }
-      bannerLines.push(line)
-    }
-    if (line === '// ==/UserScript==') {
-      break
-    }
+    if (line === '// ==UserScript==' || bannerLines.length > 0) bannerLines.push(line)
+    if (line === '// ==/UserScript==') break
   }
   await fd.close()
   return bannerLines.length > 0 ? `${bannerLines.join('\n')}\n` : ''

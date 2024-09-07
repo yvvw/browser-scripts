@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Anime4K
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.7
+// @version      0.0.8
 // @description  Anime4K画质增强
 // @credit       https://github.com/bloc97/Anime4K
 // @credit       https://github.com/Anime4KWebBoost/Anime4K-WebGPU
@@ -10,6 +10,7 @@
 // @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/anime4k.meta.js
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/anime4k.user.js
 // @match        *://*/*
+// @noframes
 // ==/UserScript==
 
 import type { Anime4KPipeline, Anime4KPresetPipelineDescriptor } from 'anime4k-webgpu'
@@ -20,9 +21,7 @@ import { Logger } from './util'
 
 const logger = Logger.new('Anime4K')
 
-function main() {
-  if (window.self !== window.top) return
-
+window.onload = function main() {
   new Anime4K().watch()
 }
 
@@ -77,7 +76,7 @@ class Anime4K {
       if (preset === lastPreset) return this.#notice(preset)
       lastPreset = preset
       if (preset === 'Clear') {
-        this.#clear().catch(logger.error)
+        this.#clear().catch(logger.error.bind(logger))
       } else {
         this.#start({ preset }).catch(this.destroy.bind(this))
       }
@@ -97,7 +96,8 @@ class Anime4K {
     const videoAspectRatio = videoWidth / videoHeight
 
     const render = debounce(
-      async ({ rectWidth, rectHeight }: { rectWidth: number; rectHeight: number }) => {
+      async (video: HTMLVideoElement) => {
+        const { clientWidth: rectWidth, clientHeight: rectHeight } = video.parentElement!
         const rectAspectRatio = rectWidth / rectHeight
         const canvasWidth =
           rectAspectRatio < videoAspectRatio ? rectWidth : rectHeight * videoAspectRatio
@@ -120,11 +120,11 @@ class Anime4K {
       if (entries.length === 0) return
       const entry = entries[0]
       if (!(entry.target instanceof HTMLVideoElement)) return this.#clear()
-      render({ rectWidth: entry.contentRect.width, rectHeight: entry.contentRect.height })
+      render(entry.target)
     })
     this.#resizeObserver!.observe(video)
 
-    render({ rectWidth: video.clientWidth, rectHeight: video.clientHeight })
+    render(video)
 
     this.#notice(preset)
   }
@@ -419,5 +419,3 @@ fn main(@location(0) fragUV : vec2f) -> @location(0) vec4f {
   return textureSampleBaseClampToEdge(myTexture, mySampler, fragUV);
 }
 `
-
-main()

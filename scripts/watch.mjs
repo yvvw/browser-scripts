@@ -1,8 +1,10 @@
-import chokidar from 'chokidar'
 import childProcess from 'node:child_process'
+import path from 'node:path'
 
-chokidar.watch('src/*.ts').on('change', (path) => {
-  console.log(`${new Date().toISOString()} ${path}`)
-  const command = `node scripts/build.mjs ${path} --dev`
-  childProcess.spawn(command, { shell: true, stdio: 'inherit' })
+import chokidar from 'chokidar'
+
+chokidar.watch('src/*.ts').on('change', (p) => {
+  const dist = path.resolve(process.cwd(), 'dist/' + p.slice(4).slice(0, -3) + '.js')
+  console.log(`${new Date().toISOString()} ${dist}`)
+  childProcess.spawn(`node scripts/build.mjs ${p} --dev`, { shell: true, stdio: 'inherit' })
 })

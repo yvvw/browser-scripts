@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.18
+// @version      0.0.19
 // @description  增加gmgn、bullx跳转，标记dev，快速交易
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -10,6 +10,7 @@
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/pumpfun.user.js
 // @match        https://www.pump.fun/*
 // @match        https://pump.fun/*
+// @noframes
 // ==/UserScript==
 
 import { delay, HTMLUtils, Logger } from './util'
@@ -17,9 +18,7 @@ import { delay, HTMLUtils, Logger } from './util'
 const logger = Logger.new('Better pump.fun')
 const pendingClose = new Set<Function>()
 
-function main() {
-  if (window.self !== window.top) return
-
+window.onload = function main() {
   let running = false
   let prevToken = ''
 
@@ -37,11 +36,11 @@ function main() {
     }
 
     Promise.allSettled([
-      addQuickButton().then(addExternalLinks).catch(logger.error),
-      markTradePanel().catch(logger.error),
-      markTopHolder().catch(logger.error),
-      autoTrade().catch(logger.error),
-      replaceHereLink().catch(logger.error),
+      addQuickButton().then(addExternalLinks).catch(logger.error.bind(logger)),
+      markTradePanel().catch(logger.error.bind(logger)),
+      markTopHolder().catch(logger.error.bind(logger)),
+      autoTrade().catch(logger.error.bind(logger)),
+      replaceHereLink().catch(logger.error.bind(logger)),
     ]).finally(() => (running = false))
   }).observe(document.body, {
     childList: true,
@@ -310,5 +309,3 @@ function playSellAudio() {
   const audio = new Audio('https://downsc.chinaz.net/Files/upload/yinxiao/2023/08/21/5414638.wav')
   audio.play().finally(() => setTimeout(() => (playing = false), 5000))
 }
-
-main()

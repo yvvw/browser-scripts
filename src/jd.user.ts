@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better JD
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.5
+// @version      0.0.6
 // @description  一键保价、复制购物车链接
 // @author       yvvw
 // @icon         https://www.jd.com/favicon.ico
@@ -10,9 +10,10 @@
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/jd.user.js
 // @match        https://pcsitepp-fm.jd.com/
 // @match        https://cart.jd.com/*
+// @noframes
 // ==/UserScript==
 
-function main() {
+window.onload = function main() {
   const button = document.createElement('button')
 
   const site = location.host.split('.')[0]
@@ -75,5 +76,3 @@ border: none;
   )
   document.body.appendChild(button)
 }
-
-main()

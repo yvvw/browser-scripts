@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.1.3
+// @version      0.1.4
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -14,6 +14,7 @@
 // @match        https://www.bilibili.com/blackboard/*
 // @match        https://live.bilibili.com/*
 // @grant        unsafeWindow
+// @noframes
 // ==/UserScript==
 
 import type { IBiliLivePlayer, IBiliPlayer, IBiliUser } from '../types/bilibili_global'
@@ -21,9 +22,7 @@ import { getNotFalsyValue, HTMLUtils, Logger } from './util'
 
 const logger = Logger.new('Better Bilibili')
 
-function main() {
-  if (window.self !== window.top) return
-
+window.onload = function main() {
   let player: IPlayer | undefined
   const href = document.location.href
   if (/live/.test(href)) {
@@ -35,8 +34,7 @@ function main() {
     logger.warn('player not found')
     return
   }
-
-  player.run(new BiliInject()).catch(logger.error)
+  player.run(new BiliInject()).catch(logger.error.bind(logger))
 }
 
 interface IPlayer {
@@ -48,8 +46,8 @@ class VideoPlayer implements IPlayer {
     const [biliPlayer, biliUser] = await Promise.all([inject.getPlayer(), inject.getUser()])
 
     await Promise.allSettled([
-      this.switchBestQuality(biliPlayer, biliUser).catch(logger.error),
-      this.switchWebFullscreen().catch(logger.error),
+      this.switchBestQuality(biliPlayer, biliUser).catch(logger.error.bind(logger)),
+      this.switchWebFullscreen().catch(logger.error.bind(logger)),
     ])
   }
 
@@ -83,10 +81,10 @@ class LivePlayer implements IPlayer {
     const livePlayer = await inject.getLivePlayer()
 
     await Promise.allSettled([
-      this.hideChatPanel().catch(logger.error),
-      this.scrollToPlayer().catch(logger.error),
-      this.switchWebFullscreen().catch(logger.error),
-      this.switchBestQuality(livePlayer).catch(logger.error),
+      this.hideChatPanel().catch(logger.error.bind(logger)),
+      this.scrollToPlayer().catch(logger.error.bind(logger)),
+      this.switchWebFullscreen().catch(logger.error.bind(logger)),
+      this.switchBestQuality(livePlayer).catch(logger.error.bind(logger)),
     ])
   }
 
@@ -103,13 +101,7 @@ class LivePlayer implements IPlayer {
   async switchWebFullscreen() {
     const playerEl = await HTMLUtils.query(() => document.getElementById('live-player'))
     playerEl.dispatchEvent(new MouseEvent('mousemove'))
-    const areaEl = document.querySelector<HTMLElement>('.right-area')
-    if (areaEl === null) throw new Error('player right area not found')
-    const childEl = areaEl.children.item(1)
-    if (childEl === null) throw new Error('fullscreen button not found')
-    const spanEl = childEl.querySelector<HTMLElement>('span')
-    if (spanEl === null) throw new Error('fullscreen button not found')
-    spanEl.click()
+    playerEl.querySelector<HTMLElement>('.right-area .tip-wrap:nth-child(2) span')?.click()
   }
 
   async switchBestQuality(player: IBiliLivePlayer) {
@@ -134,5 +126,3 @@ class BiliInject {
     return getNotFalsyValue(() => unsafeWindow.livePlayer)
   }
 }
-
-main()

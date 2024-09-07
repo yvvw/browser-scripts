@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better GMGN.ai
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.16
+// @version      0.0.17
 // @description  调整屏宽，移除buy more，增加bullx跳转，加强dev卖出标记
 // @author       yvvw
 // @icon         https://gmgn.ai/static/favicon2.ico
@@ -10,6 +10,7 @@
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/gmgn_ai.user.js
 // @match        https://gmgn.ai/*
 // @grant        GM_openInTab
+// @noframes
 // ==/UserScript==
 
 import { HTMLUtils, Logger, NavigatorUtil } from './util'
@@ -17,9 +18,7 @@ import { HTMLUtils, Logger, NavigatorUtil } from './util'
 const logger = Logger.new('Better GMGN.ai')
 const pendingClose = new Set<Function>()
 
-function main() {
-  if (window.self !== window.top) return
-
+window.onload = function main() {
   let previous = ''
   HTMLUtils.observe(
     document.body,
@@ -227,5 +226,3 @@ function decodeBullXLink(path: string) {
 
   return `https://bullx.io/terminal?chainId=${chainId}&address=${address}`
 }
-
-main()

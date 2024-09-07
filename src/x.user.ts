@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better X(Twitter)
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.13
+// @version      0.0.14
 // @description  关闭广告，快捷屏蔽
 // @author       yvvw
 // @icon         https://abs.twimg.com/favicons/twitter.3.ico
@@ -12,13 +12,12 @@
 // @match        https://twitter.com/*
 // @exclude      https://x.com/i/*
 // @exclude      https://twitter.com/i/*
+// @noframes
 // ==/UserScript==
 
 import { HTMLUtils } from './util'
 
-function main() {
-  if (window.self !== window.top) return
-
+window.onload = function main() {
   HTMLUtils.observe(
     document.body,
     async () => {
@@ -83,5 +82,3 @@ async function addBlockEl(twitterEl: HTMLDivElement) {
   )
   parentEl.insertBefore(blockBtnEl, moreBtnEl)
 }
-
-main()

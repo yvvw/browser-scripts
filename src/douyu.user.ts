@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Douyu
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.14
+// @version      0.0.15
 // @description  自动网页全屏、切换最高清晰度
 // @author       yvvw
 // @icon         https://www.douyu.com/favicon.ico
@@ -20,14 +20,14 @@
 // @match        https://www.douyu.com/7*
 // @match        https://www.douyu.com/8*
 // @match        https://www.douyu.com/9*
+// @noframes
 // ==/UserScript==
 
 import { HTMLUtils, Logger } from './util'
 
 const logger = Logger.new('Better Douyu')
 
-async function main() {
-  if (window.self !== window.top) return
+window.onload = async function main() {
   if (location.pathname.includes('watchHistory')) return
 
   const container = await HTMLUtils.query(() => document.getElementById('__h5player'))
@@ -65,5 +65,3 @@ function hideDanmuPanel() {
     .then((el) => el.click())
     .catch((err) => logger.error('hideDanmuPanel', err))
 }
-
-main().catch(logger.error)

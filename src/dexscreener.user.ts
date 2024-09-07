@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.17
+// @version      0.0.18
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -9,6 +9,7 @@
 // @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/dexscreener.meta.js
 // @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/dexscreener.user.js
 // @match        https://dexscreener.com/*
+// @noframes
 // ==/UserScript==
 
 import { HTMLUtils, Logger } from './util'
@@ -16,14 +17,12 @@ import { HTMLUtils, Logger } from './util'
 const logger = Logger.new('Better DEX Screener')
 
 function main() {
-  if (window.self !== window.top) return
-
   HTMLUtils.observe(
     document.body,
     async () => {
       if (!document.getElementById('tv-chart-container')) return
       expandWatchList()
-      await addExternalLink().catch(logger.error)
+      await addExternalLink().catch(logger.error.bind(logger))
       closeAd()
     },
     { waiting: true, throttle: 500 }
