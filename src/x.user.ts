@@ -16,7 +16,9 @@
 
 import { HTMLUtils } from './util'
 
-window.onload = function main() {
+function main() {
+  if (window.self !== window.top) return
+
   HTMLUtils.observe(
     document.body,
     async () => {
@@ -81,3 +83,5 @@ async function addBlockEl(twitterEl: HTMLDivElement) {
   )
   parentEl.insertBefore(blockBtnEl, moreBtnEl)
 }
+
+main()

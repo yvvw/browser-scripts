@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better Douyu
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.13
+// @version      0.0.14
 // @description  自动网页全屏、切换最高清晰度
 // @author       yvvw
 // @icon         https://www.douyu.com/favicon.ico
@@ -22,36 +22,48 @@
 // @match        https://www.douyu.com/9*
 // ==/UserScript==
 
-import { getNotFalsyValue, HTMLUtils } from './util'
+import { HTMLUtils, Logger } from './util'
 
-main()
+const logger = Logger.new('Better Douyu')
 
 async function main() {
   if (window.self !== window.top) return
+  if (location.pathname.includes('watchHistory')) return
 
-  if (!location.pathname.includes('watchHistory')) {
-    await getNotFalsyValue(() => document.querySelector('video'))
+  const container = await HTMLUtils.query(() => document.getElementById('__h5player'))
 
-    hideDanmuPanel()
-    switchBestQuality()
-    switchWebFullscreen()
-  }
-}
-
-function hideDanmuPanel() {
-  HTMLUtils.query(() => document.querySelector('.layout-Player-asidetoggleButton') as HTMLElement)
-    .then((el) => el.click())
-    .catch((err) => console.error('hideDanmuPanel', err))
+  new MutationObserver((mutations, observer) => {
+    for (const mutation of mutations) {
+      if (
+        mutation.target.nodeType === Node.ELEMENT_NODE &&
+        (mutation.target as HTMLElement).className.includes('broadcastDiv')
+      ) {
+        observer.disconnect()
+        switchBestQuality()
+        switchWebFullscreen()
+        hideDanmuPanel()
+        break
+      }
+    }
+  }).observe(container, { childList: true, subtree: true, attributes: true })
 }
 
 function switchBestQuality() {
   HTMLUtils.query(() => document.querySelector('.tipItem-898596 > ul > li') as HTMLElement)
     .then((el) => el.click())
-    .catch((err) => console.error('switchBestQuality', err))
+    .catch((err) => logger.error('switchBestQuality', err))
 }
 
 function switchWebFullscreen() {
   HTMLUtils.query(() => document.querySelector('.wfs-2a8e83') as HTMLElement)
     .then((el) => el.click())
-    .catch((err) => console.error('switchWebFullscreen', err))
+    .catch((err) => logger.error('switchWebFullscreen', err))
 }
+
+function hideDanmuPanel() {
+  HTMLUtils.query(() => document.querySelector('.layout-Player-asidetoggleButton') as HTMLElement)
+    .then((el) => el.click())
+    .catch((err) => logger.error('hideDanmuPanel', err))
+}
+
+main().catch(logger.error)

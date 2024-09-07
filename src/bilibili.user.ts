@@ -17,9 +17,11 @@
 // ==/UserScript==
 
 import type { IBiliLivePlayer, IBiliPlayer, IBiliUser } from '../types/bilibili_global'
-import { getNotFalsyValue, HTMLUtils } from './util'
+import { getNotFalsyValue, HTMLUtils, Logger } from './util'
 
-window.onload = function main() {
+const logger = Logger.new('Better Bilibili')
+
+function main() {
   if (window.self !== window.top) return
 
   let player: IPlayer | undefined
@@ -30,11 +32,11 @@ window.onload = function main() {
     player = new VideoPlayer()
   }
   if (!player) {
-    console.warn('player not found')
+    logger.warn('player not found')
     return
   }
 
-  player.run(new BiliInject()).catch(console.error)
+  player.run(new BiliInject()).catch(logger.error)
 }
 
 interface IPlayer {
@@ -46,8 +48,8 @@ class VideoPlayer implements IPlayer {
     const [biliPlayer, biliUser] = await Promise.all([inject.getPlayer(), inject.getUser()])
 
     await Promise.allSettled([
-      this.switchWebFullscreen().catch(console.error),
-      this.switchBestQuality(biliPlayer, biliUser).catch(console.error),
+      this.switchBestQuality(biliPlayer, biliUser).catch(logger.error),
+      this.switchWebFullscreen().catch(logger.error),
     ])
   }
 
@@ -55,10 +57,8 @@ class VideoPlayer implements IPlayer {
     const playerEl = await HTMLUtils.query(() =>
       document.querySelector<HTMLElement>('.bpx-player-ctrl-web')
     )
-    if (playerEl.classList.contains('bpx-state-entered')) {
-      console.warn('fullscreen button not found')
-      return
-    }
+    if (playerEl.classList.contains('bpx-state-entered'))
+      throw new Error('fullscreen button not found')
     playerEl.click()
   }
 
@@ -83,10 +83,10 @@ class LivePlayer implements IPlayer {
     const livePlayer = await inject.getLivePlayer()
 
     await Promise.allSettled([
-      this.hideChatPanel().catch(console.error),
-      this.scrollToPlayer().catch(console.error),
-      this.switchWebFullscreen().catch(console.error),
-      this.switchBestQuality(livePlayer).catch(console.error),
+      this.hideChatPanel().catch(logger.error),
+      this.scrollToPlayer().catch(logger.error),
+      this.switchWebFullscreen().catch(logger.error),
+      this.switchBestQuality(livePlayer).catch(logger.error),
     ])
   }
 
@@ -104,30 +104,18 @@ class LivePlayer implements IPlayer {
     const playerEl = await HTMLUtils.query(() => document.getElementById('live-player'))
     playerEl.dispatchEvent(new MouseEvent('mousemove'))
     const areaEl = document.querySelector<HTMLElement>('.right-area')
-    if (areaEl === null) {
-      console.warn('player right area not found')
-      return
-    }
+    if (areaEl === null) throw new Error('player right area not found')
     const childEl = areaEl.children.item(1)
-    if (childEl === null) {
-      console.warn('fullscreen button not found')
-      return
-    }
+    if (childEl === null) throw new Error('fullscreen button not found')
     const spanEl = childEl.querySelector<HTMLElement>('span')
-    if (spanEl === null) {
-      console.warn('fullscreen button not found')
-      return
-    }
+    if (spanEl === null) throw new Error('fullscreen button not found')
     spanEl.click()
   }
 
   async switchBestQuality(player: IBiliLivePlayer) {
     const current = player.getPlayerInfo().quality
     const support = player.getPlayerInfo().qualityCandidates.map((it) => it.qn)
-    if (support.length === 0) {
-      console.warn('support qualities is empty')
-      return
-    }
+    if (support.length === 0) throw new Error('support qualities is empty')
     const quality = support[0]
     if (current !== quality) player.switchQuality(quality)
   }
@@ -146,3 +134,5 @@ class BiliInject {
     return getNotFalsyValue(() => unsafeWindow.livePlayer)
   }
 }
+
+main()

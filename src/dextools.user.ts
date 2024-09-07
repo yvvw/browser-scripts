@@ -13,7 +13,9 @@
 
 import { HTMLUtils } from './util'
 
-window.onload = function main() {
+function main() {
+  if (window.self !== window.top) return
+
   HTMLUtils.observe(document.body, closeAd)
 }
 
@@ -25,3 +27,5 @@ function closeAd() {
       if (btnEl?.getAttribute('ariaLabel') === 'Close') btnEl.click()
     })
 }
+
+main()

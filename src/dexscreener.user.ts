@@ -11,9 +11,9 @@
 // @match        https://dexscreener.com/*
 // ==/UserScript==
 
-import { HTMLUtils } from './util'
+import { HTMLUtils, Logger } from './util'
 
-main()
+const logger = Logger.new('Better DEX Screener')
 
 function main() {
   if (window.self !== window.top) return
@@ -23,7 +23,7 @@ function main() {
     async () => {
       if (!document.getElementById('tv-chart-container')) return
       expandWatchList()
-      await addExternalLink().catch(console.error)
+      await addExternalLink().catch(logger.error)
       closeAd()
     },
     { waiting: true, throttle: 500 }
@@ -131,7 +131,7 @@ function getGmGnLink(chain: string, token: string) {
   } else if (chain === 'solana') {
     return `https://gmgn.ai/sol/token/${token}`
   } else {
-    console.warn(`${chain} unsupported`)
+    logger.warn(`${chain} unsupported`)
     return null
   }
 }
@@ -146,7 +146,9 @@ function getBullxLink(chain: string, token: string) {
   } else if (chain === 'tron') {
     return `https://tron.bullx.io/terminal?chainId=728126428&address=${token}`
   } else {
-    console.warn(`${chain} unsupported`)
+    logger.warn(`${chain} unsupported`)
     return null
   }
 }
+
+main()

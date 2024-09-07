@@ -12,11 +12,14 @@
 // @grant        GM_openInTab
 // ==/UserScript==
 
-import { HTMLUtils, NavigatorUtil } from './util'
+import { HTMLUtils, Logger, NavigatorUtil } from './util'
 
+const logger = Logger.new('Better GMGN.ai')
 const pendingClose = new Set<Function>()
 
-window.onload = function main() {
+function main() {
+  if (window.self !== window.top) return
+
   let previous = ''
   HTMLUtils.observe(
     document.body,
@@ -121,26 +124,26 @@ async function updateExternalLink() {
   const addLink = (rowEl: HTMLDivElement) => {
     const linkEL = rowEl.querySelector<HTMLAnchorElement>('a')
     if (linkEL === null) {
-      console.error('行结构更改')
+      logger.error('行结构更改')
       return
     }
 
     const [path, search] = linkEL.href.split('?')
     const query = NavigatorUtil.parseQuery(search)
     if (!('symbol' in query)) {
-      console.error('未发现symbol')
+      logger.error('未发现symbol')
       return
     }
     const symbol = decodeURIComponent(query.symbol)
 
     const divEl = rowEl.querySelector(`div[title="${symbol}"]`)
     if (divEl === null) {
-      console.error('未发现div元素')
+      logger.error('未发现div元素')
       return
     }
     const divChildEl = divEl.firstElementChild as HTMLDivElement
     if (divChildEl === null) {
-      console.error('未发现div子元素')
+      logger.error('未发现div子元素')
       return
     }
 
@@ -224,3 +227,5 @@ function decodeBullXLink(path: string) {
 
   return `https://bullx.io/terminal?chainId=${chainId}&address=${address}`
 }
+
+main()

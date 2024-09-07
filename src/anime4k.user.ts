@@ -16,7 +16,13 @@ import type { Anime4KPipeline, Anime4KPresetPipelineDescriptor } from 'anime4k-w
 import { ModeA, ModeAA, ModeB, ModeBB, ModeC, ModeCA } from 'anime4k-webgpu'
 import debounce from 'debounce'
 
-window.onload = function main() {
+import { Logger } from './util'
+
+const logger = Logger.new('Anime4K')
+
+function main() {
+  if (window.self !== window.top) return
+
   new Anime4K().watch()
 }
 
@@ -71,7 +77,7 @@ class Anime4K {
       if (preset === lastPreset) return this.#notice(preset)
       lastPreset = preset
       if (preset === 'Clear') {
-        this.#clear().catch(console.error)
+        this.#clear().catch(logger.error)
       } else {
         this.#start({ preset }).catch(this.destroy.bind(this))
       }
@@ -413,3 +419,5 @@ fn main(@location(0) fragUV : vec2f) -> @location(0) vec4f {
   return textureSampleBaseClampToEdge(myTexture, mySampler, fragUV);
 }
 `
+
+main()

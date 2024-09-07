@@ -12,11 +12,14 @@
 // @match        https://pump.fun/*
 // ==/UserScript==
 
-import { delay, HTMLUtils } from './util'
+import { delay, HTMLUtils, Logger } from './util'
 
+const logger = Logger.new('Better pump.fun')
 const pendingClose = new Set<Function>()
 
-window.onload = function main() {
+function main() {
+  if (window.self !== window.top) return
+
   let running = false
   let prevToken = ''
 
@@ -34,11 +37,11 @@ window.onload = function main() {
     }
 
     Promise.allSettled([
-      addQuickButton().then(addExternalLinks).catch(console.error),
-      markTradePanel().catch(console.error),
-      markTopHolder().catch(console.error),
-      autoTrade().catch(console.error),
-      replaceHereLink().catch(console.error),
+      addQuickButton().then(addExternalLinks).catch(logger.error),
+      markTradePanel().catch(logger.error),
+      markTopHolder().catch(logger.error),
+      autoTrade().catch(logger.error),
+      replaceHereLink().catch(logger.error),
     ]).finally(() => (running = false))
   }).observe(document.body, {
     childList: true,
@@ -223,7 +226,7 @@ async function labelDevInTradePanel() {
   function labelTrade(el: HTMLTableRowElement, idx: number) {
     const nameEl = el.cells.item(0)?.firstElementChild as HTMLAnchorElement | null
     if (!nameEl) {
-      console.warn('未发现a标签')
+      logger.warn('未发现a标签')
       return
     }
     const operateType = (el.cells.item(1) as HTMLDivElement).innerText
@@ -307,3 +310,5 @@ function playSellAudio() {
   const audio = new Audio('https://downsc.chinaz.net/Files/upload/yinxiao/2023/08/21/5414638.wav')
   audio.play().finally(() => setTimeout(() => (playing = false), 5000))
 }
+
+main()

@@ -12,7 +12,7 @@
 // @match        https://cart.jd.com/*
 // ==/UserScript==
 
-window.onload = function main() {
+function main() {
   const button = document.createElement('button')
 
   const site = location.host.split('.')[0]
@@ -75,3 +75,5 @@ border: none;
   )
   document.body.appendChild(button)
 }
+
+main()

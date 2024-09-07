@@ -124,3 +124,34 @@ export class GM {
     return GM_openInTab(...args)
   }
 }
+
+export class Logger {
+  static console = Object.freeze(window.console)
+
+  static new(ns: string): Logger {
+    return new this(ns)
+  }
+
+  constructor(private ns: string) {}
+
+  log(...args: Parameters<Console['log']>) {
+    Logger.console.log.apply(Logger.console, this.#inject(args))
+  }
+
+  warn(...args: Parameters<Console['warn']>) {
+    Logger.console.warn.apply(Logger.console, this.#inject(args))
+  }
+
+  error(...args: Parameters<Console['error']>) {
+    Logger.console.error.apply(Logger.console, this.#inject(args))
+  }
+
+  #inject(args: any[]) {
+    return [
+      `%c${this.ns}%c ${args[0]}`,
+      'background: #2a2; color: #fff; padding: 2px 4px; border-radius: 2px;',
+      '',
+      ...args.slice(1),
+    ]
+  }
+}

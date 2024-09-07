@@ -11,9 +11,13 @@
 // @match        https://live.douyin.com/*
 // ==/UserScript==
 
-import { HTMLUtils } from './util'
+import { HTMLUtils, Logger } from './util'
 
-window.onload = function main() {
+const logger = Logger.new('Better Douyin')
+
+function main() {
+  if (window.self !== window.top) return
+
   hideGift()
   switchWebFullscreen()
 }
@@ -23,7 +27,7 @@ function hideGift() {
     HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[text()="屏蔽礼物特效"]')
   )
     .then((el) => (el.nextElementSibling! as HTMLDivElement).click())
-    .catch((err) => console.error('hideGift', err))
+    .catch((err) => logger.error('hideGift', err))
 }
 
 function switchWebFullscreen() {
@@ -31,5 +35,7 @@ function switchWebFullscreen() {
     HTMLUtils.getFirstElementByXPath<HTMLSpanElement>('//span[text()="网页全屏"]')
   )
     .then((el) => (el.parentElement!.parentElement!.nextElementSibling as HTMLDivElement).click())
-    .catch((err) => console.error('switchWebFullscreen', err))
+    .catch((err) => logger.error('switchWebFullscreen', err))
 }
+
+main()
