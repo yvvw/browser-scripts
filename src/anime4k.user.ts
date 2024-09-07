@@ -99,10 +99,12 @@ class Anime4K {
       async (video: HTMLVideoElement) => {
         const { clientWidth: rectWidth, clientHeight: rectHeight } = video.parentElement!
         const rectAspectRatio = rectWidth / rectHeight
-        const canvasWidth =
+        const canvasWidth = Math.ceil(
           rectAspectRatio < videoAspectRatio ? rectWidth : rectHeight * videoAspectRatio
-        const canvasHeight =
+        )
+        const canvasHeight = Math.ceil(
           videoAspectRatio < rectAspectRatio ? rectHeight : rectWidth / videoAspectRatio
+        )
         canvas.width = canvasWidth
         canvas.height = canvasHeight
         canvas.style.setProperty('left', `${(rectWidth - canvasWidth) / 2}px`)
