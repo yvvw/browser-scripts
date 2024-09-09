@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Anime4K
 // @namespace    https://github.com/yvvw/browser-scripts
-// @version      0.0.8
+// @version      0.0.9
 // @description  Anime4K画质增强
 // @credit       https://github.com/bloc97/Anime4K
 // @credit       https://github.com/Anime4KWebBoost/Anime4K-WebGPU
@@ -207,17 +207,17 @@ class Anime4K {
       ],
     })
 
-    const updateTexture = () =>
-      device.queue.copyExternalImageToTexture({ source: video }, { texture: inputTexture }, [
-        videoWidth,
-        videoHeight,
-      ])
-
     let stop = false
     let requestId: ReturnType<(typeof video)['requestVideoFrameCallback']>
 
     const renderFrame = () => {
-      if (!video.paused) updateTexture()
+      if (stop) return
+
+      // update texture
+      device.queue.copyExternalImageToTexture({ source: video }, { texture: inputTexture }, [
+        videoWidth,
+        videoHeight,
+      ])
 
       const commandEncoder = device.createCommandEncoder()
       pipelines.forEach((pipeline) => pipeline.pass(commandEncoder))
@@ -239,12 +239,8 @@ class Anime4K {
 
       device.queue.submit([commandEncoder.finish()])
 
-      if (!stop) requestId = video.requestVideoFrameCallback(renderFrame)
+      requestId = video.requestVideoFrameCallback(renderFrame)
     }
-
-    requestId = video.requestVideoFrameCallback(renderFrame)
-
-    updateTexture()
     renderFrame()
 
     return async () => {
