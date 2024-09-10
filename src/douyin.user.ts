@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         Better Douyin
 // @namespace    https://github.com/yvvw/browser-scripts
+// @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/douyin.user.ts
 // @version      0.0.2
 // @description  自动网页全屏、关闭礼物特效
 // @author       yvvw

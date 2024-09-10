@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         Better X(Twitter)
 // @namespace    https://github.com/yvvw/browser-scripts
+// @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/x.user.ts
 // @version      0.0.14
 // @description  关闭广告，快捷屏蔽
 // @author       yvvw

@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         Better Douyu
 // @namespace    https://github.com/yvvw/browser-scripts
+// @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/douyu.user.ts
 // @version      0.0.15
 // @description  自动网页全屏、切换最高清晰度
 // @author       yvvw

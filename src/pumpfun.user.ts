@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/browser-scripts
+// @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/pumpfun.user.ts
 // @version      0.0.19
 // @description  增加gmgn、bullx跳转，标记dev，快速交易
 // @author       yvvw

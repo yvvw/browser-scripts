@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
+// @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/dexscreener.user.ts
 // @version      0.0.18
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw

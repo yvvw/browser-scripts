@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         Better JD
 // @namespace    https://github.com/yvvw/browser-scripts
+// @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/jd.user.ts
 // @version      0.0.6
 // @description  一键保价、复制购物车链接
 // @author       yvvw

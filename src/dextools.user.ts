@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         Better DEXTools
 // @namespace    https://github.com/yvvw/browser-scripts
+// @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/dextools.user.ts
 // @version      0.0.7
 // @description  关闭广告
 // @author       yvvw

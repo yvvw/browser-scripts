@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         Anime4K
 // @namespace    https://github.com/yvvw/browser-scripts
+// @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/anime4k.user.ts
 // @version      0.0.9
 // @description  Anime4K画质增强
 // @credit       https://github.com/bloc97/Anime4K

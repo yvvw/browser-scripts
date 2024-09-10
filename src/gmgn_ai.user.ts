@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         Better GMGN.ai
 // @namespace    https://github.com/yvvw/browser-scripts
+// @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/gmgn_ai.user.ts
 // @version      0.0.17
 // @description  调整屏宽，移除buy more，增加bullx跳转，加强dev卖出标记
 // @author       yvvw

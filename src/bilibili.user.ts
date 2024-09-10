@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/browser-scripts
+// @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/bilibili.user.ts
 // @version      0.1.4
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
