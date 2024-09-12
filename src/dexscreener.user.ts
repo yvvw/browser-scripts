@@ -2,7 +2,7 @@
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/dexscreener.user.ts
-// @version      0.0.18
+// @version      0.0.19
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -111,9 +111,6 @@ function getChainFromPath() {
 
 function getExternalLinks(el: HTMLDivElement, chain: string) {
   const aEls = el.querySelectorAll('a[title="Open in block explorer"]')
-  if (aEls.length !== 3) {
-    throw new Error('token address not found')
-  }
   const aEl = aEls.item(1) as HTMLAnchorElement
   const address = aEl.href.split('/').pop()!
 
