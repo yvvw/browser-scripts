@@ -2,7 +2,7 @@
 // @name         Anime4K
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/anime4k.user.ts
-// @version      0.0.9
+// @version      0.0.10
 // @description  Anime4K画质增强
 // @credit       https://github.com/bloc97/Anime4K
 // @credit       https://github.com/Anime4KWebBoost/Anime4K-WebGPU
@@ -22,7 +22,7 @@ import { Logger } from './util'
 
 const logger = Logger.new('Anime4K')
 
-window.onload = function main() {
+function main() {
   new Anime4K().watch()
 }
 
@@ -48,7 +48,7 @@ class Anime4K {
   #getPipelines(
     preset: IAnime4KPipelinePreset,
     descriptor: Anime4KPresetPipelineDescriptor
-  ): [...Anime4KPipeline[], Anime4KPipeline] {
+  ): Anime4KPipeline[] {
     switch (preset) {
       case 'Anime4K: A':
         return [new ModeA(descriptor)]
@@ -71,7 +71,7 @@ class Anime4K {
 
   watch() {
     let lastPreset: string | undefined
-    this.#keyboardListener = (ev: KeyboardEvent) => {
+    this.#keyboardListener = (ev: WindowEventMap['keydown']) => {
       const preset = this.#presetKeyMap[ev.key]
       if (preset === undefined) return
       if (preset === lastPreset) return this.#notice(preset)
@@ -82,7 +82,7 @@ class Anime4K {
         this.#start({ preset }).catch(this.destroy.bind(this))
       }
     }
-    window.addEventListener('keydown', this.#keyboardListener)
+    window.addEventListener('keydown', this.#keyboardListener!)
   }
 
   #resizeObserver?: ResizeObserver
@@ -415,3 +415,5 @@ fn main(@location(0) fragUV : vec2f) -> @location(0) vec4f {
   return textureSampleBaseClampToEdge(myTexture, mySampler, fragUV);
 }
 `
+
+main()

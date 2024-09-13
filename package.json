@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "anime4k-webgpu": "^1.0.0",
-    "debounce": "^2.1.0"
+    "debounce": "^2.1.1"
   },
   "devDependencies": {
     "@types/node": "^20.16.5",
@@ -20,7 +20,7 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^4.0.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.6.2"
   },
   "prettier": {
     "plugins": [
