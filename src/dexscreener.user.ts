@@ -2,7 +2,7 @@
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/dexscreener.user.ts
-// @version      0.0.19
+// @version      0.0.20
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -59,6 +59,9 @@ async function addExternalLink() {
   if (links === null) return
 
   const containerEl = createExternalContainerEl()
+  if (links.swap) {
+    containerEl.appendChild(createExternalLinkEl('Swap', links.swap))
+  }
   if (links.gmgn) {
     containerEl.appendChild(createExternalLinkEl('GMGN', links.gmgn))
   }
@@ -115,8 +118,22 @@ function getExternalLinks(el: HTMLDivElement, chain: string) {
   const address = aEl.href.split('/').pop()!
 
   return {
+    swap: getSwapLink(chain, address),
     gmgn: getGmGnLink(chain, address),
     bullx: getBullxLink(chain, address),
+  }
+}
+
+function getSwapLink(chain: string, token: string) {
+  if (chain === 'ethereum') {
+    return `https://app.uniswap.org/swap?chain=ethereum&inputCurrency=ETH&outputCurrency=${token}`
+  } else if (chain === 'base') {
+    return `https://app.uniswap.org/swap?chain=base&inputCurrency=ETH&outputCurrency=${token}`
+  } else if (chain === 'solana') {
+    return `https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${token}&inputMint=sol&outputMint=${token}`
+  } else {
+    logger.warn(`${chain} unsupported`)
+    return null
   }
 }
 

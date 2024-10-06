@@ -2,7 +2,7 @@
 // @name         Better X(Twitter)
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/x.user.ts
-// @version      0.0.14
+// @version      0.0.15
 // @description  关闭广告，快捷屏蔽
 // @author       yvvw
 // @icon         https://abs.twimg.com/favicons/twitter.3.ico
@@ -48,17 +48,20 @@ async function addBlockEl(twitterEl: HTMLDivElement) {
   const block = async () => {
     moreBtnEl.click()
 
-    await new Promise((resolve) => setTimeout(resolve, 0))
-    const blockBtn2 = document.querySelector<HTMLButtonElement>('div[data-testid="block"]')
-    if (blockBtn2 === null) return
+    const blockBtn2 = await HTMLUtils.query(() =>
+      document.querySelector<HTMLButtonElement>('div[data-testid="block"]')
+    )
     blockBtn2.click()
 
-    await new Promise((resolve) => setTimeout(resolve, 0))
-    const confirmBtn = document.querySelector<HTMLButtonElement>(
-      'button[data-testid="confirmationSheetConfirm"]'
+    const confirmBtn = await HTMLUtils.query(() =>
+      document.querySelector<HTMLButtonElement>('button[data-testid="confirmationSheetConfirm"]')
     )
-    if (confirmBtn === null) return
     confirmBtn.click()
+
+    const laterBtn = await HTMLUtils.query(() =>
+      HTMLUtils.getFirstElementByXPath<HTMLButtonElement>('//button[contains(., "Maybe later")]')
+    )
+    laterBtn.click()
   }
 
   if (twitterEl.innerText.includes('\nAd\n')) {
