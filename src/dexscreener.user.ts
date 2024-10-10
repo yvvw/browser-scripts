@@ -2,7 +2,7 @@
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/dexscreener.user.ts
-// @version      0.0.20
+// @version      0.0.21
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -62,6 +62,9 @@ async function addExternalLink() {
   if (links.swap) {
     containerEl.appendChild(createExternalLinkEl('Swap', links.swap))
   }
+  if (links.pump) {
+    containerEl.appendChild(createExternalLinkEl('Pump', links.pump))
+  }
   if (links.gmgn) {
     containerEl.appendChild(createExternalLinkEl('GMGN', links.gmgn))
   }
@@ -119,6 +122,7 @@ function getExternalLinks(el: HTMLDivElement, chain: string) {
 
   return {
     swap: getSwapLink(chain, address),
+    pump: getPumpLink(chain, address),
     gmgn: getGmGnLink(chain, address),
     bullx: getBullxLink(chain, address),
   }
@@ -131,6 +135,15 @@ function getSwapLink(chain: string, token: string) {
     return `https://app.uniswap.org/swap?chain=base&inputCurrency=ETH&outputCurrency=${token}`
   } else if (chain === 'solana') {
     return `https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${token}&inputMint=sol&outputMint=${token}`
+  } else {
+    logger.warn(`${chain} unsupported`)
+    return null
+  }
+}
+
+function getPumpLink(chain: string, token: string) {
+  if (chain === 'solana' && token.endsWith('pump')) {
+    return `https://pump.fun/${token}`
   } else {
     logger.warn(`${chain} unsupported`)
     return null
