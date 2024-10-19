@@ -2,7 +2,7 @@
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/pumpfun.user.ts
-// @version      0.0.20
+// @version      0.0.21
 // @description  增加gmgn、bullx跳转
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -32,6 +32,12 @@ async function addExternalLinks() {
   const divWrapEl = document.createElement('div')
   divWrapEl.classList.add('flex', 'gap-2', 'text-green-300', 'ml-auto')
 
+  divWrapEl.appendChild(
+    createExternalLink(
+      'Swap',
+      `https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${address}&inputMint=sol&outputMint=${address}`
+    )
+  )
   divWrapEl.appendChild(createExternalLink('GMGN', `https://gmgn.ai/sol/token/${address}`))
   divWrapEl.appendChild(
     createExternalLink('DEXScreener', `https://dexscreener.com/solana/${address}`)
