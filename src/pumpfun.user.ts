@@ -2,7 +2,7 @@
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/pumpfun.user.ts
-// @version      0.0.21
+// @version      0.0.22
 // @description  增加gmgn、bullx跳转
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -19,7 +19,23 @@ import { HTMLUtils, Logger } from './util'
 const logger = Logger.new('Better pump.fun')
 
 window.onload = function main() {
-  addExternalLinks().catch(logger.error.bind(logger))
+  let running = false
+  let prevToken = ''
+
+  const run = () => {
+    const token = location.pathname.slice(1)
+    if (running || token.length <= 40 || prevToken === token) {
+      return
+    }
+    running = true
+    prevToken = token
+
+    addExternalLinks()
+      .catch(logger.error.bind(logger))
+      .finally(() => (running = false))
+  }
+
+  new MutationObserver(run).observe(document.body, { childList: true, subtree: true })
 }
 
 async function addExternalLinks() {
