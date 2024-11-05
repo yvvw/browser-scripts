@@ -2,8 +2,8 @@
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/pumpfun.user.ts
-// @version      0.0.22
-// @description  增加gmgn、bullx跳转
+// @version      0.0.23
+// @description  增加跳转
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
 // @license      MIT
@@ -49,17 +49,17 @@ async function addExternalLinks() {
   divWrapEl.classList.add('flex', 'gap-2', 'text-green-300', 'ml-auto')
 
   divWrapEl.appendChild(
+    createExternalLink('DEXScreener', `https://dexscreener.com/solana/${address}`)
+  )
+  divWrapEl.appendChild(createExternalLink('GMGN', `https://gmgn.ai/sol/token/${address}`))
+  divWrapEl.appendChild(
+    createExternalLink('photon', `https://photon-sol.tinyastro.io/en/lp/${address}`)
+  )
+  divWrapEl.appendChild(
     createExternalLink(
       'Swap',
       `https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${address}&inputMint=sol&outputMint=${address}`
     )
-  )
-  divWrapEl.appendChild(createExternalLink('GMGN', `https://gmgn.ai/sol/token/${address}`))
-  divWrapEl.appendChild(
-    createExternalLink('DEXScreener', `https://dexscreener.com/solana/${address}`)
-  )
-  divWrapEl.appendChild(
-    createExternalLink('BullX', `https://bullx.io/terminal?chainId=1399811149&address=${address}`)
   )
   threadEl.parentElement?.appendChild(divWrapEl)
 }
