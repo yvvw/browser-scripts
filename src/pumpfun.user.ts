@@ -2,7 +2,7 @@
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/pumpfun.user.ts
-// @version      0.0.23
+// @version      0.0.24
 // @description  增加跳转
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -23,7 +23,7 @@ window.onload = function main() {
   let prevToken = ''
 
   const run = () => {
-    const token = location.pathname.slice(1)
+    const token = location.pathname.split('/').pop()!
     if (running || token.length <= 40 || prevToken === token) {
       return
     }

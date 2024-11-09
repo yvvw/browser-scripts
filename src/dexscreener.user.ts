@@ -2,7 +2,7 @@
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/dexscreener.user.ts
-// @version      0.0.22
+// @version      0.0.23
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -143,7 +143,7 @@ function getSwapLink(chain: string, token: string) {
 
 function getPumpLink(chain: string, token: string) {
   if (chain === 'solana' && token.endsWith('pump')) {
-    return `https://pump.fun/${token}`
+    return `https://pump.fun/coin/${token}`
   } else {
     logger.warn(`${chain} unsupported`)
     return null
