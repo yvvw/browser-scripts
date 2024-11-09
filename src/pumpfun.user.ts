@@ -2,7 +2,7 @@
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/pumpfun.user.ts
-// @version      0.0.24
+// @version      0.0.25
 // @description  增加跳转
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -30,7 +30,7 @@ window.onload = function main() {
     running = true
     prevToken = token
 
-    addExternalLinks()
+    addExternalLinks(token)
       .catch(logger.error.bind(logger))
       .finally(() => (running = false))
   }
@@ -38,27 +38,25 @@ window.onload = function main() {
   new MutationObserver(run).observe(document.body, { childList: true, subtree: true })
 }
 
-async function addExternalLinks() {
+async function addExternalLinks(token: string) {
   const threadEl = await HTMLUtils.query(() =>
     HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[text()="Thread"]')
   )
-
-  const address = location.pathname.replace('/', '')
 
   const divWrapEl = document.createElement('div')
   divWrapEl.classList.add('flex', 'gap-2', 'text-green-300', 'ml-auto')
 
   divWrapEl.appendChild(
-    createExternalLink('DEXScreener', `https://dexscreener.com/solana/${address}`)
+    createExternalLink('DEXScreener', `https://dexscreener.com/solana/${token}`)
   )
-  divWrapEl.appendChild(createExternalLink('GMGN', `https://gmgn.ai/sol/token/${address}`))
+  divWrapEl.appendChild(createExternalLink('GMGN', `https://gmgn.ai/sol/token/${token}`))
   divWrapEl.appendChild(
-    createExternalLink('photon', `https://photon-sol.tinyastro.io/en/lp/${address}`)
+    createExternalLink('photon', `https://photon-sol.tinyastro.io/en/lp/${token}`)
   )
   divWrapEl.appendChild(
     createExternalLink(
       'Swap',
-      `https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${address}&inputMint=sol&outputMint=${address}`
+      `https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${token}&inputMint=sol&outputMint=${token}`
     )
   )
   threadEl.parentElement?.appendChild(divWrapEl)
