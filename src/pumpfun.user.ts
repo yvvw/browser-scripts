@@ -2,7 +2,7 @@
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/pumpfun.user.ts
-// @version      0.0.25
+// @version      0.0.26
 // @description  增加跳转
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -40,22 +40,22 @@ window.onload = function main() {
 
 async function addExternalLinks(token: string) {
   const threadEl = await HTMLUtils.query(() =>
-    HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[text()="Thread"]')
+    HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[text()="thread"]')
   )
 
   const divWrapEl = document.createElement('div')
   divWrapEl.classList.add('flex', 'gap-2', 'text-green-300', 'ml-auto')
 
   divWrapEl.appendChild(
-    createExternalLink('DEXScreener', `https://dexscreener.com/solana/${token}`)
+    createExternalLink('dexscreener', `https://dexscreener.com/solana/${token}`)
   )
-  divWrapEl.appendChild(createExternalLink('GMGN', `https://gmgn.ai/sol/token/${token}`))
+  divWrapEl.appendChild(createExternalLink('gmgn', `https://gmgn.ai/sol/token/${token}`))
   divWrapEl.appendChild(
     createExternalLink('photon', `https://photon-sol.tinyastro.io/en/lp/${token}`)
   )
   divWrapEl.appendChild(
     createExternalLink(
-      'Swap',
+      'raydium',
       `https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${token}&inputMint=sol&outputMint=${token}`
     )
   )
@@ -66,6 +66,6 @@ function createExternalLink(text: string, href: string) {
   const el = document.createElement('a')
   el.setAttribute('href', href)
   el.setAttribute('target', '_blank')
-  el.setHTMLUnsafe(text)
+  el.innerText = text
   return el
 }
