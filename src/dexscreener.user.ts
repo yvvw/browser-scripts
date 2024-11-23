@@ -60,13 +60,13 @@ async function addExternalLink() {
 
   const containerEl = createExternalContainerEl()
   if (links.swap) {
-    containerEl.appendChild(createExternalLinkEl('Swap', links.swap))
+    containerEl.appendChild(createExternalLinkEl('swap', links.swap))
   }
   if (links.pump) {
-    containerEl.appendChild(createExternalLinkEl('Pump', links.pump))
+    containerEl.appendChild(createExternalLinkEl('pump', links.pump))
   }
   if (links.gmgn) {
-    containerEl.appendChild(createExternalLinkEl('GMGN', links.gmgn))
+    containerEl.appendChild(createExternalLinkEl('gmgn', links.gmgn))
   }
   if (links.photon) {
     containerEl.appendChild(createExternalLinkEl('photon', links.photon))
