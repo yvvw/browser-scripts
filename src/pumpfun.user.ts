@@ -2,13 +2,13 @@
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/pumpfun.user.ts
-// @version      0.0.26
+// @version      0.0.27
 // @description  增加跳转
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
 // @license      MIT
-// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/pumpfun.meta.js
-// @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/pumpfun.user.js
+// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/pumpfun.meta.js
+// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/pumpfun.user.js
 // @match        https://www.pump.fun/*
 // @match        https://pump.fun/*
 // @noframes

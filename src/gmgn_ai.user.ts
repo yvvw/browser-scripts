@@ -2,13 +2,13 @@
 // @name         Better GMGN.ai
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/gmgn_ai.user.ts
-// @version      0.0.18
+// @version      0.0.19
 // @description  调整屏宽
 // @author       yvvw
 // @icon         https://gmgn.ai/static/favicon2.ico
 // @license      MIT
-// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/gmgn_ai.meta.js
-// @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/gmgn_ai.user.js
+// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/gmgn_ai.meta.js
+// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/gmgn_ai.user.js
 // @match        https://gmgn.ai/*
 // @grant        GM_openInTab
 // @noframes

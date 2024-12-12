@@ -2,13 +2,13 @@
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/dexscreener.user.ts
-// @version      0.0.23
+// @version      0.0.24
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
 // @license      MIT
-// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/dexscreener.meta.js
-// @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/dexscreener.user.js
+// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/dexscreener.meta.js
+// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/dexscreener.user.js
 // @match        https://dexscreener.com/*
 // @noframes
 // ==/UserScript==

@@ -2,13 +2,13 @@
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/bilibili.user.ts
-// @version      0.1.4
+// @version      0.1.5
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
 // @license      MIT
-// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/bilibili.meta.js
-// @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/bilibili.user.js
+// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/bilibili.meta.js
+// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/bilibili.user.js
 // @match        https://www.bilibili.com/video/*
 // @match        https://www.bilibili.com/list/*
 // @match        https://www.bilibili.com/bangumi/play/*

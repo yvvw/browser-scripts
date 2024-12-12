@@ -2,13 +2,13 @@
 // @name         Better JD
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/jd.user.ts
-// @version      0.0.6
+// @version      0.0.7
 // @description  一键保价、复制购物车链接
 // @author       yvvw
 // @icon         https://www.jd.com/favicon.ico
 // @license      MIT
-// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/jd.meta.js
-// @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/jd.user.js
+// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/jd.meta.js
+// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/jd.user.js
 // @match        https://pcsitepp-fm.jd.com/
 // @match        https://cart.jd.com/*
 // @noframes

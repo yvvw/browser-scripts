@@ -2,13 +2,13 @@
 // @name         Better Douyu
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/douyu.user.ts
-// @version      0.0.15
+// @version      0.0.16
 // @description  自动网页全屏、切换最高清晰度
 // @author       yvvw
 // @icon         https://www.douyu.com/favicon.ico
 // @license      MIT
-// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/douyu.meta.js
-// @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/douyu.user.js
+// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/douyu.meta.js
+// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/douyu.user.js
 // @match        https://www.douyu.com/directory/watchHistory
 // @match        https://www.douyu.com/topic/*
 // @match        https://www.douyu.com/0*

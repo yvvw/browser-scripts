@@ -2,13 +2,13 @@
 // @name         Better Douyin
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/douyin.user.ts
-// @version      0.0.2
+// @version      0.0.3
 // @description  自动网页全屏、关闭礼物特效
 // @author       yvvw
 // @icon         https://www.douyin.com/favicon.ico
 // @license      MIT
-// @updateURL    https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/douyin.meta.js
-// @downloadURL  https://mirror.ghproxy.com/https://github.com/yvvw/browser-scripts/releases/download/latest/douyin.user.js
+// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/douyin.meta.js
+// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/douyin.user.js
 // @match        https://live.douyin.com/*
 // @noframes
 // ==/UserScript==
