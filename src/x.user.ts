@@ -7,8 +7,8 @@
 // @author       yvvw
 // @icon         https://abs.twimg.com/favicons/twitter.3.ico
 // @license      MIT
-// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/x.meta.js
-// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/x.user.js
+// @updateURL    https://github.com/yvvw/browser-scripts/releases/download/latest/x.meta.js
+// @downloadURL  https://github.com/yvvw/browser-scripts/releases/download/latest/x.user.js
 // @match        https://x.com/*
 // @match        https://twitter.com/*
 // @exclude      https://x.com/i/*

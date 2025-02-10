@@ -7,8 +7,8 @@
 // @author       yvvw
 // @icon         https://www.douyin.com/favicon.ico
 // @license      MIT
-// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/douyin.meta.js
-// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/douyin.user.js
+// @updateURL    https://github.com/yvvw/browser-scripts/releases/download/latest/douyin.meta.js
+// @downloadURL  https://github.com/yvvw/browser-scripts/releases/download/latest/douyin.user.js
 // @match        https://live.douyin.com/*
 // @noframes
 // ==/UserScript==

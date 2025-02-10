@@ -7,8 +7,8 @@
 // @author       yvvw
 // @icon         https://www.douyu.com/favicon.ico
 // @license      MIT
-// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/douyu.meta.js
-// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/douyu.user.js
+// @updateURL    https://github.com/yvvw/browser-scripts/releases/download/latest/douyu.meta.js
+// @downloadURL  https://github.com/yvvw/browser-scripts/releases/download/latest/douyu.user.js
 // @match        https://www.douyu.com/directory/watchHistory
 // @match        https://www.douyu.com/topic/*
 // @match        https://www.douyu.com/0*

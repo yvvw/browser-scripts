@@ -8,8 +8,8 @@
 // @credit       https://github.com/Anime4KWebBoost/Anime4K-WebGPU
 // @author       yvvw
 // @license      MIT
-// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/anime4k.meta.js
-// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/anime4k.user.js
+// @updateURL    https://github.com/yvvw/browser-scripts/releases/download/latest/anime4k.meta.js
+// @downloadURL  https://github.com/yvvw/browser-scripts/releases/download/latest/anime4k.user.js
 // @match        *://*/*
 // ==/UserScript==
 

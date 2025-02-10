@@ -7,8 +7,8 @@
 // @author       yvvw
 // @icon         https://www.jd.com/favicon.ico
 // @license      MIT
-// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/jd.meta.js
-// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/jd.user.js
+// @updateURL    https://github.com/yvvw/browser-scripts/releases/download/latest/jd.meta.js
+// @downloadURL  https://github.com/yvvw/browser-scripts/releases/download/latest/jd.user.js
 // @match        https://pcsitepp-fm.jd.com/
 // @match        https://cart.jd.com/*
 // @noframes

@@ -7,8 +7,8 @@
 // @author       yvvw
 // @icon         https://www.dextools.io/app/favicon.ico
 // @license      MIT
-// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/dextools.meta.js
-// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/dextools.user.js
+// @updateURL    https://github.com/yvvw/browser-scripts/releases/download/latest/dextools.meta.js
+// @downloadURL  https://github.com/yvvw/browser-scripts/releases/download/latest/dextools.user.js
 // @match        https://www.dextools.io/*
 // @noframes
 // ==/UserScript==

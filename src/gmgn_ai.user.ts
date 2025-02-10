@@ -7,8 +7,8 @@
 // @author       yvvw
 // @icon         https://gmgn.ai/static/favicon2.ico
 // @license      MIT
-// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/gmgn_ai.meta.js
-// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/gmgn_ai.user.js
+// @updateURL    https://github.com/yvvw/browser-scripts/releases/download/latest/gmgn_ai.meta.js
+// @downloadURL  https://github.com/yvvw/browser-scripts/releases/download/latest/gmgn_ai.user.js
 // @match        https://gmgn.ai/*
 // @grant        GM_openInTab
 // @noframes

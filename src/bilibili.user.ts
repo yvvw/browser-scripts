@@ -7,8 +7,8 @@
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
 // @license      MIT
-// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/bilibili.meta.js
-// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/bilibili.user.js
+// @updateURL    https://github.com/yvvw/browser-scripts/releases/download/latest/bilibili.meta.js
+// @downloadURL  https://github.com/yvvw/browser-scripts/releases/download/latest/bilibili.user.js
 // @match        https://www.bilibili.com/video/*
 // @match        https://www.bilibili.com/list/*
 // @match        https://www.bilibili.com/bangumi/play/*

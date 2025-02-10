@@ -7,8 +7,8 @@
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
 // @license      MIT
-// @updateURL    https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/dexscreener.meta.js
-// @downloadURL  https://ghp.ci/https://github.com/yvvw/browser-scripts/releases/download/latest/dexscreener.user.js
+// @updateURL    https://github.com/yvvw/browser-scripts/releases/download/latest/dexscreener.meta.js
+// @downloadURL  https://github.com/yvvw/browser-scripts/releases/download/latest/dexscreener.user.js
 // @match        https://dexscreener.com/*
 // @noframes
 // ==/UserScript==
