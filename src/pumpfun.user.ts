@@ -2,7 +2,7 @@
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/pumpfun.user.ts
-// @version      0.0.27
+// @version      0.0.28
 // @description  增加跳转
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -39,6 +39,11 @@ window.onload = function main() {
 }
 
 async function addExternalLinks(token: string) {
+  if (document.body.dataset.betterPumpfun === token) {
+    return
+  }
+  document.body.dataset.betterPumpfun = token
+
   const threadEl = await HTMLUtils.query(() =>
     HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[text()="thread"]')
   )
