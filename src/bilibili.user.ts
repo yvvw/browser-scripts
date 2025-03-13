@@ -2,7 +2,7 @@
 // @name         Better Bilibili
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/bilibili.user.ts
-// @version      0.1.5
+// @version      0.1.6
 // @description  移除不需要组件、网页全屏、最高可用清晰度
 // @author       yvvw
 // @icon         https://www.bilibili.com/favicon.ico
@@ -80,27 +80,38 @@ class VideoPlayer implements IPlayer {
 class LivePlayer implements IPlayer {
   async run(inject: BiliInject) {
     const livePlayer = await inject.getLivePlayer()
+    const doc = this.#getDocument()
 
     await Promise.allSettled([
-      this.hideChatPanel().catch(logger.error.bind(logger)),
-      this.scrollToPlayer().catch(logger.error.bind(logger)),
-      this.switchWebFullscreen().catch(logger.error.bind(logger)),
+      this.hideChatPanel(doc).catch(logger.error.bind(logger)),
+      this.scrollToPlayer(doc).catch(logger.error.bind(logger)),
+      this.switchWebFullscreen(doc).catch(logger.error.bind(logger)),
       this.switchBestQuality(livePlayer).catch(logger.error.bind(logger)),
     ])
   }
 
-  async hideChatPanel() {
-    const el = await HTMLUtils.query(() => document.getElementById('aside-area-toggle-btn'))
+  #getDocument() {
+    const frames = document.getElementsByTagName('iframe')
+    for (const frame of frames) {
+      if (frame.getAttribute('allowfullscreen') !== null) {
+        return frame.contentDocument!
+      }
+    }
+    return document
+  }
+
+  async hideChatPanel(doc: Document) {
+    const el = await HTMLUtils.query(() => doc.getElementById('aside-area-toggle-btn'))
     el.click()
   }
 
-  async scrollToPlayer() {
-    const playerEl = await HTMLUtils.query(() => document.getElementById('live-player'))
+  async scrollToPlayer(doc: Document) {
+    const playerEl = await HTMLUtils.query(() => doc.getElementById('live-player'))
     playerEl.scrollIntoView()
   }
 
-  async switchWebFullscreen() {
-    const playerEl = await HTMLUtils.query(() => document.getElementById('live-player'))
+  async switchWebFullscreen(doc: Document) {
+    const playerEl = await HTMLUtils.query(() => doc.getElementById('live-player'))
     playerEl.dispatchEvent(new MouseEvent('mousemove'))
     playerEl.querySelector<HTMLElement>('.right-area .tip-wrap:nth-child(2) span')?.click()
   }
