@@ -28,19 +28,21 @@ export class HTMLUtils {
   }
 
   static evaluate(xpath: string, context: Node = document) {
-    return document.evaluate(xpath, context, null, XPathResult.ANY_TYPE, null)
+    return document.evaluate(xpath, context, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null)
   }
 
   static getFirstElementByXPath<E extends Element>(xpath: string, context?: Node): E | null {
-    return this.evaluate(xpath, context).iterateNext() as E
+    const res = this.evaluate(xpath, context)
+    return res.snapshotLength > 0 ? (res.snapshotItem(0) as E) : null
   }
 
   static getElementsByXPath<E extends Element>(xpath: string, context?: Node): E[] {
     const res = this.evaluate(xpath, context)
-    const r: E[] = []
-    let i: E | null
-    while ((i = res.iterateNext() as E)) r.push(i)
-    return r
+    const items: E[] = []
+    for (let i = 0; i < res.snapshotLength; i++) {
+      items.push(res.snapshotItem(i) as E)
+    }
+    return items
   }
 
   static observe(
