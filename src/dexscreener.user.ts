@@ -2,7 +2,7 @@
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/dexscreener.user.ts
-// @version      0.0.25
+// @version      0.0.26
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -100,7 +100,7 @@ function createExternalLinkEl(text: string, href: string) {
   return el
 }
 
-const SUPPORT_CHAINS = ['ethereum', 'base', 'solana', 'tron']
+const SUPPORT_CHAINS = ['ethereum', 'base', 'solana', 'tron', 'bsc']
 
 function getChainFromPath() {
   const parts = document.location.pathname.split('/')
@@ -123,7 +123,7 @@ function getExternalLinks(el: HTMLDivElement, chain: string) {
 
   return {
     swap: getSwapLink(chain, address),
-    pump: getPumpLink(chain, address),
+    pump: getMemeLink(chain, address),
     gmgn: getGmGnLink(chain, address),
     photon: getPhotonLink(chain, address),
   }
@@ -136,17 +136,21 @@ function getSwapLink(chain: string, token: string) {
     return `https://app.uniswap.org/swap?chain=base&inputCurrency=ETH&outputCurrency=${token}`
   } else if (chain === 'solana') {
     return `https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${token}&inputMint=sol&outputMint=${token}`
+  } else if (chain === 'bsc') {
+    return `https://pancakeswap.finance/swap?inputCurrency=BNB&outputCurrency=${token}`
   } else {
     logger.warn(`${chain} swap unsupported`)
     return null
   }
 }
 
-function getPumpLink(chain: string, token: string) {
+function getMemeLink(chain: string, token: string) {
   if (chain === 'solana' && token.endsWith('pump')) {
     return `https://pump.fun/coin/${token}`
   } else if (chain === 'tron') {
     return `https://sunpump.meme/token/${token}`
+  } else if (chain === 'bsc') {
+    return `https://four.meme/token/${token}`
   } else {
     logger.warn(`${chain} pump unsupported`)
     return null
@@ -162,6 +166,8 @@ function getGmGnLink(chain: string, token: string) {
     return `https://gmgn.ai/sol/token/${token}`
   } else if (chain === 'tron') {
     return `https://gmgn.ai/tron/token/${token}`
+  } else if (chain === 'bsc') {
+    return `https://gmgn.ai/bsc/token/${token}`
   } else {
     logger.warn(`${chain} gmgn unsupported`)
     return null
@@ -171,25 +177,14 @@ function getGmGnLink(chain: string, token: string) {
 function getPhotonLink(chain: string, token: string) {
   if (chain === 'ethereum') {
     return `https://photon.tinyastro.io/en/lp/${token}`
+  } else if (chain === 'base') {
+    return `https://photon-base.tinyastro.io/en/lp/${token}`
   } else if (chain === 'solana') {
     return `https://photon-sol.tinyastro.io/en/lp/${token}`
+  } else if (chain === 'tron') {
+    return `https://photon-tron.tinyastro.io/en/lp/${token}`
   } else {
     logger.warn(`${chain} photon unsupported`)
-    return null
-  }
-}
-
-function getBullxLink(chain: string, token: string) {
-  if (chain === 'ethereum') {
-    return `https://bullx.io/terminal?chainId=1&address=${token}`
-  } else if (chain === 'base') {
-    return `https://bullx.io/terminal?chainId=8453&address=${token}`
-  } else if (chain === 'solana') {
-    return `https://bullx.io/terminal?chainId=1399811149&address=${token}`
-  } else if (chain === 'tron') {
-    return `https://tron.bullx.io/terminal?chainId=728126428&address=${token}`
-  } else {
-    logger.warn(`${chain} bullx unsupported`)
     return null
   }
 }
