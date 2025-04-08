@@ -2,7 +2,7 @@
 // @name         Anime4K
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/anime4k.user.ts
-// @version      0.0.11
+// @version      0.0.12
 // @description  Anime4K画质增强
 // @credit       https://github.com/bloc97/Anime4K
 // @credit       https://github.com/Anime4KWebBoost/Anime4K-WebGPU
@@ -342,6 +342,7 @@ class Anime4K {
 
   #notice(text: string) {
     const noticeEl = document.getElementById(this.#NOTICE_ID) as HTMLDivElement
+    if (noticeEl === null) return
     noticeEl.innerText = text
     noticeEl.style.setProperty('opacity', '1')
 
