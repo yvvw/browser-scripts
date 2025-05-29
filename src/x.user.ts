@@ -48,16 +48,12 @@ async function addExtraButtons(twitterEl: HTMLDivElement) {
 
 async function addBlockButton(twitterEl: HTMLDivElement) {
   // twitter right corner `...` button
-  const moreBtn = await HTMLUtils.query(() =>
-    twitterEl.querySelector<HTMLDivElement>('button[aria-label="More"]')
-  )
+  const moreBtn = await HTMLUtils.query(() => twitterEl.querySelector<HTMLDivElement>('button[aria-label="More"]'))
 
   const block = async () => {
     moreBtn.click()
 
-    const btn = await HTMLUtils.query(() =>
-      document.querySelector<HTMLButtonElement>('div[data-testid="block"]')
-    )
+    const btn = await HTMLUtils.query(() => document.querySelector<HTMLButtonElement>('div[data-testid="block"]'))
     btn.click()
 
     const confirmBtn = await HTMLUtils.query(() =>
@@ -92,16 +88,12 @@ async function addBlockButton(twitterEl: HTMLDivElement) {
 }
 
 async function addNotInterestedButton(twitterEl: HTMLDivElement) {
-  const moreBtn = await HTMLUtils.query(() =>
-    twitterEl.querySelector<HTMLDivElement>('button[aria-label="More"]')
-  )
+  const moreBtn = await HTMLUtils.query(() => twitterEl.querySelector<HTMLDivElement>('button[aria-label="More"]'))
 
   const notInterested = async () => {
     moreBtn.click()
 
-    const btn = await HTMLUtils.query(() =>
-      document.querySelector<HTMLButtonElement>('div[role="menuitem"]')
-    )
+    const btn = await HTMLUtils.query(() => document.querySelector<HTMLButtonElement>('div[role="menuitem"]'))
 
     if (!btn.innerText.includes('Not interested')) {
       ;(

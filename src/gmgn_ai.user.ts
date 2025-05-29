@@ -16,7 +16,7 @@
 
 import { HTMLUtils } from './util'
 
-const pendingClose = new Set<Function>()
+const pendingClose = new Set<() => void>()
 
 window.onload = function main() {
   let previous = ''
@@ -27,7 +27,9 @@ window.onload = function main() {
       previous = location.href
 
       if (pendingClose.size > 0) {
-        pendingClose.forEach((close) => close())
+        for (const close of pendingClose) {
+          close()
+        }
         pendingClose.clear()
       }
 

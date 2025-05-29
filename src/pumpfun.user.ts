@@ -2,7 +2,7 @@
 // @name         Better pump.fun
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/pumpfun.user.ts
-// @version      0.0.28
+// @version      0.0.29
 // @description  增加跳转
 // @author       yvvw
 // @icon         https://www.pump.fun/icon.png
@@ -32,7 +32,9 @@ window.onload = function main() {
 
     addExternalLinks(token)
       .catch(logger.error.bind(logger))
-      .finally(() => (running = false))
+      .finally(() => {
+        running = false
+      })
   }
 
   new MutationObserver(run).observe(document.body, { childList: true, subtree: true })
@@ -51,13 +53,8 @@ async function addExternalLinks(token: string) {
   const divWrapEl = document.createElement('div')
   divWrapEl.classList.add('flex', 'gap-2', 'text-green-300', 'ml-auto')
 
-  divWrapEl.appendChild(
-    createExternalLink('dexscreener', `https://dexscreener.com/solana/${token}`)
-  )
+  divWrapEl.appendChild(createExternalLink('axiom', `https://axiom.trade/t/${token}`))
   divWrapEl.appendChild(createExternalLink('gmgn', `https://gmgn.ai/sol/token/${token}`))
-  divWrapEl.appendChild(
-    createExternalLink('photon', `https://photon-sol.tinyastro.io/en/lp/${token}`)
-  )
   divWrapEl.appendChild(
     createExternalLink(
       'raydium',

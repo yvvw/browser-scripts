@@ -25,6 +25,7 @@ function main() {
       expandWatchList()
       await addExternalLink().catch(logger.error.bind(logger))
       closeAd()
+      return
     },
     { waiting: true, throttle: 500 }
   )
@@ -51,10 +52,8 @@ async function addExternalLink() {
   }
 
   const chain = getChainFromPath()
-  const aEl = await HTMLUtils.query(() =>
-    HTMLUtils.getFirstElementByXPath<HTMLSpanElement>('//span[text()="Pair"]')
-  )
-  const bEl = aEl.parentElement!.parentElement!.parentElement as HTMLDivElement
+  const aEl = await HTMLUtils.query(() => HTMLUtils.getFirstElementByXPath<HTMLSpanElement>('//span[text()="Pair"]'))
+  const bEl = aEl.parentElement?.parentElement?.parentElement as HTMLDivElement
   const links = getExternalLinks(bEl, chain)
   if (links === null) return
 
@@ -78,7 +77,7 @@ async function addExternalLink() {
 
 function createExternalContainerEl() {
   const el = document.createElement('div')
-  el.dataset['external'] = 'container'
+  el.dataset.external = 'container'
   el.style.setProperty('display', 'flex')
   el.style.setProperty('gap', '10px')
   el.style.setProperty('line-height', '36px')
@@ -95,7 +94,7 @@ function createExternalLinkEl(text: string, href: string) {
   el.setAttribute('target', '_blank')
   el.setAttribute('rel', 'noopener noreferrer nofollow')
   el.setHTMLUnsafe(text)
-  el.dataset['external'] = text
+  el.dataset.external = text
   el.classList.add('chakra-link', 'chakra-button')
   return el
 }
@@ -132,61 +131,69 @@ function getExternalLinks(el: HTMLDivElement, chain: string) {
 function getSwapLink(chain: string, token: string) {
   if (chain === 'ethereum') {
     return `https://app.uniswap.org/swap?chain=ethereum&inputCurrency=ETH&outputCurrency=${token}`
-  } else if (chain === 'base') {
-    return `https://app.uniswap.org/swap?chain=base&inputCurrency=ETH&outputCurrency=${token}`
-  } else if (chain === 'solana') {
-    return `https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${token}&inputMint=sol&outputMint=${token}`
-  } else if (chain === 'bsc') {
-    return `https://pancakeswap.finance/swap?inputCurrency=BNB&outputCurrency=${token}`
-  } else {
-    logger.warn(`${chain} swap unsupported`)
-    return null
   }
+  if (chain === 'base') {
+    return `https://app.uniswap.org/swap?chain=base&inputCurrency=ETH&outputCurrency=${token}`
+  }
+  if (chain === 'solana') {
+    return `https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${token}&inputMint=sol&outputMint=${token}`
+  }
+  if (chain === 'bsc') {
+    return `https://pancakeswap.finance/swap?inputCurrency=BNB&outputCurrency=${token}`
+  }
+  logger.warn(`${chain} swap unsupported`)
+  return null
 }
 
 function getMemeLink(chain: string, token: string) {
   if (chain === 'solana' && token.endsWith('pump')) {
     return `https://pump.fun/coin/${token}`
-  } else if (chain === 'tron') {
-    return `https://sunpump.meme/token/${token}`
-  } else if (chain === 'bsc') {
-    return `https://four.meme/token/${token}`
-  } else {
-    logger.warn(`${chain} pump unsupported`)
-    return null
   }
+  if (chain === 'tron') {
+    return `https://sunpump.meme/token/${token}`
+  }
+  if (chain === 'bsc') {
+    return `https://four.meme/token/${token}`
+  }
+  logger.warn(`${chain} pump unsupported`)
+  return null
 }
 
 function getGmGnLink(chain: string, token: string) {
   if (chain === 'ethereum') {
     return `https://gmgn.ai/eth/token/${token}`
-  } else if (chain === 'base') {
-    return `https://gmgn.ai/base/token/${token}`
-  } else if (chain === 'solana') {
-    return `https://gmgn.ai/sol/token/${token}`
-  } else if (chain === 'tron') {
-    return `https://gmgn.ai/tron/token/${token}`
-  } else if (chain === 'bsc') {
-    return `https://gmgn.ai/bsc/token/${token}`
-  } else {
-    logger.warn(`${chain} gmgn unsupported`)
-    return null
   }
+  if (chain === 'base') {
+    return `https://gmgn.ai/base/token/${token}`
+  }
+  if (chain === 'solana') {
+    return `https://gmgn.ai/sol/token/${token}`
+  }
+  if (chain === 'tron') {
+    return `https://gmgn.ai/tron/token/${token}`
+  }
+  if (chain === 'bsc') {
+    return `https://gmgn.ai/bsc/token/${token}`
+  }
+  logger.warn(`${chain} gmgn unsupported`)
+  return null
 }
 
 function getPhotonLink(chain: string, token: string) {
   if (chain === 'ethereum') {
     return `https://photon.tinyastro.io/en/lp/${token}`
-  } else if (chain === 'base') {
-    return `https://photon-base.tinyastro.io/en/lp/${token}`
-  } else if (chain === 'solana') {
-    return `https://photon-sol.tinyastro.io/en/lp/${token}`
-  } else if (chain === 'tron') {
-    return `https://photon-tron.tinyastro.io/en/lp/${token}`
-  } else {
-    logger.warn(`${chain} photon unsupported`)
-    return null
   }
+  if (chain === 'base') {
+    return `https://photon-base.tinyastro.io/en/lp/${token}`
+  }
+  if (chain === 'solana') {
+    return `https://photon-sol.tinyastro.io/en/lp/${token}`
+  }
+  if (chain === 'tron') {
+    return `https://photon-tron.tinyastro.io/en/lp/${token}`
+  }
+  logger.warn(`${chain} photon unsupported`)
+  return null
 }
 
 main()

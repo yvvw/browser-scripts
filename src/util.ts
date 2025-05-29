@@ -7,7 +7,7 @@ export async function getNotFalsyValue<R>(
   option?: { times?: number; interval?: number }
 ): Promise<NonNullable<R>> {
   let times = option?.times || 20
-  let interval = option?.interval || 500
+  const interval = option?.interval || 500
 
   while (true) {
     times--
@@ -20,10 +20,7 @@ export async function getNotFalsyValue<R>(
 }
 
 export class HTMLUtils {
-  static async query<N extends Node>(
-    queryElement: () => N | null,
-    option?: { times: number; interval: number }
-  ) {
+  static async query<N extends Node>(queryElement: () => N | null, option?: { times: number; interval: number }) {
     return getNotFalsyValue<N>(queryElement, { interval: 500, ...option })
   }
 
@@ -32,12 +29,12 @@ export class HTMLUtils {
   }
 
   static getFirstElementByXPath<E extends Element>(xpath: string, context?: Node): E | null {
-    const res = this.evaluate(xpath, context)
+    const res = HTMLUtils.evaluate(xpath, context)
     return res.snapshotLength > 0 ? (res.snapshotItem(0) as E) : null
   }
 
   static getElementsByXPath<E extends Element>(xpath: string, context?: Node): E[] {
-    const res = this.evaluate(xpath, context)
+    const res = HTMLUtils.evaluate(xpath, context)
     const items: E[] = []
     for (let i = 0; i < res.snapshotLength; i++) {
       items.push(res.snapshotItem(i) as E)
@@ -50,7 +47,7 @@ export class HTMLUtils {
     callback: (
       mutations: MutationRecord[],
       observer: MutationObserver
-    ) => boolean | void | Promise<boolean | void>,
+    ) => boolean | undefined | void | Promise<boolean | undefined | void>,
     options?: MutationObserverInit & { waiting?: boolean; throttle?: number }
   ): () => void {
     let running = false
@@ -131,7 +128,7 @@ export class Logger {
   static #console = console
 
   static new(ns: string): Logger {
-    return new this(ns)
+    return new Logger(ns)
   }
 
   constructor(private ns: string) {}

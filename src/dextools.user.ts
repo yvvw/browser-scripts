@@ -20,10 +20,9 @@ window.onload = function main() {
 }
 
 function closeAd() {
-  Array.from(document.querySelectorAll<HTMLSpanElement>('span'))
-    .filter((it) => it.innerText === 'Ad')
-    .forEach((el) => {
-      const btnEl = el.nextElementSibling as HTMLButtonElement | null
-      if (btnEl?.getAttribute('ariaLabel') === 'Close') btnEl.click()
-    })
+  const els = Array.from(document.querySelectorAll<HTMLSpanElement>('span')).filter((it) => it.innerText === 'Ad')
+  for (const el of els) {
+    const btnEl = el.nextElementSibling as HTMLButtonElement | null
+    if (btnEl?.getAttribute('ariaLabel') === 'Close') btnEl.click()
+  }
 }

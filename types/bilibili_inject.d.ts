@@ -29,5 +29,3 @@ export declare interface IBiliLivePlayer {
   }
   switchQuality(string): void
 }
-
-export {}

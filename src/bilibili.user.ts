@@ -19,7 +19,7 @@
 // ==/UserScript==
 
 import type { IBiliLivePlayer, IBiliPlayer, IBiliUser } from '../types/bilibili_inject'
-import { getNotFalsyValue, HTMLUtils, Logger } from './util'
+import { HTMLUtils, Logger, getNotFalsyValue } from './util'
 
 const logger = Logger.new('Better Bilibili')
 
@@ -53,11 +53,8 @@ class VideoPlayer implements IPlayer {
   }
 
   async switchWebFullscreen() {
-    const playerEl = await HTMLUtils.query(() =>
-      document.querySelector<HTMLElement>('.bpx-player-ctrl-web')
-    )
-    if (playerEl.classList.contains('bpx-state-entered'))
-      throw new Error('fullscreen button not found')
+    const playerEl = await HTMLUtils.query(() => document.querySelector<HTMLElement>('.bpx-player-ctrl-web'))
+    if (playerEl.classList.contains('bpx-state-entered')) throw new Error('fullscreen button not found')
     playerEl.click()
   }
 

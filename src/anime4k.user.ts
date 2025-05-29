@@ -44,10 +44,7 @@ class Anime4K {
     '6': 'Anime4K: C+A',
   }
 
-  #getPipelines(
-    preset: IAnime4KPipelinePreset,
-    descriptor: Anime4KPresetPipelineDescriptor
-  ): Anime4KPipeline[] {
+  #getPipelines(preset: IAnime4KPipelinePreset, descriptor: Anime4KPresetPipelineDescriptor): Anime4KPipeline[] {
     switch (preset) {
       case 'Anime4K: A':
         return [new ModeA(descriptor)]
@@ -99,12 +96,8 @@ class Anime4K {
       async (video: HTMLVideoElement) => {
         const { clientWidth: rectWidth, clientHeight: rectHeight } = video.parentElement!
         const rectAspectRatio = rectWidth / rectHeight
-        const canvasWidth = Math.ceil(
-          rectAspectRatio < videoAspectRatio ? rectWidth : rectHeight * videoAspectRatio
-        )
-        const canvasHeight = Math.ceil(
-          videoAspectRatio < rectAspectRatio ? rectHeight : rectWidth / videoAspectRatio
-        )
+        const canvasWidth = Math.ceil(rectAspectRatio < videoAspectRatio ? rectWidth : rectHeight * videoAspectRatio)
+        const canvasHeight = Math.ceil(videoAspectRatio < rectAspectRatio ? rectHeight : rectWidth / videoAspectRatio)
         canvas.width = canvasWidth
         canvas.height = canvasHeight
         canvas.style.setProperty('left', `${(rectWidth - canvasWidth) / 2}px`)
@@ -124,7 +117,7 @@ class Anime4K {
       if (!(entry.target instanceof HTMLVideoElement)) return this.#clear()
       render(entry.target)
     })
-    this.#resizeObserver!.observe(video)
+    this.#resizeObserver?.observe(video)
 
     render(video)
 
@@ -141,7 +134,9 @@ class Anime4K {
     video: HTMLVideoElement
   }) {
     if (video.readyState < video.HAVE_FUTURE_DATA) {
-      await new Promise((resolve) => (video.onloadeddata = resolve))
+      await new Promise((resolve) => {
+        video.onloadeddata = resolve
+      })
     }
 
     const { videoWidth, videoHeight } = video
@@ -155,10 +150,7 @@ class Anime4K {
     const inputTexture = device.createTexture({
       size: [videoWidth, videoHeight, 1],
       format: 'rgba16float',
-      usage:
-        GPUTextureUsage.COPY_DST |
-        GPUTextureUsage.TEXTURE_BINDING |
-        GPUTextureUsage.RENDER_ATTACHMENT,
+      usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.RENDER_ATTACHMENT,
     })
 
     const pipelines = this.#getPipelines(preset, {
@@ -202,7 +194,7 @@ class Anime4K {
         },
         {
           binding: 2,
-          resource: pipelines.at(-1)!.getOutputTexture().createView(),
+          resource: pipelines.at(-1)?.getOutputTexture().createView() as GPUBindingResource,
         },
       ],
     })
@@ -214,13 +206,12 @@ class Anime4K {
       if (stop) return
 
       // update texture
-      device.queue.copyExternalImageToTexture({ source: video }, { texture: inputTexture }, [
-        videoWidth,
-        videoHeight,
-      ])
+      device.queue.copyExternalImageToTexture({ source: video }, { texture: inputTexture }, [videoWidth, videoHeight])
 
       const commandEncoder = device.createCommandEncoder()
-      pipelines.forEach((pipeline) => pipeline.pass(commandEncoder))
+      for (const pipeline of pipelines) {
+        pipeline.pass(commandEncoder)
+      }
 
       const renderPassEncoder = commandEncoder.beginRenderPass({
         colorAttachments: [
@@ -368,7 +359,7 @@ class Anime4K {
   }
 
   #destroyById(id: string) {
-    let el = document.getElementById(id)
+    const el = document.getElementById(id)
     if (el !== null) el.parentElement?.removeChild(el)
   }
 }

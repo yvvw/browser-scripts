@@ -23,17 +23,13 @@ window.onload = function main() {
 }
 
 function hideGift() {
-  HTMLUtils.query(() =>
-    HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[text()="屏蔽礼物特效"]')
-  )
+  HTMLUtils.query(() => HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[text()="屏蔽礼物特效"]'))
     .then((el) => (el.nextElementSibling! as HTMLDivElement).click())
     .catch((err) => logger.error('hideGift', err))
 }
 
 function switchWebFullscreen() {
-  HTMLUtils.query(() =>
-    HTMLUtils.getFirstElementByXPath<HTMLSpanElement>('//span[text()="网页全屏"]')
-  )
-    .then((el) => (el.parentElement!.parentElement!.nextElementSibling as HTMLDivElement).click())
+  HTMLUtils.query(() => HTMLUtils.getFirstElementByXPath<HTMLSpanElement>('//span[text()="网页全屏"]'))
+    .then((el) => (el.parentElement?.parentElement?.nextElementSibling as HTMLDivElement).click())
     .catch((err) => logger.error('switchWebFullscreen', err))
 }
