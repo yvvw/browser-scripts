@@ -2,14 +2,14 @@
 // @name         Better Axiom
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/axiom.user.ts
-// @version      0.0.1
+// @version      0.0.2
 // @description  添加外部跳转
 // @author       yvvw
 // @icon         https://axiom.trade/favicon.ico
 // @license      MIT
 // @updateURL    https://github.com/yvvw/browser-scripts/releases/download/latest/axiom.meta.js
 // @downloadURL  https://github.com/yvvw/browser-scripts/releases/download/latest/axiom.user.js
-// @match        https://axiom.trade/meme/*
+// @match        https://axiom.trade/*
 // @noframes
 // ==/UserScript==
 
@@ -28,7 +28,7 @@ function main() {
         logger.error(e)
       }
     },
-    { waiting: true, throttle: 500 }
+    { waiting: true, throttle: 200 }
   )
 }
 
