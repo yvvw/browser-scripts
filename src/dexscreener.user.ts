@@ -2,7 +2,7 @@
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/dexscreener.user.ts
-// @version      0.0.26
+// @version      0.0.27
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -64,6 +64,9 @@ async function addExternalLink() {
   if (links.pump) {
     containerEl.appendChild(createExternalLinkEl('pump', links.pump))
   }
+  if (links.axiom) {
+    containerEl.appendChild(createExternalLinkEl('axiom', links.axiom))
+  }
   if (links.gmgn) {
     containerEl.appendChild(createExternalLinkEl('gmgn', links.gmgn))
   }
@@ -123,6 +126,7 @@ function getExternalLinks(el: HTMLDivElement, chain: string) {
   return {
     swap: getSwapLink(chain, address),
     pump: getMemeLink(chain, address),
+    axiom: getAxiomLink(chain, address),
     gmgn: getGmGnLink(chain, address),
     photon: getPhotonLink(chain, address),
   }
@@ -156,6 +160,14 @@ function getMemeLink(chain: string, token: string) {
     return `https://four.meme/token/${token}`
   }
   logger.warn(`${chain} pump unsupported`)
+  return null
+}
+
+function getAxiomLink(chain: string, token: string) {
+  if (chain === 'solana') {
+    return `https://axiom.trade/t/${token}`
+  }
+  logger.warn(`${chain} axiom unsupported`)
   return null
 }
 
