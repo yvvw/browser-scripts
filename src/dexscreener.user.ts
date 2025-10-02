@@ -2,7 +2,7 @@
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/dexscreener.user.ts
-// @version      0.0.27
+// @version      0.0.28
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -61,18 +61,21 @@ async function addExternalLink() {
   if (links.swap) {
     containerEl.appendChild(createExternalLinkEl('swap', links.swap))
   }
-  if (links.pump) {
-    containerEl.appendChild(createExternalLinkEl('pump', links.pump))
-  }
-  if (links.axiom) {
-    containerEl.appendChild(createExternalLinkEl('axiom', links.axiom))
+  if (links.meme) {
+    containerEl.appendChild(createExternalLinkEl('meme', links.meme))
   }
   if (links.gmgn) {
     containerEl.appendChild(createExternalLinkEl('gmgn', links.gmgn))
   }
-  if (links.photon) {
-    containerEl.appendChild(createExternalLinkEl('photon', links.photon))
+  if (links.padre) {
+    containerEl.appendChild(createExternalLinkEl('padre', links.padre))
   }
+  // if (links.axiom) {
+  //   containerEl.appendChild(createExternalLinkEl('axiom', links.axiom))
+  // }
+  // if (links.photon) {
+  //   containerEl.appendChild(createExternalLinkEl('photon', links.photon))
+  // }
   bEl.insertBefore(containerEl, bEl.firstChild)
 
   await HTMLUtils.query(() => document.querySelector('div[data-external]'))
@@ -125,9 +128,10 @@ function getExternalLinks(el: HTMLDivElement, chain: string) {
 
   return {
     swap: getSwapLink(chain, address),
-    pump: getMemeLink(chain, address),
-    axiom: getAxiomLink(chain, address),
+    meme: getMemeLink(chain, address),
     gmgn: getGmGnLink(chain, address),
+    padre: getPadreLink(chain, address),
+    axiom: getAxiomLink(chain, address),
     photon: getPhotonLink(chain, address),
   }
 }
@@ -163,14 +167,6 @@ function getMemeLink(chain: string, token: string) {
   return null
 }
 
-function getAxiomLink(chain: string, token: string) {
-  if (chain === 'solana') {
-    return `https://axiom.trade/t/${token}`
-  }
-  logger.warn(`${chain} axiom unsupported`)
-  return null
-}
-
 function getGmGnLink(chain: string, token: string) {
   if (chain === 'ethereum') {
     return `https://gmgn.ai/eth/token/${token}`
@@ -188,6 +184,25 @@ function getGmGnLink(chain: string, token: string) {
     return `https://gmgn.ai/bsc/token/${token}`
   }
   logger.warn(`${chain} gmgn unsupported`)
+  return null
+}
+
+function getPadreLink(chain: string, token: string) {
+  if (chain === 'solana') {
+    return `https://trade.padre.gg/trade/solana/${token}`
+  }
+  if (chain === 'base') {
+    return `https://trade.padre.gg/trade/base/${token}`
+  }
+  logger.warn(`${chain} padre unsupported`)
+  return null
+}
+
+function getAxiomLink(chain: string, token: string) {
+  if (chain === 'solana') {
+    return `https://axiom.trade/t/${token}`
+  }
+  logger.warn(`${chain} axiom unsupported`)
   return null
 }
 
