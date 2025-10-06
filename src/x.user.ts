@@ -50,8 +50,8 @@ function autoTranslate() {
       buttonEl.click()
     }
   }
-  const contentEl = document.querySelector('div[data-testid="tweetText"]')
-  if (contentEl !== null) {
+  const contentEls = document.querySelectorAll('div[data-testid="tweetText"]')
+  for (const contentEl of contentEls) {
     const buttonEl = contentEl.parentElement?.querySelector('button') as HTMLElement
     if (buttonEl !== null && buttonEl.innerText === '翻译帖子') {
       buttonEl.click()
