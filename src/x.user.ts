@@ -2,7 +2,7 @@
 // @name         Better X(Twitter)
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/x.user.ts
-// @version      0.0.18
+// @version      0.0.19
 // @description  自动点翻译，自动屏蔽广告，快捷屏蔽、不感兴趣
 // @author       yvvw
 // @icon         https://abs.twimg.com/favicons/twitter.3.ico
@@ -16,7 +16,7 @@
 // @noframes
 // ==/UserScript==
 
-import { delay, HTMLUtils, Logger } from './util'
+import { HTMLUtils, Logger } from './util'
 
 const logger = Logger.new('Better X')
 
@@ -43,12 +43,20 @@ window.onload = function main() {
 }
 
 function autoTranslate() {
-  const spans = document.querySelectorAll('span')
-  spans.forEach((span) => {
-    if (span.textContent === '翻译帖子') {
-      span.parentElement?.click()
+  const unameEl = document.querySelector<HTMLDivElement>('div[data-testid="UserName"]')
+  if (unameEl !== null) {
+    const buttonEl = unameEl.nextElementSibling?.querySelector('button') as HTMLElement
+    if (buttonEl !== null && buttonEl.innerText === '翻译简介') {
+      buttonEl.click()
     }
-  })
+  }
+  const contentEl = document.querySelector('div[data-testid="tweetText"]')
+  if (contentEl !== null) {
+    const buttonEl = contentEl.parentElement?.querySelector('button') as HTMLElement
+    if (buttonEl !== null && buttonEl.innerText === '翻译帖子') {
+      buttonEl.click()
+    }
+  }
 }
 
 async function addExtraButtons(twitterEl: HTMLDivElement) {
@@ -65,16 +73,16 @@ async function addBlockButton(twitterEl: HTMLDivElement) {
   const block = async () => {
     moreBtn.click()
 
-    const btn = await HTMLUtils.query(() => document.querySelector<HTMLButtonElement>('div[data-testid="block"]'))
+    const btn = await HTMLUtils.query(() => document.querySelector<HTMLDivElement>('div[data-testid="block"]'))
     btn.click()
 
     const confirmBtn = await HTMLUtils.query(() =>
-      document.querySelector<HTMLButtonElement>('button[data-testid="confirmationSheetConfirm"]')
+      document.querySelector<HTMLElement>('button[data-testid="confirmationSheetConfirm"]')
     )
     confirmBtn.click()
 
     const laterBtn = await HTMLUtils.query(() =>
-      HTMLUtils.getFirstElementByXPath<HTMLButtonElement>('//button[contains(., "Maybe later")]')
+      HTMLUtils.getFirstElementByXPath<HTMLElement>('//button[contains(., "Maybe later")]')
     )
     laterBtn.click()
   }
@@ -111,12 +119,11 @@ async function addNotInterestedButton(twitterEl: HTMLDivElement) {
   const notInterested = async () => {
     moreBtn.click()
 
-    const btn = await HTMLUtils.query(() => document.querySelector<HTMLButtonElement>('div[role="menuitem"]'))
+    const btn = await HTMLUtils.query(() => document.querySelector<HTMLDivElement>('div[role="menuitem"]'))
 
     if (!(btn.innerText.includes('Not interested') || btn.innerText.includes('不感兴趣'))) {
       ;(
-        document.querySelector<HTMLButtonElement>('div[role="menu"]')?.parentElement
-          ?.firstElementChild as HTMLDivElement
+        document.querySelector<HTMLElement>('div[role="menu"]')?.parentElement?.firstElementChild as HTMLDivElement
       )?.click()
       return
     }
