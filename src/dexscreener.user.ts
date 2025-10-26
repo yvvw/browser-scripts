@@ -2,7 +2,7 @@
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/dexscreener.user.ts
-// @version      0.0.28
+// @version      0.0.29
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -144,7 +144,7 @@ function getSwapLink(chain: string, token: string) {
     return `https://app.uniswap.org/swap?chain=base&inputCurrency=ETH&outputCurrency=${token}`
   }
   if (chain === 'solana') {
-    return `https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${token}&inputMint=sol&outputMint=${token}`
+    return `https://jup.ag/?sell=So11111111111111111111111111111111111111112&buy=${token}`
   }
   if (chain === 'bsc') {
     return `https://pancakeswap.finance/swap?inputCurrency=BNB&outputCurrency=${token}`
