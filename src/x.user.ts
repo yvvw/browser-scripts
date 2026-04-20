@@ -2,7 +2,7 @@
 // @name         Better X(Twitter)
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/x.user.ts
-// @version      0.0.19
+// @version      0.0.20
 // @description  自动点翻译，自动屏蔽广告，快捷屏蔽、不感兴趣
 // @author       yvvw
 // @icon         https://abs.twimg.com/favicons/twitter.3.ico
@@ -20,7 +20,7 @@ import { HTMLUtils, Logger } from './util'
 
 const logger = Logger.new('Better X')
 
-window.onload = function main() {
+unsafeWindow.onload = function main() {
   HTMLUtils.observe(
     document.body,
     async () => {
@@ -43,18 +43,13 @@ window.onload = function main() {
 }
 
 function autoTranslate() {
-  const unameEl = document.querySelector<HTMLDivElement>('div[data-testid="UserName"]')
-  if (unameEl !== null) {
-    const buttonEl = unameEl.nextElementSibling?.querySelector('button') as HTMLElement
-    if (buttonEl !== null && buttonEl.innerText === '翻译简介') {
-      buttonEl.click()
-    }
-  }
-  const contentEls = document.querySelectorAll('div[data-testid="tweetText"]')
-  for (const contentEl of contentEls) {
-    const buttonEl = contentEl.parentElement?.querySelector('button') as HTMLElement
-    if (buttonEl !== null && buttonEl.innerText === '翻译帖子') {
-      buttonEl.click()
+  const contentEl = document.querySelector<HTMLDivElement>('article[data-testid="tweet"]')
+  const buttonEls = contentEl?.querySelectorAll('button')
+  if (buttonEls !== undefined) {
+    for (const buttonEl of buttonEls) {
+      if (buttonEl.ariaLabel === '显示翻译') {
+        buttonEl.click()
+      }
     }
   }
 }
