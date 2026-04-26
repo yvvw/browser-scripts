@@ -2,7 +2,7 @@
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/dexscreener.user.ts
-// @version      0.0.29
+// @version      0.0.30
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -67,15 +67,9 @@ async function addExternalLink() {
   if (links.gmgn) {
     containerEl.appendChild(createExternalLinkEl('gmgn', links.gmgn))
   }
-  if (links.padre) {
-    containerEl.appendChild(createExternalLinkEl('padre', links.padre))
+  if (links.binance) {
+    containerEl.appendChild(createExternalLinkEl('binance', links.binance))
   }
-  // if (links.axiom) {
-  //   containerEl.appendChild(createExternalLinkEl('axiom', links.axiom))
-  // }
-  // if (links.photon) {
-  //   containerEl.appendChild(createExternalLinkEl('photon', links.photon))
-  // }
   bEl.insertBefore(containerEl, bEl.firstChild)
 
   await HTMLUtils.query(() => document.querySelector('div[data-external]'))
@@ -130,9 +124,7 @@ function getExternalLinks(el: HTMLDivElement, chain: string) {
     swap: getSwapLink(chain, address),
     meme: getMemeLink(chain, address),
     gmgn: getGmGnLink(chain, address),
-    padre: getPadreLink(chain, address),
-    axiom: getAxiomLink(chain, address),
-    photon: getPhotonLink(chain, address),
+    binance: getBinanceLink(chain, address),
   }
 }
 
@@ -184,6 +176,20 @@ function getGmGnLink(chain: string, token: string) {
     return `https://gmgn.ai/bsc/token/${token}`
   }
   logger.warn(`${chain} gmgn unsupported`)
+  return null
+}
+
+function getBinanceLink(chain: string, token: string) {
+  if (chain === 'base') {
+    return `https://web3.binance.com/zh-CN/token/base/${token}`
+  }
+  if (chain === 'solana') {
+    return `https://web3.binance.com/zh-CN/token/sol/${token}`
+  }
+  if (chain === 'bsc') {
+    return `https://web3.binance.com/zh-CN/token/bsc/${token}`
+  }
+  logger.warn(`${chain} binance unsupported`)
   return null
 }
 
