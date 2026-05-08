@@ -2,7 +2,7 @@
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/dexscreener.user.ts
-// @version      0.0.32
+// @version      0.0.33
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -130,14 +130,16 @@ function getExternalLinks(el: HTMLDivElement, chain: string) {
 
 function getSwapLink(chain: string, token: string) {
   if (chain === 'ethereum') {
-    return `https://app.uniswap.org/swap?chain=ethereum&inputCurrency=ETH&outputCurrency=${token}`
+    // https://app.uniswap.org/swap?chain=ethereum&inputCurrency=ETH&outputCurrency=${token}
+    return `https://app.uniswap.org/explore/tokens/ethereum/${token}`
   }
   if (chain === 'base') {
     const chain = 8453
     return `https://matcha.xyz/trade?buyChain=${chain}&sellChain=${chain}&buyAddress=${token}&sellAddress=0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`
   }
   if (chain === 'solana') {
-    return `https://jup.ag/?sell=So11111111111111111111111111111111111111112&buy=${token}`
+    // https://jup.ag/?sell=So11111111111111111111111111111111111111112&buy=${token}
+    return `https://jup.ag/tokens/${token}`
   }
   if (chain === 'bsc') {
     return `https://pancakeswap.finance/swap?inputCurrency=BNB&outputCurrency=${token}`
