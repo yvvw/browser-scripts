@@ -2,7 +2,7 @@
 // @name         Better DEX Screener
 // @namespace    https://github.com/yvvw/browser-scripts
 // @homepageURL  https://github.com/yvvw/browser-scripts/blob/main/src/dexscreener.user.ts
-// @version      0.0.33
+// @version      0.0.34
 // @description  展开关注列表、添加外部跳转、关闭广告
 // @author       yvvw
 // @icon         https://dexscreener.com/favicon.ico
@@ -67,9 +67,6 @@ async function addExternalLink() {
   if (links.gmgn) {
     containerEl.appendChild(createExternalLinkEl('gmgn', links.gmgn))
   }
-  if (links.binance) {
-    containerEl.appendChild(createExternalLinkEl('binance', links.binance))
-  }
   bEl.insertBefore(containerEl, bEl.firstChild)
 
   await HTMLUtils.query(() => document.querySelector('div[data-external]'))
@@ -124,14 +121,14 @@ function getExternalLinks(el: HTMLDivElement, chain: string) {
     swap: getSwapLink(chain, address),
     meme: getMemeLink(chain, address),
     gmgn: getGmGnLink(chain, address),
-    binance: getBinanceLink(chain, address),
   }
 }
 
 function getSwapLink(chain: string, token: string) {
   if (chain === 'ethereum') {
     // https://app.uniswap.org/swap?chain=ethereum&inputCurrency=ETH&outputCurrency=${token}
-    return `https://app.uniswap.org/explore/tokens/ethereum/${token}`
+    const chain = 1
+    return `https://matcha.xyz/trade?buyChain=${chain}&sellChain=${chain}&buyAddress=${token}&sellAddress=0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`
   }
   if (chain === 'base') {
     const chain = 8453
@@ -142,7 +139,9 @@ function getSwapLink(chain: string, token: string) {
     return `https://jup.ag/tokens/${token}`
   }
   if (chain === 'bsc') {
-    return `https://pancakeswap.finance/swap?inputCurrency=BNB&outputCurrency=${token}`
+    // `https://pancakeswap.finance/swap?inputCurrency=BNB&outputCurrency=${token}`
+    const chain = 56
+    return `https://matcha.xyz/trade?buyChain=${chain}&sellChain=${chain}&buyAddress=${token}&sellAddress=0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`
   }
   logger.warn(`${chain} swap unsupported`)
   return null
